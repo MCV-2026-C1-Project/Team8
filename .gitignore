@@ -1,0 +1,8 @@
+data/
+descriptors/
+*.zip
+__pycache__/
+*.pyc
+results/*.pkl
+.pytest_cache/
+.venv/
