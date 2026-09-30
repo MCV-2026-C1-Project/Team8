@@ -32,16 +32,35 @@ Run the retrieval and evaluate mAP@1 and mAP@5 on the development set:
 ```
 python src/run_retrieval.py --descriptor hsv --measure hellinger
 python src/run_retrieval.py --descriptor ycbcr --measure chi2
+python src/run_retrieval.py --descriptor rgb --rgb-bins 16 16 16 --measure l1
+python src/run_retrieval.py --descriptor lab --lab-bins 16 16 16 --measure hellinger
+python src/run_retrieval.py --descriptor lab --measure wasserstein
 ```
 
 Save the test set results to a `.pkl` file for submission:
 
 ```
-python src/run_retrieval.py --descriptor hsv --measure hellinger --query-set qst1 --no-gt --output results/qst1_method1.pkl
+python src/run_retrieval.py --descriptor hsv --measure hellinger --query-set qst1 --no-gt --output results/QST1/method1/result.pkl
 ```
 
-- `--descriptor`: `hsv` or `ycbcr`
-- `--measure`: `euclidean`, `l1`, `chi2`, `intersection` or `hellinger`
+- `--descriptor`: `hsv`, `ycbcr`, `rgb` or `lab`
+- `--measure`: `euclidean`, `l1`, `chi2`, `intersection`, `hellinger` or `wasserstein`
 - `--k`: number of results returned per query (default 10)
 
 Descriptors are computed the first time a script needs them and cached in `descriptors/`. To compute them ahead of time, run `python src/compute_descriptors.py --data data/BBDD`. Run any script with `-h` to see the bin and range options.
+
+## Experiments
+
+```
+python src/run_experiments.py --output results/experiments.csv
+```
+
+Edit `EXPERIMENTS` in `src/run_experiments.py` to configure parameter grids.
+The default evaluates all four descriptors with the same six measures on QSD1
+and saves mAP@1/mAP@5 in a CSV. Add `--overwrite` to replace an existing CSV.
+
+## Tests
+
+```
+python -m pytest -q
+```

@@ -14,17 +14,18 @@ DATA_DIR = ROOT / "data"
 BBDD_DIR = DATA_DIR / "BBDD"
 
 
-def retrieve(query_desc, db_desc, db_ids, measure_name, k):
+def retrieve(query_desc, db_desc, db_ids, measure_name, k, channel_sizes=None):
     """For each query, the IDs of the k most similar database images.
 
     query_desc: (Q, D) query descriptors, rows in sorted query-file order.
     db_desc:    (N, D) database descriptors.
     db_ids:     (N,)   database image IDs; db_ids[i] is the image of row i.
+    channel_sizes: bins per channel, required only for Wasserstein.
     Returns a list of Q lists of k plain Python ints (BBDD IDs), most similar first.
     """
     results = []
     for q in query_desc:
-        rows = rank(q, db_desc, measure_name)[:k]        # row indices, best first
+        rows = rank(q, db_desc, measure_name, channel_sizes)[:k]  # row indices, best first
         results.append([int(i) for i in db_ids[rows]])   # rows -> image IDs, np.int64 -> int
     return results
 

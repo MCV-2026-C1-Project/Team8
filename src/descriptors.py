@@ -13,6 +13,8 @@ from tqdm import tqdm
 
 YCBCR_DEFAULTS = dict(bins=(8, 32, 32), y_range=(0, 256), chroma_range=(0, 256))
 HSV_DEFAULTS = dict(bins=(32, 16, 8), s_min=40, v_min=40)
+RGB_DEFAULTS = dict(bins=(16, 16, 16))
+LAB_DEFAULTS = dict(bins=(16, 16, 16))
 
 
 # ----------------------------------------------------------------------------
@@ -84,8 +86,29 @@ def hsv_hist(img_bgr, bins=HSV_DEFAULTS["bins"], s_min=HSV_DEFAULTS["s_min"],
     ])
 
 
-METHODS = {"ycbcr": ycbcr_hist, "hsv": hsv_hist}
-DEFAULTS = {"ycbcr": YCBCR_DEFAULTS, "hsv": HSV_DEFAULTS}
+def _three_channel_hist(image, bins):
+    """Concatenate normalised 1D histograms of three uint8 channels."""
+    if len(bins) != 3 or any(int(b) != b or b <= 0 for b in bins):
+        raise ValueError("bins must contain three positive integers")
+    return np.concatenate([
+        _norm(_hist(channel, size, (0, 256)))
+        for channel, size in zip(cv2.split(image), bins)
+    ])
+
+
+def rgb_hist(img_bgr, bins=RGB_DEFAULTS["bins"]):
+    """Independent 1D histograms in true R, G, B order, each summing to 1."""
+    return _three_channel_hist(cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB), bins)
+
+
+def lab_hist(img_bgr, bins=LAB_DEFAULTS["bins"]):
+    """L, a, b histograms using OpenCV uint8 Lab encoding (all in [0, 256))."""
+    return _three_channel_hist(cv2.cvtColor(img_bgr, cv2.COLOR_BGR2Lab), bins)
+
+
+METHODS = {"ycbcr": ycbcr_hist, "hsv": hsv_hist, "rgb": rgb_hist, "lab": lab_hist}
+DEFAULTS = {"ycbcr": YCBCR_DEFAULTS, "hsv": HSV_DEFAULTS,
+            "rgb": RGB_DEFAULTS, "lab": LAB_DEFAULTS}
 
 
 def full_params(method, **params):
