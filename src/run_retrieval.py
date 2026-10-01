@@ -30,13 +30,18 @@ def main():
     ap.add_argument("--hsv-bins", type=int, nargs=3, default=DEFAULTS["hsv"]["bins"], metavar=("H", "S", "V"))
     ap.add_argument("--s-min", type=int, default=DEFAULTS["hsv"]["s_min"])
     ap.add_argument("--v-min", type=int, default=DEFAULTS["hsv"]["v_min"])
+    ap.add_argument("--hue-valid-weight", action="store_true", default=DEFAULTS["hsv"]["hue_valid_weight"],
+                    help="HSV only: scale Hue by the fraction of valid pixels")
+    ap.add_argument("--hue-smoothing", action="store_true", default=DEFAULTS["hsv"]["hue_smoothing"],
+                    help="HSV only: circularly smooth the Hue histogram")
     ap.add_argument("--rgb-bins", type=int, nargs=3, default=DEFAULTS["rgb"]["bins"], metavar=("R", "G", "B"))
     ap.add_argument("--lab-bins", type=int, nargs=3, default=DEFAULTS["lab"]["bins"], metavar=("L", "A", "B"))
     args = ap.parse_args()
 
     params = {
         "ycbcr": dict(bins=tuple(args.ycbcr_bins), chroma_range=tuple(args.chroma_range)),
-        "hsv": dict(bins=tuple(args.hsv_bins), s_min=args.s_min, v_min=args.v_min),
+        "hsv": dict(bins=tuple(args.hsv_bins), s_min=args.s_min, v_min=args.v_min,
+                    hue_valid_weight=args.hue_valid_weight, hue_smoothing=args.hue_smoothing),
         "rgb": dict(bins=tuple(args.rgb_bins)),
         "lab": dict(bins=tuple(args.lab_bins)),
     }[args.descriptor]

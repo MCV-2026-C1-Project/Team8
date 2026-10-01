@@ -1,8 +1,8 @@
 """1D per-channel colour histogram descriptors (Week 1, Task 1).
 
 All descriptors are concatenations of independent 1D histograms, one per
-channel, each normalised to sum to 1. No joint (2D/3D) or spatial histograms
-and no preprocessing (e.g. equalisation) are applied.
+channel, each normalised to sum to 1 by default. No joint (2D/3D)
+or spatial histograms and no image preprocessing (e.g. equalisation) are applied.
 """
 import re
 from pathlib import Path
@@ -12,7 +12,8 @@ import numpy as np
 from tqdm import tqdm
 
 YCBCR_DEFAULTS = dict(bins=(8, 32, 32), y_range=(0, 256), chroma_range=(0, 256))
-HSV_DEFAULTS = dict(bins=(32, 16, 8), s_min=40, v_min=40)
+HSV_DEFAULTS = dict(bins=(16, 16, 8), s_min=20, v_min=40,
+                    hue_valid_weight=True, hue_smoothing=False)
 RGB_DEFAULTS = dict(bins=(16, 16, 16))
 LAB_DEFAULTS = dict(bins=(8, 64, 64))
 
@@ -69,18 +70,26 @@ def ycbcr_hist(img_bgr, bins=YCBCR_DEFAULTS["bins"], y_range=YCBCR_DEFAULTS["y_r
 
 
 def hsv_hist(img_bgr, bins=HSV_DEFAULTS["bins"], s_min=HSV_DEFAULTS["s_min"],
-             v_min=HSV_DEFAULTS["v_min"]):
+             v_min=HSV_DEFAULTS["v_min"], hue_valid_weight=HSV_DEFAULTS["hue_valid_weight"],
+             hue_smoothing=HSV_DEFAULTS["hue_smoothing"]):
     """Concatenated 1D histograms of H, S, V.
 
     H (range 0-180 in OpenCV) is computed only over pixels with S > s_min and
     V > v_min, since hue is unreliable for dark / grey pixels. S and V use all
-    pixels.
+    pixels. Optional circular smoothing uses [1/4, 1/2, 1/4] on normalised H;
+    optional valid-Hue weighting then scales H by the fraction of valid pixels.
+    Both options leave S/V unchanged and preserve the baseline when disabled.
     """
     hsv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV)
     h, s, v = cv2.split(hsv)
     mask = ((s > s_min) & (v > v_min)).astype(np.uint8) * 255
+    hist_h = _norm(_hist(h, bins[0], (0, 180), mask))
+    if hue_smoothing:
+        hist_h = 0.25 * np.roll(hist_h, 1) + 0.5 * hist_h + 0.25 * np.roll(hist_h, -1)
+    if hue_valid_weight:
+        hist_h *= np.count_nonzero(mask) / mask.size
     return np.concatenate([
-        _norm(_hist(h, bins[0], (0, 180), mask)),
+        hist_h,
         _norm(_hist(s, bins[1], (0, 256))),
         _norm(_hist(v, bins[2], (0, 256))),
     ])
@@ -134,6 +143,10 @@ def method_tag(method, **params):
     elif method == "hsv":
         if (p["s_min"], p["v_min"]) != (HSV_DEFAULTS["s_min"], HSV_DEFAULTS["v_min"]):
             tag += f"_s{p['s_min']}v{p['v_min']}"
+        if p["hue_valid_weight"]:
+            tag += "_hweight"
+        if p["hue_smoothing"]:
+            tag += "_hsmooth"
     return tag
 
 

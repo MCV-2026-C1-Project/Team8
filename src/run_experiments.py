@@ -18,19 +18,26 @@ from retrieval import BBDD_DIR, DATA_DIR, DESC_DIR, ROOT, load_gt, load_or_compu
 
 # Cartesian products within each entry; entries and choices retain their order.
 # To expand HSV, e.g.: "bins": [(32, 16, 8), (16, 16, 16)], "s_min": [20, 40].
+# Use [False, True] for either Hue option to compare enabled/disabled variants.
 COMMON_MEASURES = list(MEASURES)
 
 EXPERIMENTS = [
-    dict(descriptor="hsv", grid={"bins": [DEFAULTS["hsv"]["bins"]],
-                               "s_min": [DEFAULTS["hsv"]["s_min"]],
-                               "v_min": [DEFAULTS["hsv"]["v_min"]]},
-         measures=COMMON_MEASURES),
-    dict(descriptor="ycbcr", grid={"bins": [DEFAULTS["ycbcr"]["bins"]]},
-         measures=COMMON_MEASURES),
-    dict(descriptor="rgb", grid={"bins": [DEFAULTS["rgb"]["bins"]]},
-         measures=COMMON_MEASURES),
-    dict(descriptor="lab", grid={"bins": [DEFAULTS["lab"]["bins"]]},
-         measures=COMMON_MEASURES),
+    dict(
+        descriptor="hsv",
+        grid={
+            "bins": [
+                (16, 16, 8),
+                (32, 16, 8),
+                (32, 32, 16),
+                (64, 32, 16),
+            ],
+            "s_min": [20, 40, 60],
+            "v_min": [20, 40, 60],
+            "hue_valid_weight": [False, True],
+            "hue_smoothing": [False, True],
+        },
+        measures=COMMON_MEASURES,
+    ),
 ]
 
 FIELDS = ["descriptor", "bins", "parameters", "measure", "map1", "map5"]
