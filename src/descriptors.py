@@ -14,7 +14,7 @@ from tqdm import tqdm
 YCBCR_DEFAULTS = dict(bins=(8, 32, 32), y_range=(0, 256), chroma_range=(0, 256))
 HSV_DEFAULTS = dict(bins=(32, 16, 8), s_min=40, v_min=40)
 RGB_DEFAULTS = dict(bins=(16, 16, 16))
-LAB_DEFAULTS = dict(bins=(16, 16, 16))
+LAB_DEFAULTS = dict(bins=(8, 64, 64))
 
 
 # ----------------------------------------------------------------------------
