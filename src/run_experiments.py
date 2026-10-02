@@ -23,22 +23,45 @@ COMMON_MEASURES = list(MEASURES)
 
 EXPERIMENTS = [
     dict(
-        descriptor="hsv",
+        descriptor="rgb",
         grid={
             "bins": [
+                (8, 8, 8),
+                (8, 16, 16),
+                (16, 8, 8),
                 (16, 16, 8),
+                (16, 16, 16),
+                (16, 16, 32),
+                (16, 32, 16),
                 (32, 16, 8),
+                (32, 16, 16),
                 (32, 32, 16),
                 (64, 32, 16),
-            ],
-            "s_min": [20, 40, 60],
-            "v_min": [20, 40, 60],
-            "hue_valid_weight": [False, True],
-            "hue_smoothing": [False, True],
+                (64, 64, 32),
+            ]
         },
         measures=COMMON_MEASURES,
     ),
 ]
+
+# EXPERIMENTS = [
+#     dict(
+#         descriptor="hsv",
+#         grid={
+#             "bins": [
+#                 (16, 16, 8),
+#                 (32, 16, 8),
+#                 (32, 32, 16),
+#                 (64, 32, 16),
+#             ],
+#             "s_min": [20, 40, 60],
+#             "v_min": [20, 40, 60],
+#             "hue_valid_weight": [False, True],
+#             "hue_smoothing": [False, True],
+#         },
+#         measures=COMMON_MEASURES,
+#     ),
+# ]
 
 FIELDS = ["descriptor", "bins", "parameters", "measure", "map1", "map5"]
 
