@@ -61,8 +61,9 @@ For HSV, set `hue_valid_weight` and/or `hue_smoothing` to `[False, True]` to swe
 The default evaluates all four descriptors with the same six measures on QSD1
 and saves mAP@1/mAP@5 in a CSV. Add `--overwrite` to replace an existing CSV.
 
-## Tests
+Optional rank fusion uses one fixed configuration per descriptor:
 
 ```
-python -m pytest -q
+python src/run_experiments.py --fusion --fusion-descriptor hsv --smoke --output results/hsv_fusion_smoke_general.csv
+python src/run_experiments.py --fusion --fusion-descriptor rgb --output results/rgb_fusion_general.csv
 ```

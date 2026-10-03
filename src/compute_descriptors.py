@@ -7,9 +7,8 @@ Examples:
 import argparse
 from pathlib import Path
 
-import numpy as np
-
 from descriptors import METHODS, DEFAULTS, compute_folder, method_tag
+from retrieval import save_descriptor_cache
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -25,9 +24,9 @@ def main():
     ap.add_argument("--hsv-bins", type=int, nargs=3, default=DEFAULTS["hsv"]["bins"], metavar=("H", "S", "V"))
     ap.add_argument("--s-min", type=int, default=DEFAULTS["hsv"]["s_min"])
     ap.add_argument("--v-min", type=int, default=DEFAULTS["hsv"]["v_min"])
-    ap.add_argument("--hue-valid-weight", action="store_true", default=DEFAULTS["hsv"]["hue_valid_weight"],
+    ap.add_argument("--hue-valid-weight", argparse.BooleanOptionalAction, default=DEFAULTS["hsv"]["hue_valid_weight"],
                     help="HSV only: scale Hue by the fraction of valid pixels")
-    ap.add_argument("--hue-smoothing", action="store_true", default=DEFAULTS["hsv"]["hue_smoothing"],
+    ap.add_argument("--hue-smoothing", action=argparse.BooleanOptionalAction, default=DEFAULTS["hsv"]["hue_smoothing"],
                     help="HSV only: circularly smooth the Hue histogram")
     ap.add_argument("--rgb-bins", type=int, nargs=3, default=DEFAULTS["rgb"]["bins"], metavar=("R", "G", "B"))
     ap.add_argument("--lab-bins", type=int, nargs=3, default=DEFAULTS["lab"]["bins"], metavar=("L", "A", "B"))
@@ -49,7 +48,7 @@ def main():
     for m in methods:
         ids, desc = compute_folder(args.data, m, **params[m])
         path = out / f"{name}_{method_tag(m, **params[m])}.npz"
-        np.savez(path, ids=ids, desc=desc)
+        save_descriptor_cache(path, ids, desc, m, params[m])
         print(f"Saved {path}  ids={ids.shape}  desc={desc.shape} {desc.dtype}")
 
 
