@@ -128,25 +128,19 @@ def full_params(method, **params):
 
 
 def method_tag(method, **params):
-    """Filename tag encoding method and parameters, e.g. 'ycbcr_8-32-32'.
-
-    Non-default ranges/thresholds are appended, e.g. 'ycbcr_8-32-32_c64-192'
-    or 'hsv_32-16-8_s30v50'.
-    """
+    """Canonical tag encoding every effective parameter, independent of defaults."""
     p = full_params(method, **params)
+    def number(value):
+        return str(int(value)) if value == int(value) else str(float(value))
+
     tag = f"{method}_" + "-".join(str(int(b)) for b in p["bins"])
     if method == "ycbcr":
-        if tuple(p["y_range"]) != YCBCR_DEFAULTS["y_range"]:
-            tag += "_y{}-{}".format(*p["y_range"])
-        if tuple(p["chroma_range"]) != YCBCR_DEFAULTS["chroma_range"]:
-            tag += "_c{}-{}".format(*p["chroma_range"])
+        tag += "_y" + "-".join(number(v) for v in p["y_range"])
+        tag += "_c" + "-".join(number(v) for v in p["chroma_range"])
     elif method == "hsv":
-        if (p["s_min"], p["v_min"]) != (HSV_DEFAULTS["s_min"], HSV_DEFAULTS["v_min"]):
-            tag += f"_s{p['s_min']}v{p['v_min']}"
-        if p["hue_valid_weight"]:
-            tag += "_hweight"
-        if p["hue_smoothing"]:
-            tag += "_hsmooth"
+        tag += f"_s{number(p['s_min'])}v{number(p['v_min'])}"
+        tag += f"_hw{int(p['hue_valid_weight'])}"
+        tag += f"_hs{int(p['hue_smoothing'])}"
     return tag
 
 
