@@ -1,15 +1,14 @@
-"""Generate publication-ready figures for Week 1 image retrieval results (CIELab & HSV).
+"""Generate plots for image retrieval results (CIELab & HSV).
 
 Outputs saved to plots/:
   - lab_distances_comparison.png : Grouped bar plot (mAP@1 & mAP@5) across measures for Lab 8-64-64.
   - lab_top10_bins.png           : Grouped bar plot of top-10 CIELab setups.
-  - lab_lightness_effect.png     : Grouped bar plot showing Lightness (L) suppression effect.
   - lab_measures_heatmap.png     : Heatmap of (bins x measures) across mAP@5 for CIELab.
   - hsv_distances_comparison.png : Grouped bar plot across measures for top HSV bins.
   - hsv_top10_configs.png        : Grouped bar plot of top-10 HSV configurations.
-  - hsv_parameters_effect.png    : Grouped bar plot showing effect of HSV weighting & smoothing.
   - hsv_measures_heatmap.png     : Heatmap of (bins x measures) across mAP@5 for HSV.
 """
+
 from pathlib import Path
 import ast
 import json
@@ -24,7 +23,7 @@ PLOTS_DIR = ROOT / "plots"
 
 
 def setup_style():
-    """Apply consistent styling for scientific reporting."""
+    """Apply consistent styling."""
     sns.set_theme(style="whitegrid", font_scale=1.05)
     plt.rcParams.update({
         "figure.autolayout": True,
@@ -50,9 +49,6 @@ def annotate_bars(ax, fmt="{:.2f}", fontsize=8.5, offset=2):
             )
 
 
-# -----------------------------------------------------------------------------
-# Common Plots: Distances & Top-10
-# -----------------------------------------------------------------------------
 def plot_distances_for_descriptor(df, out_dir, desc_name, target_bins):
     """Grouped bar plot comparing all distance measures for a fixed bin setup."""
     subset = df[(df["descriptor"] == desc_name) & (df["bins"] == target_bins)].copy()
@@ -191,9 +187,7 @@ def plot_measures_heatmap(df, out_dir, desc_name):
 
 
 
-# -----------------------------------------------------------------------------
 # Main Execution
-# -----------------------------------------------------------------------------
 def load_all_results():
     """Load and merge all CSVs found in config_results/."""
     dfs = []
@@ -214,14 +208,14 @@ def main():
 
     df = load_all_results()
 
-    # 1. CIELab Visualizations
+    # CIELab Visualizations
     if "lab" in df["descriptor"].values:
         print("Generating CIELab plots...")
         plot_distances_for_descriptor(df, PLOTS_DIR, desc_name="lab", target_bins="8-64-64")
         plot_top10_configurations(df, PLOTS_DIR, desc_name="lab")
         plot_measures_heatmap(df, PLOTS_DIR, desc_name="lab")
 
-    # 2. HSV Visualizations
+    # HSV Visualizations
     if "hsv" in df["descriptor"].values:
         print("Generating HSV plots...")
         plot_distances_for_descriptor(df, PLOTS_DIR, desc_name="hsv", target_bins="16-16-8")
