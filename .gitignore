@@ -4,5 +4,6 @@ descriptors/
 __pycache__/
 *.pyc
 results/*.pkl
+results/**/*.pkl
 .pytest_cache/
 .venv/

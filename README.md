@@ -8,40 +8,44 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-## Data
+Extract the course zips into `data/` (git-ignored): `data/BBDD/`, `data/qsd1_w1/` (with `gt_corresps.pkl`) and `data/qst1_w1/`.
 
-Download the course zips and extract them into `data/`, one folder per zip:
-
-- `BBDD.zip` → `data/BBDD/` (museum database)
-- `qsd1_w1.zip` → `data/qsd1_w1/` (development queries + `gt_corresps.pkl`)
-- `qst1_w1.zip` → `data/qst1_w1/` (test queries, no ground truth)
-
-```
-data/
-├── BBDD/        bbdd_00000.jpg, ...
-├── qsd1_w1/     00000.jpg, ..., gt_corresps.pkl
-└── qst1_w1/     00000.jpg, ...
-```
-
-`data/` and the zips are git-ignored.
-
-## Run
-
-Run the retrieval and evaluate mAP@1 and mAP@5 on the development set:
+## Retrieval
 
 ```
 python src/run_retrieval.py --descriptor hsv --measure hellinger
-python src/run_retrieval.py --descriptor ycbcr --measure chi2
+python src/run_retrieval.py --descriptor hsv --measure hellinger --query-set qst1 --no-gt --output results/QST1/method2/result.pkl
 ```
 
-Save the test set results to a `.pkl` file for submission:
+- `--descriptor`: `hsv`, `hsv_baseline`, `ycbcr`, `rgb`, `lab`
+- `--measure`: `euclidean`, `l1`, `chi2`, `intersection`, `hellinger`, `wasserstein`
+
+Each descriptor concatenates one normalised 1D histogram per channel. Default bins:
+
+| Descriptor     | Bins        | Other defaults |
+|----------------|-------------|----------------|
+| `hsv` (method 2) | 16-16-16    | Hue counts only pixels with S > 10 and V > 40; Hue not rescaled, no smoothing |
+| `hsv_baseline` (method 1) | 180-256-256 | One bin per value, no mask |
+| `ycbcr`        | 8-32-32     | Full 0-256 range, no chroma overflow bins |
+| `rgb`          | 8-8-8       | — |
+| `lab`          | 8-64-64     | — |
+
+Descriptors are cached in `descriptors/` (or precomputed with `src/compute_descriptors.py`). Use `-h` on any script for bin/range options.
+
+## Experiments
 
 ```
-python src/run_retrieval.py --descriptor hsv --measure hellinger --query-set qst1 --no-gt --output results/qst1_method1.pkl
+python src/run_experiments.py --grid {default,lab,ycbcr} --output config_results/<name>.csv
+python src/run_experiments.py --fusion --fusion-descriptor {hsv,rgb,lab,ycbcr} --output <file>.csv
+python src/sweep_hsv.py --output config_results/hsv_sweep.csv
 ```
 
-- `--descriptor`: `hsv`, `hsv_baseline`, `rgb`, `lab` or `ycbcr`
-- `--measure`: `euclidean`, `l1`, `chi2`, `intersection`, `hellinger` or `wasserstein`
-- `--k`: number of results returned per query (default 10)
+Sweep results are in `config_results/`, other results in `results/`, and `notebooks/max_config.ipynb` picks the best configurations.
 
-Descriptors are computed the first time a script needs them and cached in `descriptors/`. To compute them ahead of time, run `python src/compute_descriptors.py --data data/BBDD`. Run any script with `-h` to see the bin and range options.
+## Plots
+
+Scripts in `src/visualizations/` write to `plots/`:
+
+- `plot_best_comparison.py`: all measures for the best config of each descriptor
+- `plot_hsv_histograms.py <id>` / `plot_hue_mask.py <id>`: per-image HSV descriptor and hue mask
+- `plot_results.py`, `plot_example_descriptors.py`: report figures
