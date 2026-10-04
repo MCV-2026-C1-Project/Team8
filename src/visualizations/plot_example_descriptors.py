@@ -1,8 +1,8 @@
-"""Generate illustrative plots of the 1D concatenated descriptors used for retrieval.
+"""Generate plots of the 1D concatenated descriptors used for retrieval.
 
 Outputs saved to plots/:
   - example_descriptor_cielab.png : Image + 1D concatenated CIELab (8-64-64) descriptor.
-  - example_descriptor_hsv.png    : Image + 1D concatenated HSV (16-16-8) descriptor.
+  - example_descriptor_hsv.png    : Image + 1D concatenated HSV (16-16-16) descriptor.
 """
 from pathlib import Path
 import cv2
@@ -26,9 +26,8 @@ def get_sample_image():
     return found[0]
 
 
-# -----------------------------------------------------------------------------
+
 # 1. CIELab Descriptor (8, 64, 64)
-# -----------------------------------------------------------------------------
 def plot_cielab_example(img_bgr, img_name, out_dir):
     lab = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2LAB)
     bins = (8, 64, 64)
@@ -78,12 +77,11 @@ def plot_cielab_example(img_bgr, img_name, out_dir):
     print(f"Saved: {out_path}")
 
 
-# -----------------------------------------------------------------------------
-# 2. HSV Descriptor (16, 16, 8) with Hue Valid Weighting
-# -----------------------------------------------------------------------------
-def plot_hsv_example(img_bgr, img_name, out_dir, s_min=20, v_min=40):
+
+# HSV Descriptor (16, 16, 16)
+def plot_hsv_example(img_bgr, img_name, out_dir, s_min=10, v_min=40, hue_valid_weight=False):
     hsv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV)
-    bins = (16, 16, 8)
+    bins = (16, 16, 16)
 
     # OpenCV Hue is in [0, 180), S and V in [0, 256)
     H = hsv[:, :, 0]
@@ -92,11 +90,14 @@ def plot_hsv_example(img_bgr, img_name, out_dir, s_min=20, v_min=40):
 
     # Valid chromatic pixels mask
     valid_mask = (S >= s_min) & (V >= v_min)
-    chromatic_weight = float(np.mean(valid_mask))
 
     h_H = cv2.calcHist([H], [0], valid_mask.astype(np.uint8), [bins[0]], [0, 180]).flatten()
+    
     if h_H.sum() > 0:
-        h_H = (h_H / h_H.sum()) * chromatic_weight
+        h_H = (h_H / h_H.sum()) 
+        if hue_valid_weight:
+            chromatic_weight = float(np.mean(valid_mask))
+            h_H *= chromatic_weight
 
     h_S = cv2.calcHist([S], [0], None, [bins[1]], [0, 256]).flatten()
     if h_S.sum() > 0:
