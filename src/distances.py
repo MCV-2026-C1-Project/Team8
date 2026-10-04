@@ -1,4 +1,4 @@
-"""Distance / similarity measures between histogram descriptors (Week 1, Task 2).
+"""Distance / similarity measures between histogram descriptors.
 
 Every measure compares ONE query descriptor q (shape D) against the WHOLE
 database db (shape N x D) and returns N scores, one per database image.

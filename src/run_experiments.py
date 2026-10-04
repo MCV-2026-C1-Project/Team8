@@ -2,6 +2,7 @@
 
 Edit EXPERIMENTS below: each grid value is a list of choices; bins are tuples.
 Run: python src/run_experiments.py --output results/experiments.csv
+Named sweeps: --grid lab or --grid ycbcr (see GRIDS).
 An existing output is only replaced when --overwrite is supplied.
 """
 import argparse
@@ -82,6 +83,25 @@ EXPERIMENTS = [
 #         measures=COMMON_MEASURES,
 #     ),
 # ]
+
+# Bin settings of the CIELab sweep (config_results/cielab_experiments.csv),
+# reused for YCbCr so both colour spaces are compared on the same grid.
+LAB_BINS = [(8, 8, 8), (16, 16, 16), (32, 32, 32), (64, 64, 64),
+            (4, 32, 32), (8, 32, 32), (16, 32, 32), (8, 64, 64)]
+
+LAB_EXPERIMENTS = [
+    dict(descriptor="lab", grid={"bins": LAB_BINS}, measures=COMMON_MEASURES),
+]
+
+# Cr/Cb concentrate around 128, so narrower chroma ranges are also tried.
+YCBCR_EXPERIMENTS = [
+    dict(descriptor="ycbcr", grid={"bins": LAB_BINS,
+                                   "chroma_range": [(0, 256), (64, 192), (96, 160)],
+                                   "chroma_overflow": [False, True]},
+         measures=COMMON_MEASURES),
+]
+
+GRIDS = {"default": EXPERIMENTS, "lab": LAB_EXPERIMENTS, "ycbcr": YCBCR_EXPERIMENTS}
 
 FIELDS = ["descriptor", "bins", "parameters", "measure", "map1", "map5"]
 
@@ -300,6 +320,7 @@ def main():
     ap.add_argument("--fusion-descriptor", choices=list(FUSION_DESCRIPTOR_PARAMS), default="hsv")
     ap.add_argument("--smoke", action="store_true", help="With --fusion: two baselines and one equal-weight fusion")
     ap.add_argument("--overwrite", action="store_true", help="Replace an existing output CSV")
+    ap.add_argument("--grid", choices=list(GRIDS), default="default", help="Experiment grid to run")
     args = ap.parse_args()
     if args.smoke and not args.fusion:
         ap.error("--smoke requires --fusion")
@@ -309,7 +330,7 @@ def main():
     if args.output.exists() and not args.overwrite:
         ap.error(f"{args.output} already exists; use --overwrite to replace it")
     rows = (run_fusion_experiments(smoke=args.smoke, descriptor=args.fusion_descriptor)
-            if args.fusion else run_experiments(EXPERIMENTS))
+            if args.fusion else run_experiments(GRIDS[args.grid]))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("w" if args.overwrite else "x", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=FUSION_FIELDS if args.fusion else FIELDS)

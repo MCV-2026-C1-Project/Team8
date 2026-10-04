@@ -1,4 +1,4 @@
-"""Mean Average Precision at K (mAP@K) (Week 1, Task 3).
+"""Mean Average Precision at K (mAP@K).
 
 apk / mapk reproduce the logic of the reference implementation by Ben Hamner:
 https://github.com/benhamner/Metrics  (Python/ml_metrics/average_precision.py)

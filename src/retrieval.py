@@ -6,7 +6,7 @@ from zipfile import BadZipFile
 
 import numpy as np
 
-from descriptors import compute_folder, full_params, method_tag
+from descriptors import channel_sizes, compute_folder, full_params, method_tag
 from distances import rank
 from metrics import normalize_gt
 
@@ -64,7 +64,7 @@ def load_or_compute(name, folder, method, params, desc_dir=DESC_DIR):
                     raise ValueError("descriptor identity does not match the requested configuration")
                 ids, desc = d["ids"], d["desc"]
                 if (ids.ndim != 1 or desc.ndim != 2 or
-                        desc.shape != (len(ids), sum(params["bins"])) or
+                        desc.shape != (len(ids), sum(channel_sizes(method, **params))) or
                         not np.issubdtype(ids.dtype, np.integer) or
                         not np.isfinite(desc).all()):
                     raise ValueError("invalid descriptor arrays")

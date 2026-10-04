@@ -27,6 +27,8 @@ def main():
     # Descriptor parameters (same defaults as compute_descriptors.py)
     ap.add_argument("--ycbcr-bins", type=int, nargs=3, default=DEFAULTS["ycbcr"]["bins"], metavar=("Y", "CR", "CB"))
     ap.add_argument("--chroma-range", type=int, nargs=2, default=DEFAULTS["ycbcr"]["chroma_range"], metavar=("LO", "HI"))
+    ap.add_argument("--chroma-overflow", action="store_true",
+                    help="Add below/above bins counting Cr/Cb pixels outside --chroma-range")
     ap.add_argument("--hsv-bins", type=int, nargs=3, default=DEFAULTS["hsv"]["bins"], metavar=("H", "S", "V"))
     ap.add_argument("--s-min", type=int, default=DEFAULTS["hsv"]["s_min"])
     ap.add_argument("--v-min", type=int, default=DEFAULTS["hsv"]["v_min"])
@@ -39,9 +41,11 @@ def main():
     args = ap.parse_args()
 
     params = {
-        "ycbcr": dict(bins=tuple(args.ycbcr_bins), chroma_range=tuple(args.chroma_range)),
+        "ycbcr": dict(bins=tuple(args.ycbcr_bins), chroma_range=tuple(args.chroma_range),
+                      chroma_overflow=args.chroma_overflow),
         "hsv": dict(bins=tuple(args.hsv_bins), s_min=args.s_min, v_min=args.v_min,
                     hue_valid_weight=args.hue_valid_weight, hue_smoothing=args.hue_smoothing),
+        "hsv_baseline": dict(bins=tuple(DEFAULTS["hsv_baseline"]["bins"])),
         "rgb": dict(bins=tuple(args.rgb_bins)),
         "lab": dict(bins=tuple(args.lab_bins)),
     }[args.descriptor]

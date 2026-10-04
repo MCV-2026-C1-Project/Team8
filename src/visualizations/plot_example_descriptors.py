@@ -9,7 +9,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 PLOTS_DIR = ROOT / "plots"
 DATA_IMG = ROOT / "data" / "qsd1_w1" / "00000.jpg"
 

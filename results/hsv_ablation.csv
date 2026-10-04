@@ -1,0 +1,817 @@
+stage,config,hue,descriptor,bins,s_min,v_min,hue_valid_weight,hue_smoothing,measure,map1,map5
+baseline,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,euclidean,0.3,0.36333333333333334
+baseline,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,l1,0.5333333333333333,0.5916666666666667
+baseline,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,chi2,0.5333333333333333,0.6038888888888889
+baseline,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,intersection,0.5333333333333333,0.5916666666666667
+baseline,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,hellinger,0.5,0.5744444444444444
+baseline,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,wasserstein,0.4666666666666667,0.5411111111111111
+bins,"8-8-4, hue on all pixels",hue on all pixels,hsv,8-8-4,-1,-1,False,False,euclidean,0.36666666666666664,0.4244444444444444
+bins,"8-8-4, hue on all pixels",hue on all pixels,hsv,8-8-4,-1,-1,False,False,l1,0.4666666666666667,0.5566666666666668
+bins,"8-8-4, hue on all pixels",hue on all pixels,hsv,8-8-4,-1,-1,False,False,chi2,0.4666666666666667,0.5333333333333333
+bins,"8-8-4, hue on all pixels",hue on all pixels,hsv,8-8-4,-1,-1,False,False,intersection,0.4666666666666667,0.5566666666666668
+bins,"8-8-4, hue on all pixels",hue on all pixels,hsv,8-8-4,-1,-1,False,False,hellinger,0.5,0.5583333333333333
+bins,"8-8-4, hue on all pixels",hue on all pixels,hsv,8-8-4,-1,-1,False,False,wasserstein,0.43333333333333335,0.5227777777777779
+bins,"8-8-8, hue on all pixels",hue on all pixels,hsv,8-8-8,-1,-1,False,False,euclidean,0.3,0.4
+bins,"8-8-8, hue on all pixels",hue on all pixels,hsv,8-8-8,-1,-1,False,False,l1,0.4666666666666667,0.5594444444444444
+bins,"8-8-8, hue on all pixels",hue on all pixels,hsv,8-8-8,-1,-1,False,False,chi2,0.4,0.5194444444444445
+bins,"8-8-8, hue on all pixels",hue on all pixels,hsv,8-8-8,-1,-1,False,False,intersection,0.4666666666666667,0.5594444444444444
+bins,"8-8-8, hue on all pixels",hue on all pixels,hsv,8-8-8,-1,-1,False,False,hellinger,0.43333333333333335,0.5472222222222223
+bins,"8-8-8, hue on all pixels",hue on all pixels,hsv,8-8-8,-1,-1,False,False,wasserstein,0.4666666666666667,0.5399999999999999
+bins,"8-8-16, hue on all pixels",hue on all pixels,hsv,8-8-16,-1,-1,False,False,euclidean,0.36666666666666664,0.405
+bins,"8-8-16, hue on all pixels",hue on all pixels,hsv,8-8-16,-1,-1,False,False,l1,0.5,0.5666666666666667
+bins,"8-8-16, hue on all pixels",hue on all pixels,hsv,8-8-16,-1,-1,False,False,chi2,0.36666666666666664,0.4938888888888889
+bins,"8-8-16, hue on all pixels",hue on all pixels,hsv,8-8-16,-1,-1,False,False,intersection,0.5,0.5666666666666667
+bins,"8-8-16, hue on all pixels",hue on all pixels,hsv,8-8-16,-1,-1,False,False,hellinger,0.36666666666666664,0.48444444444444446
+bins,"8-8-16, hue on all pixels",hue on all pixels,hsv,8-8-16,-1,-1,False,False,wasserstein,0.43333333333333335,0.5233333333333333
+bins,"8-16-4, hue on all pixels",hue on all pixels,hsv,8-16-4,-1,-1,False,False,euclidean,0.3,0.3761111111111111
+bins,"8-16-4, hue on all pixels",hue on all pixels,hsv,8-16-4,-1,-1,False,False,l1,0.43333333333333335,0.5427777777777777
+bins,"8-16-4, hue on all pixels",hue on all pixels,hsv,8-16-4,-1,-1,False,False,chi2,0.4,0.5066666666666666
+bins,"8-16-4, hue on all pixels",hue on all pixels,hsv,8-16-4,-1,-1,False,False,intersection,0.43333333333333335,0.5427777777777777
+bins,"8-16-4, hue on all pixels",hue on all pixels,hsv,8-16-4,-1,-1,False,False,hellinger,0.43333333333333335,0.5316666666666666
+bins,"8-16-4, hue on all pixels",hue on all pixels,hsv,8-16-4,-1,-1,False,False,wasserstein,0.43333333333333335,0.5244444444444445
+bins,"8-16-8, hue on all pixels",hue on all pixels,hsv,8-16-8,-1,-1,False,False,euclidean,0.3333333333333333,0.39
+bins,"8-16-8, hue on all pixels",hue on all pixels,hsv,8-16-8,-1,-1,False,False,l1,0.5,0.5816666666666667
+bins,"8-16-8, hue on all pixels",hue on all pixels,hsv,8-16-8,-1,-1,False,False,chi2,0.43333333333333335,0.525
+bins,"8-16-8, hue on all pixels",hue on all pixels,hsv,8-16-8,-1,-1,False,False,intersection,0.5,0.5816666666666667
+bins,"8-16-8, hue on all pixels",hue on all pixels,hsv,8-16-8,-1,-1,False,False,hellinger,0.43333333333333335,0.5305555555555556
+bins,"8-16-8, hue on all pixels",hue on all pixels,hsv,8-16-8,-1,-1,False,False,wasserstein,0.4666666666666667,0.5399999999999999
+bins,"8-16-16, hue on all pixels",hue on all pixels,hsv,8-16-16,-1,-1,False,False,euclidean,0.23333333333333334,0.2916666666666667
+bins,"8-16-16, hue on all pixels",hue on all pixels,hsv,8-16-16,-1,-1,False,False,l1,0.5333333333333333,0.5833333333333334
+bins,"8-16-16, hue on all pixels",hue on all pixels,hsv,8-16-16,-1,-1,False,False,chi2,0.4666666666666667,0.5427777777777777
+bins,"8-16-16, hue on all pixels",hue on all pixels,hsv,8-16-16,-1,-1,False,False,intersection,0.5333333333333333,0.5833333333333334
+bins,"8-16-16, hue on all pixels",hue on all pixels,hsv,8-16-16,-1,-1,False,False,hellinger,0.4,0.4972222222222222
+bins,"8-16-16, hue on all pixels",hue on all pixels,hsv,8-16-16,-1,-1,False,False,wasserstein,0.4666666666666667,0.5399999999999999
+bins,"8-32-4, hue on all pixels",hue on all pixels,hsv,8-32-4,-1,-1,False,False,euclidean,0.3,0.3622222222222222
+bins,"8-32-4, hue on all pixels",hue on all pixels,hsv,8-32-4,-1,-1,False,False,l1,0.4666666666666667,0.5494444444444445
+bins,"8-32-4, hue on all pixels",hue on all pixels,hsv,8-32-4,-1,-1,False,False,chi2,0.43333333333333335,0.5366666666666666
+bins,"8-32-4, hue on all pixels",hue on all pixels,hsv,8-32-4,-1,-1,False,False,intersection,0.4666666666666667,0.5494444444444445
+bins,"8-32-4, hue on all pixels",hue on all pixels,hsv,8-32-4,-1,-1,False,False,hellinger,0.43333333333333335,0.5433333333333332
+bins,"8-32-4, hue on all pixels",hue on all pixels,hsv,8-32-4,-1,-1,False,False,wasserstein,0.43333333333333335,0.5227777777777778
+bins,"8-32-8, hue on all pixels",hue on all pixels,hsv,8-32-8,-1,-1,False,False,euclidean,0.26666666666666666,0.34388888888888886
+bins,"8-32-8, hue on all pixels",hue on all pixels,hsv,8-32-8,-1,-1,False,False,l1,0.5,0.58
+bins,"8-32-8, hue on all pixels",hue on all pixels,hsv,8-32-8,-1,-1,False,False,chi2,0.43333333333333335,0.5205555555555555
+bins,"8-32-8, hue on all pixels",hue on all pixels,hsv,8-32-8,-1,-1,False,False,intersection,0.5,0.58
+bins,"8-32-8, hue on all pixels",hue on all pixels,hsv,8-32-8,-1,-1,False,False,hellinger,0.4666666666666667,0.5372222222222223
+bins,"8-32-8, hue on all pixels",hue on all pixels,hsv,8-32-8,-1,-1,False,False,wasserstein,0.4666666666666667,0.545
+bins,"8-32-16, hue on all pixels",hue on all pixels,hsv,8-32-16,-1,-1,False,False,euclidean,0.26666666666666666,0.30666666666666664
+bins,"8-32-16, hue on all pixels",hue on all pixels,hsv,8-32-16,-1,-1,False,False,l1,0.5,0.55
+bins,"8-32-16, hue on all pixels",hue on all pixels,hsv,8-32-16,-1,-1,False,False,chi2,0.43333333333333335,0.5177777777777778
+bins,"8-32-16, hue on all pixels",hue on all pixels,hsv,8-32-16,-1,-1,False,False,intersection,0.5,0.55
+bins,"8-32-16, hue on all pixels",hue on all pixels,hsv,8-32-16,-1,-1,False,False,hellinger,0.4,0.4994444444444444
+bins,"8-32-16, hue on all pixels",hue on all pixels,hsv,8-32-16,-1,-1,False,False,wasserstein,0.4666666666666667,0.5466666666666666
+bins,"16-8-4, hue on all pixels",hue on all pixels,hsv,16-8-4,-1,-1,False,False,euclidean,0.3333333333333333,0.4216666666666667
+bins,"16-8-4, hue on all pixels",hue on all pixels,hsv,16-8-4,-1,-1,False,False,l1,0.43333333333333335,0.5444444444444444
+bins,"16-8-4, hue on all pixels",hue on all pixels,hsv,16-8-4,-1,-1,False,False,chi2,0.5,0.565
+bins,"16-8-4, hue on all pixels",hue on all pixels,hsv,16-8-4,-1,-1,False,False,intersection,0.43333333333333335,0.5444444444444444
+bins,"16-8-4, hue on all pixels",hue on all pixels,hsv,16-8-4,-1,-1,False,False,hellinger,0.5333333333333333,0.5816666666666667
+bins,"16-8-4, hue on all pixels",hue on all pixels,hsv,16-8-4,-1,-1,False,False,wasserstein,0.4,0.4827777777777778
+bins,"16-8-8, hue on all pixels",hue on all pixels,hsv,16-8-8,-1,-1,False,False,euclidean,0.3,0.3994444444444445
+bins,"16-8-8, hue on all pixels",hue on all pixels,hsv,16-8-8,-1,-1,False,False,l1,0.5,0.5844444444444444
+bins,"16-8-8, hue on all pixels",hue on all pixels,hsv,16-8-8,-1,-1,False,False,chi2,0.4666666666666667,0.5549999999999999
+bins,"16-8-8, hue on all pixels",hue on all pixels,hsv,16-8-8,-1,-1,False,False,intersection,0.5,0.5844444444444444
+bins,"16-8-8, hue on all pixels",hue on all pixels,hsv,16-8-8,-1,-1,False,False,hellinger,0.4666666666666667,0.5622222222222223
+bins,"16-8-8, hue on all pixels",hue on all pixels,hsv,16-8-8,-1,-1,False,False,wasserstein,0.4666666666666667,0.5411111111111111
+bins,"16-8-16, hue on all pixels",hue on all pixels,hsv,16-8-16,-1,-1,False,False,euclidean,0.36666666666666664,0.4083333333333333
+bins,"16-8-16, hue on all pixels",hue on all pixels,hsv,16-8-16,-1,-1,False,False,l1,0.4666666666666667,0.5666666666666667
+bins,"16-8-16, hue on all pixels",hue on all pixels,hsv,16-8-16,-1,-1,False,False,chi2,0.43333333333333335,0.5455555555555556
+bins,"16-8-16, hue on all pixels",hue on all pixels,hsv,16-8-16,-1,-1,False,False,intersection,0.4666666666666667,0.5666666666666667
+bins,"16-8-16, hue on all pixels",hue on all pixels,hsv,16-8-16,-1,-1,False,False,hellinger,0.43333333333333335,0.5233333333333333
+bins,"16-8-16, hue on all pixels",hue on all pixels,hsv,16-8-16,-1,-1,False,False,wasserstein,0.43333333333333335,0.5272222222222223
+bins,"16-16-4, hue on all pixels",hue on all pixels,hsv,16-16-4,-1,-1,False,False,euclidean,0.3,0.38999999999999996
+bins,"16-16-4, hue on all pixels",hue on all pixels,hsv,16-16-4,-1,-1,False,False,l1,0.43333333333333335,0.5527777777777777
+bins,"16-16-4, hue on all pixels",hue on all pixels,hsv,16-16-4,-1,-1,False,False,chi2,0.4666666666666667,0.5566666666666666
+bins,"16-16-4, hue on all pixels",hue on all pixels,hsv,16-16-4,-1,-1,False,False,intersection,0.43333333333333335,0.5527777777777777
+bins,"16-16-4, hue on all pixels",hue on all pixels,hsv,16-16-4,-1,-1,False,False,hellinger,0.5,0.5733333333333334
+bins,"16-16-4, hue on all pixels",hue on all pixels,hsv,16-16-4,-1,-1,False,False,wasserstein,0.4,0.4955555555555556
+bins,"16-16-8, hue on all pixels",hue on all pixels,hsv,16-16-8,-1,-1,False,False,euclidean,0.36666666666666664,0.43722222222222223
+bins,"16-16-8, hue on all pixels",hue on all pixels,hsv,16-16-8,-1,-1,False,False,l1,0.4666666666666667,0.5733333333333334
+bins,"16-16-8, hue on all pixels",hue on all pixels,hsv,16-16-8,-1,-1,False,False,chi2,0.4666666666666667,0.5772222222222222
+bins,"16-16-8, hue on all pixels",hue on all pixels,hsv,16-16-8,-1,-1,False,False,intersection,0.4666666666666667,0.5733333333333334
+bins,"16-16-8, hue on all pixels",hue on all pixels,hsv,16-16-8,-1,-1,False,False,hellinger,0.43333333333333335,0.5494444444444445
+bins,"16-16-8, hue on all pixels",hue on all pixels,hsv,16-16-8,-1,-1,False,False,wasserstein,0.5,0.5561111111111112
+bins,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,euclidean,0.3,0.36333333333333334
+bins,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,l1,0.5333333333333333,0.5916666666666667
+bins,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,chi2,0.5333333333333333,0.6038888888888889
+bins,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,intersection,0.5333333333333333,0.5916666666666667
+bins,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,hellinger,0.5,0.5744444444444444
+bins,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,wasserstein,0.4666666666666667,0.5411111111111111
+bins,"16-32-4, hue on all pixels",hue on all pixels,hsv,16-32-4,-1,-1,False,False,euclidean,0.3,0.3938888888888889
+bins,"16-32-4, hue on all pixels",hue on all pixels,hsv,16-32-4,-1,-1,False,False,l1,0.43333333333333335,0.5438888888888889
+bins,"16-32-4, hue on all pixels",hue on all pixels,hsv,16-32-4,-1,-1,False,False,chi2,0.4666666666666667,0.5577777777777778
+bins,"16-32-4, hue on all pixels",hue on all pixels,hsv,16-32-4,-1,-1,False,False,intersection,0.43333333333333335,0.5438888888888889
+bins,"16-32-4, hue on all pixels",hue on all pixels,hsv,16-32-4,-1,-1,False,False,hellinger,0.4666666666666667,0.5594444444444444
+bins,"16-32-4, hue on all pixels",hue on all pixels,hsv,16-32-4,-1,-1,False,False,wasserstein,0.4,0.4955555555555556
+bins,"16-32-8, hue on all pixels",hue on all pixels,hsv,16-32-8,-1,-1,False,False,euclidean,0.3333333333333333,0.40499999999999997
+bins,"16-32-8, hue on all pixels",hue on all pixels,hsv,16-32-8,-1,-1,False,False,l1,0.4666666666666667,0.5811111111111111
+bins,"16-32-8, hue on all pixels",hue on all pixels,hsv,16-32-8,-1,-1,False,False,chi2,0.4666666666666667,0.5677777777777777
+bins,"16-32-8, hue on all pixels",hue on all pixels,hsv,16-32-8,-1,-1,False,False,intersection,0.4666666666666667,0.5811111111111111
+bins,"16-32-8, hue on all pixels",hue on all pixels,hsv,16-32-8,-1,-1,False,False,hellinger,0.4666666666666667,0.5733333333333334
+bins,"16-32-8, hue on all pixels",hue on all pixels,hsv,16-32-8,-1,-1,False,False,wasserstein,0.4666666666666667,0.5377777777777778
+bins,"16-32-16, hue on all pixels",hue on all pixels,hsv,16-32-16,-1,-1,False,False,euclidean,0.26666666666666666,0.35333333333333333
+bins,"16-32-16, hue on all pixels",hue on all pixels,hsv,16-32-16,-1,-1,False,False,l1,0.5,0.5583333333333333
+bins,"16-32-16, hue on all pixels",hue on all pixels,hsv,16-32-16,-1,-1,False,False,chi2,0.4666666666666667,0.5566666666666668
+bins,"16-32-16, hue on all pixels",hue on all pixels,hsv,16-32-16,-1,-1,False,False,intersection,0.5,0.5583333333333333
+bins,"16-32-16, hue on all pixels",hue on all pixels,hsv,16-32-16,-1,-1,False,False,hellinger,0.43333333333333335,0.5316666666666666
+bins,"16-32-16, hue on all pixels",hue on all pixels,hsv,16-32-16,-1,-1,False,False,wasserstein,0.4666666666666667,0.5411111111111111
+bins,"32-8-4, hue on all pixels",hue on all pixels,hsv,32-8-4,-1,-1,False,False,euclidean,0.4,0.4555555555555556
+bins,"32-8-4, hue on all pixels",hue on all pixels,hsv,32-8-4,-1,-1,False,False,l1,0.5333333333333333,0.5638888888888888
+bins,"32-8-4, hue on all pixels",hue on all pixels,hsv,32-8-4,-1,-1,False,False,chi2,0.5666666666666667,0.586111111111111
+bins,"32-8-4, hue on all pixels",hue on all pixels,hsv,32-8-4,-1,-1,False,False,intersection,0.5333333333333333,0.5638888888888888
+bins,"32-8-4, hue on all pixels",hue on all pixels,hsv,32-8-4,-1,-1,False,False,hellinger,0.5333333333333333,0.5744444444444444
+bins,"32-8-4, hue on all pixels",hue on all pixels,hsv,32-8-4,-1,-1,False,False,wasserstein,0.4,0.4761111111111111
+bins,"32-8-8, hue on all pixels",hue on all pixels,hsv,32-8-8,-1,-1,False,False,euclidean,0.36666666666666664,0.4444444444444445
+bins,"32-8-8, hue on all pixels",hue on all pixels,hsv,32-8-8,-1,-1,False,False,l1,0.5333333333333333,0.59
+bins,"32-8-8, hue on all pixels",hue on all pixels,hsv,32-8-8,-1,-1,False,False,chi2,0.5333333333333333,0.5777777777777777
+bins,"32-8-8, hue on all pixels",hue on all pixels,hsv,32-8-8,-1,-1,False,False,intersection,0.5333333333333333,0.59
+bins,"32-8-8, hue on all pixels",hue on all pixels,hsv,32-8-8,-1,-1,False,False,hellinger,0.5333333333333333,0.5888888888888888
+bins,"32-8-8, hue on all pixels",hue on all pixels,hsv,32-8-8,-1,-1,False,False,wasserstein,0.4666666666666667,0.5355555555555557
+bins,"32-8-16, hue on all pixels",hue on all pixels,hsv,32-8-16,-1,-1,False,False,euclidean,0.43333333333333335,0.45944444444444443
+bins,"32-8-16, hue on all pixels",hue on all pixels,hsv,32-8-16,-1,-1,False,False,l1,0.5333333333333333,0.5688888888888889
+bins,"32-8-16, hue on all pixels",hue on all pixels,hsv,32-8-16,-1,-1,False,False,chi2,0.4666666666666667,0.5288888888888889
+bins,"32-8-16, hue on all pixels",hue on all pixels,hsv,32-8-16,-1,-1,False,False,intersection,0.5333333333333333,0.5688888888888889
+bins,"32-8-16, hue on all pixels",hue on all pixels,hsv,32-8-16,-1,-1,False,False,hellinger,0.43333333333333335,0.5222222222222223
+bins,"32-8-16, hue on all pixels",hue on all pixels,hsv,32-8-16,-1,-1,False,False,wasserstein,0.4666666666666667,0.5355555555555557
+bins,"32-16-4, hue on all pixels",hue on all pixels,hsv,32-16-4,-1,-1,False,False,euclidean,0.3333333333333333,0.41111111111111115
+bins,"32-16-4, hue on all pixels",hue on all pixels,hsv,32-16-4,-1,-1,False,False,l1,0.43333333333333335,0.5177777777777777
+bins,"32-16-4, hue on all pixels",hue on all pixels,hsv,32-16-4,-1,-1,False,False,chi2,0.5,0.5472222222222222
+bins,"32-16-4, hue on all pixels",hue on all pixels,hsv,32-16-4,-1,-1,False,False,intersection,0.43333333333333335,0.5177777777777777
+bins,"32-16-4, hue on all pixels",hue on all pixels,hsv,32-16-4,-1,-1,False,False,hellinger,0.5,0.5594444444444444
+bins,"32-16-4, hue on all pixels",hue on all pixels,hsv,32-16-4,-1,-1,False,False,wasserstein,0.43333333333333335,0.5055555555555556
+bins,"32-16-8, hue on all pixels",hue on all pixels,hsv,32-16-8,-1,-1,False,False,euclidean,0.36666666666666664,0.4444444444444444
+bins,"32-16-8, hue on all pixels",hue on all pixels,hsv,32-16-8,-1,-1,False,False,l1,0.4666666666666667,0.5722222222222222
+bins,"32-16-8, hue on all pixels",hue on all pixels,hsv,32-16-8,-1,-1,False,False,chi2,0.4666666666666667,0.5399999999999999
+bins,"32-16-8, hue on all pixels",hue on all pixels,hsv,32-16-8,-1,-1,False,False,intersection,0.4666666666666667,0.5722222222222222
+bins,"32-16-8, hue on all pixels",hue on all pixels,hsv,32-16-8,-1,-1,False,False,hellinger,0.5,0.565
+bins,"32-16-8, hue on all pixels",hue on all pixels,hsv,32-16-8,-1,-1,False,False,wasserstein,0.4666666666666667,0.5327777777777778
+bins,"32-16-16, hue on all pixels",hue on all pixels,hsv,32-16-16,-1,-1,False,False,euclidean,0.36666666666666664,0.44166666666666665
+bins,"32-16-16, hue on all pixels",hue on all pixels,hsv,32-16-16,-1,-1,False,False,l1,0.4666666666666667,0.5455555555555556
+bins,"32-16-16, hue on all pixels",hue on all pixels,hsv,32-16-16,-1,-1,False,False,chi2,0.5,0.5305555555555556
+bins,"32-16-16, hue on all pixels",hue on all pixels,hsv,32-16-16,-1,-1,False,False,intersection,0.4666666666666667,0.5455555555555556
+bins,"32-16-16, hue on all pixels",hue on all pixels,hsv,32-16-16,-1,-1,False,False,hellinger,0.5,0.5483333333333333
+bins,"32-16-16, hue on all pixels",hue on all pixels,hsv,32-16-16,-1,-1,False,False,wasserstein,0.4666666666666667,0.5327777777777778
+bins,"32-32-4, hue on all pixels",hue on all pixels,hsv,32-32-4,-1,-1,False,False,euclidean,0.3,0.38333333333333336
+bins,"32-32-4, hue on all pixels",hue on all pixels,hsv,32-32-4,-1,-1,False,False,l1,0.4666666666666667,0.53
+bins,"32-32-4, hue on all pixels",hue on all pixels,hsv,32-32-4,-1,-1,False,False,chi2,0.4666666666666667,0.5361111111111111
+bins,"32-32-4, hue on all pixels",hue on all pixels,hsv,32-32-4,-1,-1,False,False,intersection,0.4666666666666667,0.53
+bins,"32-32-4, hue on all pixels",hue on all pixels,hsv,32-32-4,-1,-1,False,False,hellinger,0.5,0.5594444444444444
+bins,"32-32-4, hue on all pixels",hue on all pixels,hsv,32-32-4,-1,-1,False,False,wasserstein,0.4,0.4872222222222222
+bins,"32-32-8, hue on all pixels",hue on all pixels,hsv,32-32-8,-1,-1,False,False,euclidean,0.3333333333333333,0.3983333333333333
+bins,"32-32-8, hue on all pixels",hue on all pixels,hsv,32-32-8,-1,-1,False,False,l1,0.4666666666666667,0.5538888888888889
+bins,"32-32-8, hue on all pixels",hue on all pixels,hsv,32-32-8,-1,-1,False,False,chi2,0.5,0.5666666666666667
+bins,"32-32-8, hue on all pixels",hue on all pixels,hsv,32-32-8,-1,-1,False,False,intersection,0.4666666666666667,0.5538888888888889
+bins,"32-32-8, hue on all pixels",hue on all pixels,hsv,32-32-8,-1,-1,False,False,hellinger,0.5,0.575
+bins,"32-32-8, hue on all pixels",hue on all pixels,hsv,32-32-8,-1,-1,False,False,wasserstein,0.4666666666666667,0.5394444444444446
+bins,"32-32-16, hue on all pixels",hue on all pixels,hsv,32-32-16,-1,-1,False,False,euclidean,0.3333333333333333,0.40555555555555556
+bins,"32-32-16, hue on all pixels",hue on all pixels,hsv,32-32-16,-1,-1,False,False,l1,0.4666666666666667,0.5444444444444445
+bins,"32-32-16, hue on all pixels",hue on all pixels,hsv,32-32-16,-1,-1,False,False,chi2,0.4666666666666667,0.5194444444444445
+bins,"32-32-16, hue on all pixels",hue on all pixels,hsv,32-32-16,-1,-1,False,False,intersection,0.4666666666666667,0.5444444444444445
+bins,"32-32-16, hue on all pixels",hue on all pixels,hsv,32-32-16,-1,-1,False,False,hellinger,0.43333333333333335,0.5288888888888889
+bins,"32-32-16, hue on all pixels",hue on all pixels,hsv,32-32-16,-1,-1,False,False,wasserstein,0.4666666666666667,0.5422222222222222
+bins,"64-8-4, hue on all pixels",hue on all pixels,hsv,64-8-4,-1,-1,False,False,euclidean,0.3333333333333333,0.415
+bins,"64-8-4, hue on all pixels",hue on all pixels,hsv,64-8-4,-1,-1,False,False,l1,0.5333333333333333,0.5788888888888889
+bins,"64-8-4, hue on all pixels",hue on all pixels,hsv,64-8-4,-1,-1,False,False,chi2,0.5333333333333333,0.5705555555555556
+bins,"64-8-4, hue on all pixels",hue on all pixels,hsv,64-8-4,-1,-1,False,False,intersection,0.5333333333333333,0.5788888888888889
+bins,"64-8-4, hue on all pixels",hue on all pixels,hsv,64-8-4,-1,-1,False,False,hellinger,0.5,0.551111111111111
+bins,"64-8-4, hue on all pixels",hue on all pixels,hsv,64-8-4,-1,-1,False,False,wasserstein,0.4,0.4761111111111111
+bins,"64-8-8, hue on all pixels",hue on all pixels,hsv,64-8-8,-1,-1,False,False,euclidean,0.36666666666666664,0.4538888888888889
+bins,"64-8-8, hue on all pixels",hue on all pixels,hsv,64-8-8,-1,-1,False,False,l1,0.5666666666666667,0.5972222222222221
+bins,"64-8-8, hue on all pixels",hue on all pixels,hsv,64-8-8,-1,-1,False,False,chi2,0.5,0.55
+bins,"64-8-8, hue on all pixels",hue on all pixels,hsv,64-8-8,-1,-1,False,False,intersection,0.5666666666666667,0.5972222222222221
+bins,"64-8-8, hue on all pixels",hue on all pixels,hsv,64-8-8,-1,-1,False,False,hellinger,0.4666666666666667,0.5427777777777777
+bins,"64-8-8, hue on all pixels",hue on all pixels,hsv,64-8-8,-1,-1,False,False,wasserstein,0.4666666666666667,0.5327777777777778
+bins,"64-8-16, hue on all pixels",hue on all pixels,hsv,64-8-16,-1,-1,False,False,euclidean,0.43333333333333335,0.4444444444444445
+bins,"64-8-16, hue on all pixels",hue on all pixels,hsv,64-8-16,-1,-1,False,False,l1,0.5333333333333333,0.5927777777777777
+bins,"64-8-16, hue on all pixels",hue on all pixels,hsv,64-8-16,-1,-1,False,False,chi2,0.4666666666666667,0.5038888888888888
+bins,"64-8-16, hue on all pixels",hue on all pixels,hsv,64-8-16,-1,-1,False,False,intersection,0.5333333333333333,0.5927777777777777
+bins,"64-8-16, hue on all pixels",hue on all pixels,hsv,64-8-16,-1,-1,False,False,hellinger,0.43333333333333335,0.49777777777777776
+bins,"64-8-16, hue on all pixels",hue on all pixels,hsv,64-8-16,-1,-1,False,False,wasserstein,0.4666666666666667,0.548888888888889
+bins,"64-16-4, hue on all pixels",hue on all pixels,hsv,64-16-4,-1,-1,False,False,euclidean,0.3333333333333333,0.3927777777777778
+bins,"64-16-4, hue on all pixels",hue on all pixels,hsv,64-16-4,-1,-1,False,False,l1,0.4666666666666667,0.5566666666666666
+bins,"64-16-4, hue on all pixels",hue on all pixels,hsv,64-16-4,-1,-1,False,False,chi2,0.4666666666666667,0.5411111111111111
+bins,"64-16-4, hue on all pixels",hue on all pixels,hsv,64-16-4,-1,-1,False,False,intersection,0.4666666666666667,0.5566666666666666
+bins,"64-16-4, hue on all pixels",hue on all pixels,hsv,64-16-4,-1,-1,False,False,hellinger,0.4666666666666667,0.5344444444444444
+bins,"64-16-4, hue on all pixels",hue on all pixels,hsv,64-16-4,-1,-1,False,False,wasserstein,0.43333333333333335,0.5055555555555556
+bins,"64-16-8, hue on all pixels",hue on all pixels,hsv,64-16-8,-1,-1,False,False,euclidean,0.3333333333333333,0.4261111111111111
+bins,"64-16-8, hue on all pixels",hue on all pixels,hsv,64-16-8,-1,-1,False,False,l1,0.5,0.5772222222222222
+bins,"64-16-8, hue on all pixels",hue on all pixels,hsv,64-16-8,-1,-1,False,False,chi2,0.5,0.55
+bins,"64-16-8, hue on all pixels",hue on all pixels,hsv,64-16-8,-1,-1,False,False,intersection,0.5,0.5772222222222222
+bins,"64-16-8, hue on all pixels",hue on all pixels,hsv,64-16-8,-1,-1,False,False,hellinger,0.5,0.551111111111111
+bins,"64-16-8, hue on all pixels",hue on all pixels,hsv,64-16-8,-1,-1,False,False,wasserstein,0.4666666666666667,0.5394444444444446
+bins,"64-16-16, hue on all pixels",hue on all pixels,hsv,64-16-16,-1,-1,False,False,euclidean,0.4,0.4361111111111111
+bins,"64-16-16, hue on all pixels",hue on all pixels,hsv,64-16-16,-1,-1,False,False,l1,0.4666666666666667,0.5611111111111111
+bins,"64-16-16, hue on all pixels",hue on all pixels,hsv,64-16-16,-1,-1,False,False,chi2,0.4666666666666667,0.5205555555555555
+bins,"64-16-16, hue on all pixels",hue on all pixels,hsv,64-16-16,-1,-1,False,False,intersection,0.4666666666666667,0.5611111111111111
+bins,"64-16-16, hue on all pixels",hue on all pixels,hsv,64-16-16,-1,-1,False,False,hellinger,0.5,0.5399999999999999
+bins,"64-16-16, hue on all pixels",hue on all pixels,hsv,64-16-16,-1,-1,False,False,wasserstein,0.4666666666666667,0.5394444444444446
+bins,"64-32-4, hue on all pixels",hue on all pixels,hsv,64-32-4,-1,-1,False,False,euclidean,0.3,0.36944444444444446
+bins,"64-32-4, hue on all pixels",hue on all pixels,hsv,64-32-4,-1,-1,False,False,l1,0.5,0.565
+bins,"64-32-4, hue on all pixels",hue on all pixels,hsv,64-32-4,-1,-1,False,False,chi2,0.4,0.515
+bins,"64-32-4, hue on all pixels",hue on all pixels,hsv,64-32-4,-1,-1,False,False,intersection,0.5,0.565
+bins,"64-32-4, hue on all pixels",hue on all pixels,hsv,64-32-4,-1,-1,False,False,hellinger,0.43333333333333335,0.525
+bins,"64-32-4, hue on all pixels",hue on all pixels,hsv,64-32-4,-1,-1,False,False,wasserstein,0.4,0.48888888888888893
+bins,"64-32-8, hue on all pixels",hue on all pixels,hsv,64-32-8,-1,-1,False,False,euclidean,0.3,0.38166666666666665
+bins,"64-32-8, hue on all pixels",hue on all pixels,hsv,64-32-8,-1,-1,False,False,l1,0.5333333333333333,0.5844444444444444
+bins,"64-32-8, hue on all pixels",hue on all pixels,hsv,64-32-8,-1,-1,False,False,chi2,0.5,0.5705555555555556
+bins,"64-32-8, hue on all pixels",hue on all pixels,hsv,64-32-8,-1,-1,False,False,intersection,0.5333333333333333,0.5844444444444444
+bins,"64-32-8, hue on all pixels",hue on all pixels,hsv,64-32-8,-1,-1,False,False,hellinger,0.43333333333333335,0.5344444444444444
+bins,"64-32-8, hue on all pixels",hue on all pixels,hsv,64-32-8,-1,-1,False,False,wasserstein,0.4666666666666667,0.5394444444444446
+bins,"64-32-16, hue on all pixels",hue on all pixels,hsv,64-32-16,-1,-1,False,False,euclidean,0.36666666666666664,0.41777777777777786
+bins,"64-32-16, hue on all pixels",hue on all pixels,hsv,64-32-16,-1,-1,False,False,l1,0.4666666666666667,0.5594444444444444
+bins,"64-32-16, hue on all pixels",hue on all pixels,hsv,64-32-16,-1,-1,False,False,chi2,0.4666666666666667,0.5355555555555557
+bins,"64-32-16, hue on all pixels",hue on all pixels,hsv,64-32-16,-1,-1,False,False,intersection,0.4666666666666667,0.5594444444444444
+bins,"64-32-16, hue on all pixels",hue on all pixels,hsv,64-32-16,-1,-1,False,False,hellinger,0.4,0.5022222222222222
+bins,"64-32-16, hue on all pixels",hue on all pixels,hsv,64-32-16,-1,-1,False,False,wasserstein,0.4666666666666667,0.5422222222222222
+hue condition,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,euclidean,0.3,0.36333333333333334
+hue condition,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,l1,0.5333333333333333,0.5916666666666667
+hue condition,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,chi2,0.5333333333333333,0.6038888888888889
+hue condition,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,intersection,0.5333333333333333,0.5916666666666667
+hue condition,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,hellinger,0.5,0.5744444444444444
+hue condition,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,wasserstein,0.4666666666666667,0.5411111111111111
+hue condition,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,True,False,euclidean,0.3,0.36333333333333334
+hue condition,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,True,False,l1,0.5333333333333333,0.5916666666666667
+hue condition,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,True,False,chi2,0.5333333333333333,0.6038888888888889
+hue condition,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,True,False,intersection,0.5333333333333333,0.5916666666666667
+hue condition,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,True,False,hellinger,0.5,0.5744444444444444
+hue condition,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,True,False,wasserstein,0.4666666666666667,0.5411111111111111
+hue condition,"16-16-16, hue if V>20",hue if V>20,hsv,16-16-16,-1,20,False,False,euclidean,0.3,0.38555555555555554
+hue condition,"16-16-16, hue if V>20",hue if V>20,hsv,16-16-16,-1,20,False,False,l1,0.5333333333333333,0.6094444444444443
+hue condition,"16-16-16, hue if V>20",hue if V>20,hsv,16-16-16,-1,20,False,False,chi2,0.5333333333333333,0.6022222222222222
+hue condition,"16-16-16, hue if V>20",hue if V>20,hsv,16-16-16,-1,20,False,False,intersection,0.5333333333333333,0.6094444444444443
+hue condition,"16-16-16, hue if V>20",hue if V>20,hsv,16-16-16,-1,20,False,False,hellinger,0.5,0.5733333333333334
+hue condition,"16-16-16, hue if V>20",hue if V>20,hsv,16-16-16,-1,20,False,False,wasserstein,0.4666666666666667,0.5494444444444445
+hue condition,"16-16-16, hue if V>20, weighted","hue if V>20, weighted",hsv,16-16-16,-1,20,True,False,euclidean,0.3,0.38833333333333336
+hue condition,"16-16-16, hue if V>20, weighted","hue if V>20, weighted",hsv,16-16-16,-1,20,True,False,l1,0.5333333333333333,0.6038888888888889
+hue condition,"16-16-16, hue if V>20, weighted","hue if V>20, weighted",hsv,16-16-16,-1,20,True,False,chi2,0.5333333333333333,0.6077777777777779
+hue condition,"16-16-16, hue if V>20, weighted","hue if V>20, weighted",hsv,16-16-16,-1,20,True,False,intersection,0.5,0.5805555555555555
+hue condition,"16-16-16, hue if V>20, weighted","hue if V>20, weighted",hsv,16-16-16,-1,20,True,False,hellinger,0.4,0.5005555555555555
+hue condition,"16-16-16, hue if V>20, weighted","hue if V>20, weighted",hsv,16-16-16,-1,20,True,False,wasserstein,0.4666666666666667,0.5494444444444445
+hue condition,"16-16-16, hue if V>40",hue if V>40,hsv,16-16-16,-1,40,False,False,euclidean,0.3333333333333333,0.3977777777777778
+hue condition,"16-16-16, hue if V>40",hue if V>40,hsv,16-16-16,-1,40,False,False,l1,0.5666666666666667,0.6316666666666666
+hue condition,"16-16-16, hue if V>40",hue if V>40,hsv,16-16-16,-1,40,False,False,chi2,0.5333333333333333,0.6066666666666667
+hue condition,"16-16-16, hue if V>40",hue if V>40,hsv,16-16-16,-1,40,False,False,intersection,0.5666666666666667,0.6316666666666666
+hue condition,"16-16-16, hue if V>40",hue if V>40,hsv,16-16-16,-1,40,False,False,hellinger,0.5333333333333333,0.5844444444444444
+hue condition,"16-16-16, hue if V>40",hue if V>40,hsv,16-16-16,-1,40,False,False,wasserstein,0.43333333333333335,0.5277777777777778
+hue condition,"16-16-16, hue if V>40, weighted","hue if V>40, weighted",hsv,16-16-16,-1,40,True,False,euclidean,0.3,0.3994444444444445
+hue condition,"16-16-16, hue if V>40, weighted","hue if V>40, weighted",hsv,16-16-16,-1,40,True,False,l1,0.5666666666666667,0.6344444444444444
+hue condition,"16-16-16, hue if V>40, weighted","hue if V>40, weighted",hsv,16-16-16,-1,40,True,False,chi2,0.5333333333333333,0.6066666666666667
+hue condition,"16-16-16, hue if V>40, weighted","hue if V>40, weighted",hsv,16-16-16,-1,40,True,False,intersection,0.4666666666666667,0.5416666666666666
+hue condition,"16-16-16, hue if V>40, weighted","hue if V>40, weighted",hsv,16-16-16,-1,40,True,False,hellinger,0.3333333333333333,0.43
+hue condition,"16-16-16, hue if V>40, weighted","hue if V>40, weighted",hsv,16-16-16,-1,40,True,False,wasserstein,0.43333333333333335,0.5277777777777778
+hue condition,"16-16-16, hue if V>60",hue if V>60,hsv,16-16-16,-1,60,False,False,euclidean,0.3,0.3711111111111111
+hue condition,"16-16-16, hue if V>60",hue if V>60,hsv,16-16-16,-1,60,False,False,l1,0.5666666666666667,0.6133333333333333
+hue condition,"16-16-16, hue if V>60",hue if V>60,hsv,16-16-16,-1,60,False,False,chi2,0.5,0.5638888888888888
+hue condition,"16-16-16, hue if V>60",hue if V>60,hsv,16-16-16,-1,60,False,False,intersection,0.5666666666666667,0.6133333333333333
+hue condition,"16-16-16, hue if V>60",hue if V>60,hsv,16-16-16,-1,60,False,False,hellinger,0.4666666666666667,0.5316666666666666
+hue condition,"16-16-16, hue if V>60",hue if V>60,hsv,16-16-16,-1,60,False,False,wasserstein,0.5,0.5444444444444445
+hue condition,"16-16-16, hue if V>60, weighted","hue if V>60, weighted",hsv,16-16-16,-1,60,True,False,euclidean,0.36666666666666664,0.44
+hue condition,"16-16-16, hue if V>60, weighted","hue if V>60, weighted",hsv,16-16-16,-1,60,True,False,l1,0.5333333333333333,0.6066666666666667
+hue condition,"16-16-16, hue if V>60, weighted","hue if V>60, weighted",hsv,16-16-16,-1,60,True,False,chi2,0.5333333333333333,0.5955555555555555
+hue condition,"16-16-16, hue if V>60, weighted","hue if V>60, weighted",hsv,16-16-16,-1,60,True,False,intersection,0.4666666666666667,0.5527777777777777
+hue condition,"16-16-16, hue if V>60, weighted","hue if V>60, weighted",hsv,16-16-16,-1,60,True,False,hellinger,0.3333333333333333,0.43555555555555553
+hue condition,"16-16-16, hue if V>60, weighted","hue if V>60, weighted",hsv,16-16-16,-1,60,True,False,wasserstein,0.5,0.5444444444444445
+hue condition,"16-16-16, hue if S>20",hue if S>20,hsv,16-16-16,20,-1,False,False,euclidean,0.26666666666666666,0.35888888888888887
+hue condition,"16-16-16, hue if S>20",hue if S>20,hsv,16-16-16,20,-1,False,False,l1,0.5333333333333333,0.6083333333333333
+hue condition,"16-16-16, hue if S>20",hue if S>20,hsv,16-16-16,20,-1,False,False,chi2,0.5,0.5972222222222222
+hue condition,"16-16-16, hue if S>20",hue if S>20,hsv,16-16-16,20,-1,False,False,intersection,0.5333333333333333,0.6083333333333333
+hue condition,"16-16-16, hue if S>20",hue if S>20,hsv,16-16-16,20,-1,False,False,hellinger,0.4666666666666667,0.575
+hue condition,"16-16-16, hue if S>20",hue if S>20,hsv,16-16-16,20,-1,False,False,wasserstein,0.4666666666666667,0.5505555555555556
+hue condition,"16-16-16, hue if S>20, weighted","hue if S>20, weighted",hsv,16-16-16,20,-1,True,False,euclidean,0.3333333333333333,0.3994444444444445
+hue condition,"16-16-16, hue if S>20, weighted","hue if S>20, weighted",hsv,16-16-16,20,-1,True,False,l1,0.5,0.5916666666666667
+hue condition,"16-16-16, hue if S>20, weighted","hue if S>20, weighted",hsv,16-16-16,20,-1,True,False,chi2,0.5,0.5944444444444446
+hue condition,"16-16-16, hue if S>20, weighted","hue if S>20, weighted",hsv,16-16-16,20,-1,True,False,intersection,0.5,0.5972222222222221
+hue condition,"16-16-16, hue if S>20, weighted","hue if S>20, weighted",hsv,16-16-16,20,-1,True,False,hellinger,0.4,0.5111111111111111
+hue condition,"16-16-16, hue if S>20, weighted","hue if S>20, weighted",hsv,16-16-16,20,-1,True,False,wasserstein,0.4666666666666667,0.5505555555555556
+hue condition,"16-16-16, hue if S>20, V>20","hue if S>20, V>20",hsv,16-16-16,20,20,False,False,euclidean,0.3,0.38
+hue condition,"16-16-16, hue if S>20, V>20","hue if S>20, V>20",hsv,16-16-16,20,20,False,False,l1,0.5,0.5944444444444444
+hue condition,"16-16-16, hue if S>20, V>20","hue if S>20, V>20",hsv,16-16-16,20,20,False,False,chi2,0.5333333333333333,0.615
+hue condition,"16-16-16, hue if S>20, V>20","hue if S>20, V>20",hsv,16-16-16,20,20,False,False,intersection,0.5,0.5944444444444444
+hue condition,"16-16-16, hue if S>20, V>20","hue if S>20, V>20",hsv,16-16-16,20,20,False,False,hellinger,0.5,0.5888888888888889
+hue condition,"16-16-16, hue if S>20, V>20","hue if S>20, V>20",hsv,16-16-16,20,20,False,False,wasserstein,0.4666666666666667,0.5549999999999999
+hue condition,"16-16-16, hue if S>20, V>20, weighted","hue if S>20, V>20, weighted",hsv,16-16-16,20,20,True,False,euclidean,0.36666666666666664,0.4216666666666667
+hue condition,"16-16-16, hue if S>20, V>20, weighted","hue if S>20, V>20, weighted",hsv,16-16-16,20,20,True,False,l1,0.5333333333333333,0.6027777777777779
+hue condition,"16-16-16, hue if S>20, V>20, weighted","hue if S>20, V>20, weighted",hsv,16-16-16,20,20,True,False,chi2,0.5,0.5983333333333333
+hue condition,"16-16-16, hue if S>20, V>20, weighted","hue if S>20, V>20, weighted",hsv,16-16-16,20,20,True,False,intersection,0.5,0.5788888888888889
+hue condition,"16-16-16, hue if S>20, V>20, weighted","hue if S>20, V>20, weighted",hsv,16-16-16,20,20,True,False,hellinger,0.3333333333333333,0.48000000000000004
+hue condition,"16-16-16, hue if S>20, V>20, weighted","hue if S>20, V>20, weighted",hsv,16-16-16,20,20,True,False,wasserstein,0.4666666666666667,0.5549999999999999
+hue condition,"16-16-16, hue if S>20, V>40","hue if S>20, V>40",hsv,16-16-16,20,40,False,False,euclidean,0.3333333333333333,0.38722222222222225
+hue condition,"16-16-16, hue if S>20, V>40","hue if S>20, V>40",hsv,16-16-16,20,40,False,False,l1,0.5333333333333333,0.6233333333333333
+hue condition,"16-16-16, hue if S>20, V>40","hue if S>20, V>40",hsv,16-16-16,20,40,False,False,chi2,0.5666666666666667,0.625
+hue condition,"16-16-16, hue if S>20, V>40","hue if S>20, V>40",hsv,16-16-16,20,40,False,False,intersection,0.5333333333333333,0.6233333333333333
+hue condition,"16-16-16, hue if S>20, V>40","hue if S>20, V>40",hsv,16-16-16,20,40,False,False,hellinger,0.5,0.586111111111111
+hue condition,"16-16-16, hue if S>20, V>40","hue if S>20, V>40",hsv,16-16-16,20,40,False,False,wasserstein,0.43333333333333335,0.5177777777777777
+hue condition,"16-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-16,20,40,True,False,euclidean,0.36666666666666664,0.4261111111111111
+hue condition,"16-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-16,20,40,True,False,l1,0.5666666666666667,0.64
+hue condition,"16-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-16,20,40,True,False,chi2,0.5333333333333333,0.6083333333333333
+hue condition,"16-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-16,20,40,True,False,intersection,0.4666666666666667,0.5677777777777777
+hue condition,"16-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-16,20,40,True,False,hellinger,0.3333333333333333,0.45222222222222225
+hue condition,"16-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-16,20,40,True,False,wasserstein,0.43333333333333335,0.5177777777777777
+hue condition,"16-16-16, hue if S>20, V>60","hue if S>20, V>60",hsv,16-16-16,20,60,False,False,euclidean,0.3,0.38388888888888884
+hue condition,"16-16-16, hue if S>20, V>60","hue if S>20, V>60",hsv,16-16-16,20,60,False,False,l1,0.5333333333333333,0.6066666666666667
+hue condition,"16-16-16, hue if S>20, V>60","hue if S>20, V>60",hsv,16-16-16,20,60,False,False,chi2,0.5,0.5694444444444444
+hue condition,"16-16-16, hue if S>20, V>60","hue if S>20, V>60",hsv,16-16-16,20,60,False,False,intersection,0.5333333333333333,0.6066666666666667
+hue condition,"16-16-16, hue if S>20, V>60","hue if S>20, V>60",hsv,16-16-16,20,60,False,False,hellinger,0.4666666666666667,0.5594444444444444
+hue condition,"16-16-16, hue if S>20, V>60","hue if S>20, V>60",hsv,16-16-16,20,60,False,False,wasserstein,0.4666666666666667,0.5205555555555555
+hue condition,"16-16-16, hue if S>20, V>60, weighted","hue if S>20, V>60, weighted",hsv,16-16-16,20,60,True,False,euclidean,0.4,0.45
+hue condition,"16-16-16, hue if S>20, V>60, weighted","hue if S>20, V>60, weighted",hsv,16-16-16,20,60,True,False,l1,0.5333333333333333,0.6177777777777778
+hue condition,"16-16-16, hue if S>20, V>60, weighted","hue if S>20, V>60, weighted",hsv,16-16-16,20,60,True,False,chi2,0.4666666666666667,0.5694444444444444
+hue condition,"16-16-16, hue if S>20, V>60, weighted","hue if S>20, V>60, weighted",hsv,16-16-16,20,60,True,False,intersection,0.4666666666666667,0.5722222222222222
+hue condition,"16-16-16, hue if S>20, V>60, weighted","hue if S>20, V>60, weighted",hsv,16-16-16,20,60,True,False,hellinger,0.3333333333333333,0.4305555555555555
+hue condition,"16-16-16, hue if S>20, V>60, weighted","hue if S>20, V>60, weighted",hsv,16-16-16,20,60,True,False,wasserstein,0.4666666666666667,0.5205555555555555
+hue condition,"16-16-16, hue if S>40",hue if S>40,hsv,16-16-16,40,-1,False,False,euclidean,0.3,0.38833333333333336
+hue condition,"16-16-16, hue if S>40",hue if S>40,hsv,16-16-16,40,-1,False,False,l1,0.4666666666666667,0.5483333333333333
+hue condition,"16-16-16, hue if S>40",hue if S>40,hsv,16-16-16,40,-1,False,False,chi2,0.5333333333333333,0.5888888888888889
+hue condition,"16-16-16, hue if S>40",hue if S>40,hsv,16-16-16,40,-1,False,False,intersection,0.4666666666666667,0.5483333333333333
+hue condition,"16-16-16, hue if S>40",hue if S>40,hsv,16-16-16,40,-1,False,False,hellinger,0.5333333333333333,0.5888888888888889
+hue condition,"16-16-16, hue if S>40",hue if S>40,hsv,16-16-16,40,-1,False,False,wasserstein,0.4,0.5016666666666667
+hue condition,"16-16-16, hue if S>40, weighted","hue if S>40, weighted",hsv,16-16-16,40,-1,True,False,euclidean,0.3,0.37722222222222224
+hue condition,"16-16-16, hue if S>40, weighted","hue if S>40, weighted",hsv,16-16-16,40,-1,True,False,l1,0.43333333333333335,0.5566666666666666
+hue condition,"16-16-16, hue if S>40, weighted","hue if S>40, weighted",hsv,16-16-16,40,-1,True,False,chi2,0.5,0.5777777777777778
+hue condition,"16-16-16, hue if S>40, weighted","hue if S>40, weighted",hsv,16-16-16,40,-1,True,False,intersection,0.4,0.5233333333333333
+hue condition,"16-16-16, hue if S>40, weighted","hue if S>40, weighted",hsv,16-16-16,40,-1,True,False,hellinger,0.36666666666666664,0.45
+hue condition,"16-16-16, hue if S>40, weighted","hue if S>40, weighted",hsv,16-16-16,40,-1,True,False,wasserstein,0.4,0.5016666666666667
+hue condition,"16-16-16, hue if S>40, V>20","hue if S>40, V>20",hsv,16-16-16,40,20,False,False,euclidean,0.3333333333333333,0.4038888888888889
+hue condition,"16-16-16, hue if S>40, V>20","hue if S>40, V>20",hsv,16-16-16,40,20,False,False,l1,0.4666666666666667,0.5688888888888889
+hue condition,"16-16-16, hue if S>40, V>20","hue if S>40, V>20",hsv,16-16-16,40,20,False,False,chi2,0.5666666666666667,0.6111111111111112
+hue condition,"16-16-16, hue if S>40, V>20","hue if S>40, V>20",hsv,16-16-16,40,20,False,False,intersection,0.4666666666666667,0.5688888888888889
+hue condition,"16-16-16, hue if S>40, V>20","hue if S>40, V>20",hsv,16-16-16,40,20,False,False,hellinger,0.5333333333333333,0.5944444444444446
+hue condition,"16-16-16, hue if S>40, V>20","hue if S>40, V>20",hsv,16-16-16,40,20,False,False,wasserstein,0.4,0.4922222222222222
+hue condition,"16-16-16, hue if S>40, V>20, weighted","hue if S>40, V>20, weighted",hsv,16-16-16,40,20,True,False,euclidean,0.36666666666666664,0.4311111111111111
+hue condition,"16-16-16, hue if S>40, V>20, weighted","hue if S>40, V>20, weighted",hsv,16-16-16,40,20,True,False,l1,0.5,0.5938888888888889
+hue condition,"16-16-16, hue if S>40, V>20, weighted","hue if S>40, V>20, weighted",hsv,16-16-16,40,20,True,False,chi2,0.5333333333333333,0.5944444444444446
+hue condition,"16-16-16, hue if S>40, V>20, weighted","hue if S>40, V>20, weighted",hsv,16-16-16,40,20,True,False,intersection,0.43333333333333335,0.5344444444444444
+hue condition,"16-16-16, hue if S>40, V>20, weighted","hue if S>40, V>20, weighted",hsv,16-16-16,40,20,True,False,hellinger,0.36666666666666664,0.45
+hue condition,"16-16-16, hue if S>40, V>20, weighted","hue if S>40, V>20, weighted",hsv,16-16-16,40,20,True,False,wasserstein,0.4,0.4922222222222222
+hue condition,"16-16-16, hue if S>40, V>40","hue if S>40, V>40",hsv,16-16-16,40,40,False,False,euclidean,0.36666666666666664,0.43444444444444447
+hue condition,"16-16-16, hue if S>40, V>40","hue if S>40, V>40",hsv,16-16-16,40,40,False,False,l1,0.5,0.5872222222222222
+hue condition,"16-16-16, hue if S>40, V>40","hue if S>40, V>40",hsv,16-16-16,40,40,False,False,chi2,0.5666666666666667,0.6177777777777778
+hue condition,"16-16-16, hue if S>40, V>40","hue if S>40, V>40",hsv,16-16-16,40,40,False,False,intersection,0.5,0.5872222222222222
+hue condition,"16-16-16, hue if S>40, V>40","hue if S>40, V>40",hsv,16-16-16,40,40,False,False,hellinger,0.5333333333333333,0.601111111111111
+hue condition,"16-16-16, hue if S>40, V>40","hue if S>40, V>40",hsv,16-16-16,40,40,False,False,wasserstein,0.4,0.49000000000000005
+hue condition,"16-16-16, hue if S>40, V>40, weighted","hue if S>40, V>40, weighted",hsv,16-16-16,40,40,True,False,euclidean,0.36666666666666664,0.4233333333333333
+hue condition,"16-16-16, hue if S>40, V>40, weighted","hue if S>40, V>40, weighted",hsv,16-16-16,40,40,True,False,l1,0.5,0.5994444444444444
+hue condition,"16-16-16, hue if S>40, V>40, weighted","hue if S>40, V>40, weighted",hsv,16-16-16,40,40,True,False,chi2,0.5333333333333333,0.5944444444444446
+hue condition,"16-16-16, hue if S>40, V>40, weighted","hue if S>40, V>40, weighted",hsv,16-16-16,40,40,True,False,intersection,0.43333333333333335,0.5455555555555556
+hue condition,"16-16-16, hue if S>40, V>40, weighted","hue if S>40, V>40, weighted",hsv,16-16-16,40,40,True,False,hellinger,0.3,0.41611111111111115
+hue condition,"16-16-16, hue if S>40, V>40, weighted","hue if S>40, V>40, weighted",hsv,16-16-16,40,40,True,False,wasserstein,0.4,0.49000000000000005
+hue condition,"16-16-16, hue if S>40, V>60","hue if S>40, V>60",hsv,16-16-16,40,60,False,False,euclidean,0.3333333333333333,0.40944444444444444
+hue condition,"16-16-16, hue if S>40, V>60","hue if S>40, V>60",hsv,16-16-16,40,60,False,False,l1,0.4666666666666667,0.5722222222222222
+hue condition,"16-16-16, hue if S>40, V>60","hue if S>40, V>60",hsv,16-16-16,40,60,False,False,chi2,0.5333333333333333,0.59
+hue condition,"16-16-16, hue if S>40, V>60","hue if S>40, V>60",hsv,16-16-16,40,60,False,False,intersection,0.4666666666666667,0.5722222222222222
+hue condition,"16-16-16, hue if S>40, V>60","hue if S>40, V>60",hsv,16-16-16,40,60,False,False,hellinger,0.43333333333333335,0.5233333333333333
+hue condition,"16-16-16, hue if S>40, V>60","hue if S>40, V>60",hsv,16-16-16,40,60,False,False,wasserstein,0.4,0.4861111111111111
+hue condition,"16-16-16, hue if S>40, V>60, weighted","hue if S>40, V>60, weighted",hsv,16-16-16,40,60,True,False,euclidean,0.43333333333333335,0.47
+hue condition,"16-16-16, hue if S>40, V>60, weighted","hue if S>40, V>60, weighted",hsv,16-16-16,40,60,True,False,l1,0.5,0.5927777777777777
+hue condition,"16-16-16, hue if S>40, V>60, weighted","hue if S>40, V>60, weighted",hsv,16-16-16,40,60,True,False,chi2,0.5666666666666667,0.6111111111111112
+hue condition,"16-16-16, hue if S>40, V>60, weighted","hue if S>40, V>60, weighted",hsv,16-16-16,40,60,True,False,intersection,0.43333333333333335,0.55
+hue condition,"16-16-16, hue if S>40, V>60, weighted","hue if S>40, V>60, weighted",hsv,16-16-16,40,60,True,False,hellinger,0.3333333333333333,0.4055555555555556
+hue condition,"16-16-16, hue if S>40, V>60, weighted","hue if S>40, V>60, weighted",hsv,16-16-16,40,60,True,False,wasserstein,0.4,0.4861111111111111
+hue condition,"16-16-16, hue if S>60",hue if S>60,hsv,16-16-16,60,-1,False,False,euclidean,0.23333333333333334,0.3361111111111111
+hue condition,"16-16-16, hue if S>60",hue if S>60,hsv,16-16-16,60,-1,False,False,l1,0.43333333333333335,0.5366666666666667
+hue condition,"16-16-16, hue if S>60",hue if S>60,hsv,16-16-16,60,-1,False,False,chi2,0.5,0.5788888888888889
+hue condition,"16-16-16, hue if S>60",hue if S>60,hsv,16-16-16,60,-1,False,False,intersection,0.43333333333333335,0.5366666666666667
+hue condition,"16-16-16, hue if S>60",hue if S>60,hsv,16-16-16,60,-1,False,False,hellinger,0.5333333333333333,0.6
+hue condition,"16-16-16, hue if S>60",hue if S>60,hsv,16-16-16,60,-1,False,False,wasserstein,0.4,0.4972222222222223
+hue condition,"16-16-16, hue if S>60, weighted","hue if S>60, weighted",hsv,16-16-16,60,-1,True,False,euclidean,0.3,0.36333333333333334
+hue condition,"16-16-16, hue if S>60, weighted","hue if S>60, weighted",hsv,16-16-16,60,-1,True,False,l1,0.4666666666666667,0.5594444444444444
+hue condition,"16-16-16, hue if S>60, weighted","hue if S>60, weighted",hsv,16-16-16,60,-1,True,False,chi2,0.5,0.575
+hue condition,"16-16-16, hue if S>60, weighted","hue if S>60, weighted",hsv,16-16-16,60,-1,True,False,intersection,0.4666666666666667,0.5455555555555556
+hue condition,"16-16-16, hue if S>60, weighted","hue if S>60, weighted",hsv,16-16-16,60,-1,True,False,hellinger,0.3333333333333333,0.39722222222222225
+hue condition,"16-16-16, hue if S>60, weighted","hue if S>60, weighted",hsv,16-16-16,60,-1,True,False,wasserstein,0.4,0.4972222222222223
+hue condition,"16-16-16, hue if S>60, V>20","hue if S>60, V>20",hsv,16-16-16,60,20,False,False,euclidean,0.26666666666666666,0.33388888888888885
+hue condition,"16-16-16, hue if S>60, V>20","hue if S>60, V>20",hsv,16-16-16,60,20,False,False,l1,0.43333333333333335,0.5433333333333333
+hue condition,"16-16-16, hue if S>60, V>20","hue if S>60, V>20",hsv,16-16-16,60,20,False,False,chi2,0.5666666666666667,0.6177777777777779
+hue condition,"16-16-16, hue if S>60, V>20","hue if S>60, V>20",hsv,16-16-16,60,20,False,False,intersection,0.43333333333333335,0.5433333333333333
+hue condition,"16-16-16, hue if S>60, V>20","hue if S>60, V>20",hsv,16-16-16,60,20,False,False,hellinger,0.5666666666666667,0.6222222222222222
+hue condition,"16-16-16, hue if S>60, V>20","hue if S>60, V>20",hsv,16-16-16,60,20,False,False,wasserstein,0.4,0.49388888888888893
+hue condition,"16-16-16, hue if S>60, V>20, weighted","hue if S>60, V>20, weighted",hsv,16-16-16,60,20,True,False,euclidean,0.3333333333333333,0.38166666666666665
+hue condition,"16-16-16, hue if S>60, V>20, weighted","hue if S>60, V>20, weighted",hsv,16-16-16,60,20,True,False,l1,0.5,0.5772222222222222
+hue condition,"16-16-16, hue if S>60, V>20, weighted","hue if S>60, V>20, weighted",hsv,16-16-16,60,20,True,False,chi2,0.5,0.5705555555555556
+hue condition,"16-16-16, hue if S>60, V>20, weighted","hue if S>60, V>20, weighted",hsv,16-16-16,60,20,True,False,intersection,0.4666666666666667,0.5455555555555556
+hue condition,"16-16-16, hue if S>60, V>20, weighted","hue if S>60, V>20, weighted",hsv,16-16-16,60,20,True,False,hellinger,0.3,0.3922222222222222
+hue condition,"16-16-16, hue if S>60, V>20, weighted","hue if S>60, V>20, weighted",hsv,16-16-16,60,20,True,False,wasserstein,0.4,0.49388888888888893
+hue condition,"16-16-16, hue if S>60, V>40","hue if S>60, V>40",hsv,16-16-16,60,40,False,False,euclidean,0.3,0.3711111111111111
+hue condition,"16-16-16, hue if S>60, V>40","hue if S>60, V>40",hsv,16-16-16,60,40,False,False,l1,0.5,0.601111111111111
+hue condition,"16-16-16, hue if S>60, V>40","hue if S>60, V>40",hsv,16-16-16,60,40,False,False,chi2,0.5333333333333333,0.6111111111111112
+hue condition,"16-16-16, hue if S>60, V>40","hue if S>60, V>40",hsv,16-16-16,60,40,False,False,intersection,0.5,0.601111111111111
+hue condition,"16-16-16, hue if S>60, V>40","hue if S>60, V>40",hsv,16-16-16,60,40,False,False,hellinger,0.5333333333333333,0.6205555555555555
+hue condition,"16-16-16, hue if S>60, V>40","hue if S>60, V>40",hsv,16-16-16,60,40,False,False,wasserstein,0.43333333333333335,0.5205555555555555
+hue condition,"16-16-16, hue if S>60, V>40, weighted","hue if S>60, V>40, weighted",hsv,16-16-16,60,40,True,False,euclidean,0.3333333333333333,0.38722222222222225
+hue condition,"16-16-16, hue if S>60, V>40, weighted","hue if S>60, V>40, weighted",hsv,16-16-16,60,40,True,False,l1,0.4666666666666667,0.58
+hue condition,"16-16-16, hue if S>60, V>40, weighted","hue if S>60, V>40, weighted",hsv,16-16-16,60,40,True,False,chi2,0.5,0.576111111111111
+hue condition,"16-16-16, hue if S>60, V>40, weighted","hue if S>60, V>40, weighted",hsv,16-16-16,60,40,True,False,intersection,0.4666666666666667,0.5705555555555556
+hue condition,"16-16-16, hue if S>60, V>40, weighted","hue if S>60, V>40, weighted",hsv,16-16-16,60,40,True,False,hellinger,0.26666666666666666,0.38277777777777783
+hue condition,"16-16-16, hue if S>60, V>40, weighted","hue if S>60, V>40, weighted",hsv,16-16-16,60,40,True,False,wasserstein,0.43333333333333335,0.5205555555555555
+hue condition,"16-16-16, hue if S>60, V>60","hue if S>60, V>60",hsv,16-16-16,60,60,False,False,euclidean,0.26666666666666666,0.33111111111111113
+hue condition,"16-16-16, hue if S>60, V>60","hue if S>60, V>60",hsv,16-16-16,60,60,False,False,l1,0.5,0.591111111111111
+hue condition,"16-16-16, hue if S>60, V>60","hue if S>60, V>60",hsv,16-16-16,60,60,False,False,chi2,0.5333333333333333,0.6055555555555556
+hue condition,"16-16-16, hue if S>60, V>60","hue if S>60, V>60",hsv,16-16-16,60,60,False,False,intersection,0.5,0.591111111111111
+hue condition,"16-16-16, hue if S>60, V>60","hue if S>60, V>60",hsv,16-16-16,60,60,False,False,hellinger,0.43333333333333335,0.5538888888888889
+hue condition,"16-16-16, hue if S>60, V>60","hue if S>60, V>60",hsv,16-16-16,60,60,False,False,wasserstein,0.43333333333333335,0.5277777777777778
+hue condition,"16-16-16, hue if S>60, V>60, weighted","hue if S>60, V>60, weighted",hsv,16-16-16,60,60,True,False,euclidean,0.3333333333333333,0.3927777777777778
+hue condition,"16-16-16, hue if S>60, V>60, weighted","hue if S>60, V>60, weighted",hsv,16-16-16,60,60,True,False,l1,0.43333333333333335,0.5566666666666666
+hue condition,"16-16-16, hue if S>60, V>60, weighted","hue if S>60, V>60, weighted",hsv,16-16-16,60,60,True,False,chi2,0.5,0.5861111111111111
+hue condition,"16-16-16, hue if S>60, V>60, weighted","hue if S>60, V>60, weighted",hsv,16-16-16,60,60,True,False,intersection,0.4666666666666667,0.575
+hue condition,"16-16-16, hue if S>60, V>60, weighted","hue if S>60, V>60, weighted",hsv,16-16-16,60,60,True,False,hellinger,0.26666666666666666,0.35666666666666663
+hue condition,"16-16-16, hue if S>60, V>60, weighted","hue if S>60, V>60, weighted",hsv,16-16-16,60,60,True,False,wasserstein,0.43333333333333335,0.5277777777777778
+bins + hue condition,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,euclidean,0.3,0.36333333333333334
+bins + hue condition,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,l1,0.5333333333333333,0.5916666666666667
+bins + hue condition,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,chi2,0.5333333333333333,0.6038888888888889
+bins + hue condition,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,intersection,0.5333333333333333,0.5916666666666667
+bins + hue condition,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,hellinger,0.5,0.5744444444444444
+bins + hue condition,"16-16-16, hue on all pixels",hue on all pixels,hsv,16-16-16,-1,-1,False,False,wasserstein,0.4666666666666667,0.5411111111111111
+bins + hue condition,"16-16-16, hue if V>20",hue if V>20,hsv,16-16-16,-1,20,False,False,euclidean,0.3,0.38555555555555554
+bins + hue condition,"16-16-16, hue if V>20",hue if V>20,hsv,16-16-16,-1,20,False,False,l1,0.5333333333333333,0.6094444444444443
+bins + hue condition,"16-16-16, hue if V>20",hue if V>20,hsv,16-16-16,-1,20,False,False,chi2,0.5333333333333333,0.6022222222222222
+bins + hue condition,"16-16-16, hue if V>20",hue if V>20,hsv,16-16-16,-1,20,False,False,intersection,0.5333333333333333,0.6094444444444443
+bins + hue condition,"16-16-16, hue if V>20",hue if V>20,hsv,16-16-16,-1,20,False,False,hellinger,0.5,0.5733333333333334
+bins + hue condition,"16-16-16, hue if V>20",hue if V>20,hsv,16-16-16,-1,20,False,False,wasserstein,0.4666666666666667,0.5494444444444445
+bins + hue condition,"16-16-16, hue if V>20, weighted","hue if V>20, weighted",hsv,16-16-16,-1,20,True,False,euclidean,0.3,0.38833333333333336
+bins + hue condition,"16-16-16, hue if V>20, weighted","hue if V>20, weighted",hsv,16-16-16,-1,20,True,False,l1,0.5333333333333333,0.6038888888888889
+bins + hue condition,"16-16-16, hue if V>20, weighted","hue if V>20, weighted",hsv,16-16-16,-1,20,True,False,chi2,0.5333333333333333,0.6077777777777779
+bins + hue condition,"16-16-16, hue if V>20, weighted","hue if V>20, weighted",hsv,16-16-16,-1,20,True,False,intersection,0.5,0.5805555555555555
+bins + hue condition,"16-16-16, hue if V>20, weighted","hue if V>20, weighted",hsv,16-16-16,-1,20,True,False,hellinger,0.4,0.5005555555555555
+bins + hue condition,"16-16-16, hue if V>20, weighted","hue if V>20, weighted",hsv,16-16-16,-1,20,True,False,wasserstein,0.4666666666666667,0.5494444444444445
+bins + hue condition,"16-16-16, hue if V>40",hue if V>40,hsv,16-16-16,-1,40,False,False,euclidean,0.3333333333333333,0.3977777777777778
+bins + hue condition,"16-16-16, hue if V>40",hue if V>40,hsv,16-16-16,-1,40,False,False,l1,0.5666666666666667,0.6316666666666666
+bins + hue condition,"16-16-16, hue if V>40",hue if V>40,hsv,16-16-16,-1,40,False,False,chi2,0.5333333333333333,0.6066666666666667
+bins + hue condition,"16-16-16, hue if V>40",hue if V>40,hsv,16-16-16,-1,40,False,False,intersection,0.5666666666666667,0.6316666666666666
+bins + hue condition,"16-16-16, hue if V>40",hue if V>40,hsv,16-16-16,-1,40,False,False,hellinger,0.5333333333333333,0.5844444444444444
+bins + hue condition,"16-16-16, hue if V>40",hue if V>40,hsv,16-16-16,-1,40,False,False,wasserstein,0.43333333333333335,0.5277777777777778
+bins + hue condition,"16-16-16, hue if V>40, weighted","hue if V>40, weighted",hsv,16-16-16,-1,40,True,False,euclidean,0.3,0.3994444444444445
+bins + hue condition,"16-16-16, hue if V>40, weighted","hue if V>40, weighted",hsv,16-16-16,-1,40,True,False,l1,0.5666666666666667,0.6344444444444444
+bins + hue condition,"16-16-16, hue if V>40, weighted","hue if V>40, weighted",hsv,16-16-16,-1,40,True,False,chi2,0.5333333333333333,0.6066666666666667
+bins + hue condition,"16-16-16, hue if V>40, weighted","hue if V>40, weighted",hsv,16-16-16,-1,40,True,False,intersection,0.4666666666666667,0.5416666666666666
+bins + hue condition,"16-16-16, hue if V>40, weighted","hue if V>40, weighted",hsv,16-16-16,-1,40,True,False,hellinger,0.3333333333333333,0.43
+bins + hue condition,"16-16-16, hue if V>40, weighted","hue if V>40, weighted",hsv,16-16-16,-1,40,True,False,wasserstein,0.43333333333333335,0.5277777777777778
+bins + hue condition,"16-16-16, hue if V>60",hue if V>60,hsv,16-16-16,-1,60,False,False,euclidean,0.3,0.3711111111111111
+bins + hue condition,"16-16-16, hue if V>60",hue if V>60,hsv,16-16-16,-1,60,False,False,l1,0.5666666666666667,0.6133333333333333
+bins + hue condition,"16-16-16, hue if V>60",hue if V>60,hsv,16-16-16,-1,60,False,False,chi2,0.5,0.5638888888888888
+bins + hue condition,"16-16-16, hue if V>60",hue if V>60,hsv,16-16-16,-1,60,False,False,intersection,0.5666666666666667,0.6133333333333333
+bins + hue condition,"16-16-16, hue if V>60",hue if V>60,hsv,16-16-16,-1,60,False,False,hellinger,0.4666666666666667,0.5316666666666666
+bins + hue condition,"16-16-16, hue if V>60",hue if V>60,hsv,16-16-16,-1,60,False,False,wasserstein,0.5,0.5444444444444445
+bins + hue condition,"16-16-16, hue if V>60, weighted","hue if V>60, weighted",hsv,16-16-16,-1,60,True,False,euclidean,0.36666666666666664,0.44
+bins + hue condition,"16-16-16, hue if V>60, weighted","hue if V>60, weighted",hsv,16-16-16,-1,60,True,False,l1,0.5333333333333333,0.6066666666666667
+bins + hue condition,"16-16-16, hue if V>60, weighted","hue if V>60, weighted",hsv,16-16-16,-1,60,True,False,chi2,0.5333333333333333,0.5955555555555555
+bins + hue condition,"16-16-16, hue if V>60, weighted","hue if V>60, weighted",hsv,16-16-16,-1,60,True,False,intersection,0.4666666666666667,0.5527777777777777
+bins + hue condition,"16-16-16, hue if V>60, weighted","hue if V>60, weighted",hsv,16-16-16,-1,60,True,False,hellinger,0.3333333333333333,0.43555555555555553
+bins + hue condition,"16-16-16, hue if V>60, weighted","hue if V>60, weighted",hsv,16-16-16,-1,60,True,False,wasserstein,0.5,0.5444444444444445
+bins + hue condition,"16-16-16, hue if S>20",hue if S>20,hsv,16-16-16,20,-1,False,False,euclidean,0.26666666666666666,0.35888888888888887
+bins + hue condition,"16-16-16, hue if S>20",hue if S>20,hsv,16-16-16,20,-1,False,False,l1,0.5333333333333333,0.6083333333333333
+bins + hue condition,"16-16-16, hue if S>20",hue if S>20,hsv,16-16-16,20,-1,False,False,chi2,0.5,0.5972222222222222
+bins + hue condition,"16-16-16, hue if S>20",hue if S>20,hsv,16-16-16,20,-1,False,False,intersection,0.5333333333333333,0.6083333333333333
+bins + hue condition,"16-16-16, hue if S>20",hue if S>20,hsv,16-16-16,20,-1,False,False,hellinger,0.4666666666666667,0.575
+bins + hue condition,"16-16-16, hue if S>20",hue if S>20,hsv,16-16-16,20,-1,False,False,wasserstein,0.4666666666666667,0.5505555555555556
+bins + hue condition,"16-16-16, hue if S>20, weighted","hue if S>20, weighted",hsv,16-16-16,20,-1,True,False,euclidean,0.3333333333333333,0.3994444444444445
+bins + hue condition,"16-16-16, hue if S>20, weighted","hue if S>20, weighted",hsv,16-16-16,20,-1,True,False,l1,0.5,0.5916666666666667
+bins + hue condition,"16-16-16, hue if S>20, weighted","hue if S>20, weighted",hsv,16-16-16,20,-1,True,False,chi2,0.5,0.5944444444444446
+bins + hue condition,"16-16-16, hue if S>20, weighted","hue if S>20, weighted",hsv,16-16-16,20,-1,True,False,intersection,0.5,0.5972222222222221
+bins + hue condition,"16-16-16, hue if S>20, weighted","hue if S>20, weighted",hsv,16-16-16,20,-1,True,False,hellinger,0.4,0.5111111111111111
+bins + hue condition,"16-16-16, hue if S>20, weighted","hue if S>20, weighted",hsv,16-16-16,20,-1,True,False,wasserstein,0.4666666666666667,0.5505555555555556
+bins + hue condition,"16-16-16, hue if S>20, V>20","hue if S>20, V>20",hsv,16-16-16,20,20,False,False,euclidean,0.3,0.38
+bins + hue condition,"16-16-16, hue if S>20, V>20","hue if S>20, V>20",hsv,16-16-16,20,20,False,False,l1,0.5,0.5944444444444444
+bins + hue condition,"16-16-16, hue if S>20, V>20","hue if S>20, V>20",hsv,16-16-16,20,20,False,False,chi2,0.5333333333333333,0.615
+bins + hue condition,"16-16-16, hue if S>20, V>20","hue if S>20, V>20",hsv,16-16-16,20,20,False,False,intersection,0.5,0.5944444444444444
+bins + hue condition,"16-16-16, hue if S>20, V>20","hue if S>20, V>20",hsv,16-16-16,20,20,False,False,hellinger,0.5,0.5888888888888889
+bins + hue condition,"16-16-16, hue if S>20, V>20","hue if S>20, V>20",hsv,16-16-16,20,20,False,False,wasserstein,0.4666666666666667,0.5549999999999999
+bins + hue condition,"16-16-16, hue if S>20, V>20, weighted","hue if S>20, V>20, weighted",hsv,16-16-16,20,20,True,False,euclidean,0.36666666666666664,0.4216666666666667
+bins + hue condition,"16-16-16, hue if S>20, V>20, weighted","hue if S>20, V>20, weighted",hsv,16-16-16,20,20,True,False,l1,0.5333333333333333,0.6027777777777779
+bins + hue condition,"16-16-16, hue if S>20, V>20, weighted","hue if S>20, V>20, weighted",hsv,16-16-16,20,20,True,False,chi2,0.5,0.5983333333333333
+bins + hue condition,"16-16-16, hue if S>20, V>20, weighted","hue if S>20, V>20, weighted",hsv,16-16-16,20,20,True,False,intersection,0.5,0.5788888888888889
+bins + hue condition,"16-16-16, hue if S>20, V>20, weighted","hue if S>20, V>20, weighted",hsv,16-16-16,20,20,True,False,hellinger,0.3333333333333333,0.48000000000000004
+bins + hue condition,"16-16-16, hue if S>20, V>20, weighted","hue if S>20, V>20, weighted",hsv,16-16-16,20,20,True,False,wasserstein,0.4666666666666667,0.5549999999999999
+bins + hue condition,"16-16-16, hue if S>20, V>40","hue if S>20, V>40",hsv,16-16-16,20,40,False,False,euclidean,0.3333333333333333,0.38722222222222225
+bins + hue condition,"16-16-16, hue if S>20, V>40","hue if S>20, V>40",hsv,16-16-16,20,40,False,False,l1,0.5333333333333333,0.6233333333333333
+bins + hue condition,"16-16-16, hue if S>20, V>40","hue if S>20, V>40",hsv,16-16-16,20,40,False,False,chi2,0.5666666666666667,0.625
+bins + hue condition,"16-16-16, hue if S>20, V>40","hue if S>20, V>40",hsv,16-16-16,20,40,False,False,intersection,0.5333333333333333,0.6233333333333333
+bins + hue condition,"16-16-16, hue if S>20, V>40","hue if S>20, V>40",hsv,16-16-16,20,40,False,False,hellinger,0.5,0.586111111111111
+bins + hue condition,"16-16-16, hue if S>20, V>40","hue if S>20, V>40",hsv,16-16-16,20,40,False,False,wasserstein,0.43333333333333335,0.5177777777777777
+bins + hue condition,"16-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-16,20,40,True,False,euclidean,0.36666666666666664,0.4261111111111111
+bins + hue condition,"16-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-16,20,40,True,False,l1,0.5666666666666667,0.64
+bins + hue condition,"16-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-16,20,40,True,False,chi2,0.5333333333333333,0.6083333333333333
+bins + hue condition,"16-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-16,20,40,True,False,intersection,0.4666666666666667,0.5677777777777777
+bins + hue condition,"16-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-16,20,40,True,False,hellinger,0.3333333333333333,0.45222222222222225
+bins + hue condition,"16-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-16,20,40,True,False,wasserstein,0.43333333333333335,0.5177777777777777
+bins + hue condition,"16-16-16, hue if S>20, V>60","hue if S>20, V>60",hsv,16-16-16,20,60,False,False,euclidean,0.3,0.38388888888888884
+bins + hue condition,"16-16-16, hue if S>20, V>60","hue if S>20, V>60",hsv,16-16-16,20,60,False,False,l1,0.5333333333333333,0.6066666666666667
+bins + hue condition,"16-16-16, hue if S>20, V>60","hue if S>20, V>60",hsv,16-16-16,20,60,False,False,chi2,0.5,0.5694444444444444
+bins + hue condition,"16-16-16, hue if S>20, V>60","hue if S>20, V>60",hsv,16-16-16,20,60,False,False,intersection,0.5333333333333333,0.6066666666666667
+bins + hue condition,"16-16-16, hue if S>20, V>60","hue if S>20, V>60",hsv,16-16-16,20,60,False,False,hellinger,0.4666666666666667,0.5594444444444444
+bins + hue condition,"16-16-16, hue if S>20, V>60","hue if S>20, V>60",hsv,16-16-16,20,60,False,False,wasserstein,0.4666666666666667,0.5205555555555555
+bins + hue condition,"16-16-16, hue if S>20, V>60, weighted","hue if S>20, V>60, weighted",hsv,16-16-16,20,60,True,False,euclidean,0.4,0.45
+bins + hue condition,"16-16-16, hue if S>20, V>60, weighted","hue if S>20, V>60, weighted",hsv,16-16-16,20,60,True,False,l1,0.5333333333333333,0.6177777777777778
+bins + hue condition,"16-16-16, hue if S>20, V>60, weighted","hue if S>20, V>60, weighted",hsv,16-16-16,20,60,True,False,chi2,0.4666666666666667,0.5694444444444444
+bins + hue condition,"16-16-16, hue if S>20, V>60, weighted","hue if S>20, V>60, weighted",hsv,16-16-16,20,60,True,False,intersection,0.4666666666666667,0.5722222222222222
+bins + hue condition,"16-16-16, hue if S>20, V>60, weighted","hue if S>20, V>60, weighted",hsv,16-16-16,20,60,True,False,hellinger,0.3333333333333333,0.4305555555555555
+bins + hue condition,"16-16-16, hue if S>20, V>60, weighted","hue if S>20, V>60, weighted",hsv,16-16-16,20,60,True,False,wasserstein,0.4666666666666667,0.5205555555555555
+bins + hue condition,"16-16-16, hue if S>40",hue if S>40,hsv,16-16-16,40,-1,False,False,euclidean,0.3,0.38833333333333336
+bins + hue condition,"16-16-16, hue if S>40",hue if S>40,hsv,16-16-16,40,-1,False,False,l1,0.4666666666666667,0.5483333333333333
+bins + hue condition,"16-16-16, hue if S>40",hue if S>40,hsv,16-16-16,40,-1,False,False,chi2,0.5333333333333333,0.5888888888888889
+bins + hue condition,"16-16-16, hue if S>40",hue if S>40,hsv,16-16-16,40,-1,False,False,intersection,0.4666666666666667,0.5483333333333333
+bins + hue condition,"16-16-16, hue if S>40",hue if S>40,hsv,16-16-16,40,-1,False,False,hellinger,0.5333333333333333,0.5888888888888889
+bins + hue condition,"16-16-16, hue if S>40",hue if S>40,hsv,16-16-16,40,-1,False,False,wasserstein,0.4,0.5016666666666667
+bins + hue condition,"16-16-16, hue if S>40, weighted","hue if S>40, weighted",hsv,16-16-16,40,-1,True,False,euclidean,0.3,0.37722222222222224
+bins + hue condition,"16-16-16, hue if S>40, weighted","hue if S>40, weighted",hsv,16-16-16,40,-1,True,False,l1,0.43333333333333335,0.5566666666666666
+bins + hue condition,"16-16-16, hue if S>40, weighted","hue if S>40, weighted",hsv,16-16-16,40,-1,True,False,chi2,0.5,0.5777777777777778
+bins + hue condition,"16-16-16, hue if S>40, weighted","hue if S>40, weighted",hsv,16-16-16,40,-1,True,False,intersection,0.4,0.5233333333333333
+bins + hue condition,"16-16-16, hue if S>40, weighted","hue if S>40, weighted",hsv,16-16-16,40,-1,True,False,hellinger,0.36666666666666664,0.45
+bins + hue condition,"16-16-16, hue if S>40, weighted","hue if S>40, weighted",hsv,16-16-16,40,-1,True,False,wasserstein,0.4,0.5016666666666667
+bins + hue condition,"16-16-16, hue if S>40, V>20","hue if S>40, V>20",hsv,16-16-16,40,20,False,False,euclidean,0.3333333333333333,0.4038888888888889
+bins + hue condition,"16-16-16, hue if S>40, V>20","hue if S>40, V>20",hsv,16-16-16,40,20,False,False,l1,0.4666666666666667,0.5688888888888889
+bins + hue condition,"16-16-16, hue if S>40, V>20","hue if S>40, V>20",hsv,16-16-16,40,20,False,False,chi2,0.5666666666666667,0.6111111111111112
+bins + hue condition,"16-16-16, hue if S>40, V>20","hue if S>40, V>20",hsv,16-16-16,40,20,False,False,intersection,0.4666666666666667,0.5688888888888889
+bins + hue condition,"16-16-16, hue if S>40, V>20","hue if S>40, V>20",hsv,16-16-16,40,20,False,False,hellinger,0.5333333333333333,0.5944444444444446
+bins + hue condition,"16-16-16, hue if S>40, V>20","hue if S>40, V>20",hsv,16-16-16,40,20,False,False,wasserstein,0.4,0.4922222222222222
+bins + hue condition,"16-16-16, hue if S>40, V>20, weighted","hue if S>40, V>20, weighted",hsv,16-16-16,40,20,True,False,euclidean,0.36666666666666664,0.4311111111111111
+bins + hue condition,"16-16-16, hue if S>40, V>20, weighted","hue if S>40, V>20, weighted",hsv,16-16-16,40,20,True,False,l1,0.5,0.5938888888888889
+bins + hue condition,"16-16-16, hue if S>40, V>20, weighted","hue if S>40, V>20, weighted",hsv,16-16-16,40,20,True,False,chi2,0.5333333333333333,0.5944444444444446
+bins + hue condition,"16-16-16, hue if S>40, V>20, weighted","hue if S>40, V>20, weighted",hsv,16-16-16,40,20,True,False,intersection,0.43333333333333335,0.5344444444444444
+bins + hue condition,"16-16-16, hue if S>40, V>20, weighted","hue if S>40, V>20, weighted",hsv,16-16-16,40,20,True,False,hellinger,0.36666666666666664,0.45
+bins + hue condition,"16-16-16, hue if S>40, V>20, weighted","hue if S>40, V>20, weighted",hsv,16-16-16,40,20,True,False,wasserstein,0.4,0.4922222222222222
+bins + hue condition,"16-16-16, hue if S>40, V>40","hue if S>40, V>40",hsv,16-16-16,40,40,False,False,euclidean,0.36666666666666664,0.43444444444444447
+bins + hue condition,"16-16-16, hue if S>40, V>40","hue if S>40, V>40",hsv,16-16-16,40,40,False,False,l1,0.5,0.5872222222222222
+bins + hue condition,"16-16-16, hue if S>40, V>40","hue if S>40, V>40",hsv,16-16-16,40,40,False,False,chi2,0.5666666666666667,0.6177777777777778
+bins + hue condition,"16-16-16, hue if S>40, V>40","hue if S>40, V>40",hsv,16-16-16,40,40,False,False,intersection,0.5,0.5872222222222222
+bins + hue condition,"16-16-16, hue if S>40, V>40","hue if S>40, V>40",hsv,16-16-16,40,40,False,False,hellinger,0.5333333333333333,0.601111111111111
+bins + hue condition,"16-16-16, hue if S>40, V>40","hue if S>40, V>40",hsv,16-16-16,40,40,False,False,wasserstein,0.4,0.49000000000000005
+bins + hue condition,"16-16-16, hue if S>40, V>40, weighted","hue if S>40, V>40, weighted",hsv,16-16-16,40,40,True,False,euclidean,0.36666666666666664,0.4233333333333333
+bins + hue condition,"16-16-16, hue if S>40, V>40, weighted","hue if S>40, V>40, weighted",hsv,16-16-16,40,40,True,False,l1,0.5,0.5994444444444444
+bins + hue condition,"16-16-16, hue if S>40, V>40, weighted","hue if S>40, V>40, weighted",hsv,16-16-16,40,40,True,False,chi2,0.5333333333333333,0.5944444444444446
+bins + hue condition,"16-16-16, hue if S>40, V>40, weighted","hue if S>40, V>40, weighted",hsv,16-16-16,40,40,True,False,intersection,0.43333333333333335,0.5455555555555556
+bins + hue condition,"16-16-16, hue if S>40, V>40, weighted","hue if S>40, V>40, weighted",hsv,16-16-16,40,40,True,False,hellinger,0.3,0.41611111111111115
+bins + hue condition,"16-16-16, hue if S>40, V>40, weighted","hue if S>40, V>40, weighted",hsv,16-16-16,40,40,True,False,wasserstein,0.4,0.49000000000000005
+bins + hue condition,"16-16-16, hue if S>40, V>60","hue if S>40, V>60",hsv,16-16-16,40,60,False,False,euclidean,0.3333333333333333,0.40944444444444444
+bins + hue condition,"16-16-16, hue if S>40, V>60","hue if S>40, V>60",hsv,16-16-16,40,60,False,False,l1,0.4666666666666667,0.5722222222222222
+bins + hue condition,"16-16-16, hue if S>40, V>60","hue if S>40, V>60",hsv,16-16-16,40,60,False,False,chi2,0.5333333333333333,0.59
+bins + hue condition,"16-16-16, hue if S>40, V>60","hue if S>40, V>60",hsv,16-16-16,40,60,False,False,intersection,0.4666666666666667,0.5722222222222222
+bins + hue condition,"16-16-16, hue if S>40, V>60","hue if S>40, V>60",hsv,16-16-16,40,60,False,False,hellinger,0.43333333333333335,0.5233333333333333
+bins + hue condition,"16-16-16, hue if S>40, V>60","hue if S>40, V>60",hsv,16-16-16,40,60,False,False,wasserstein,0.4,0.4861111111111111
+bins + hue condition,"16-16-16, hue if S>40, V>60, weighted","hue if S>40, V>60, weighted",hsv,16-16-16,40,60,True,False,euclidean,0.43333333333333335,0.47
+bins + hue condition,"16-16-16, hue if S>40, V>60, weighted","hue if S>40, V>60, weighted",hsv,16-16-16,40,60,True,False,l1,0.5,0.5927777777777777
+bins + hue condition,"16-16-16, hue if S>40, V>60, weighted","hue if S>40, V>60, weighted",hsv,16-16-16,40,60,True,False,chi2,0.5666666666666667,0.6111111111111112
+bins + hue condition,"16-16-16, hue if S>40, V>60, weighted","hue if S>40, V>60, weighted",hsv,16-16-16,40,60,True,False,intersection,0.43333333333333335,0.55
+bins + hue condition,"16-16-16, hue if S>40, V>60, weighted","hue if S>40, V>60, weighted",hsv,16-16-16,40,60,True,False,hellinger,0.3333333333333333,0.4055555555555556
+bins + hue condition,"16-16-16, hue if S>40, V>60, weighted","hue if S>40, V>60, weighted",hsv,16-16-16,40,60,True,False,wasserstein,0.4,0.4861111111111111
+bins + hue condition,"16-16-16, hue if S>60",hue if S>60,hsv,16-16-16,60,-1,False,False,euclidean,0.23333333333333334,0.3361111111111111
+bins + hue condition,"16-16-16, hue if S>60",hue if S>60,hsv,16-16-16,60,-1,False,False,l1,0.43333333333333335,0.5366666666666667
+bins + hue condition,"16-16-16, hue if S>60",hue if S>60,hsv,16-16-16,60,-1,False,False,chi2,0.5,0.5788888888888889
+bins + hue condition,"16-16-16, hue if S>60",hue if S>60,hsv,16-16-16,60,-1,False,False,intersection,0.43333333333333335,0.5366666666666667
+bins + hue condition,"16-16-16, hue if S>60",hue if S>60,hsv,16-16-16,60,-1,False,False,hellinger,0.5333333333333333,0.6
+bins + hue condition,"16-16-16, hue if S>60",hue if S>60,hsv,16-16-16,60,-1,False,False,wasserstein,0.4,0.4972222222222223
+bins + hue condition,"16-16-16, hue if S>60, weighted","hue if S>60, weighted",hsv,16-16-16,60,-1,True,False,euclidean,0.3,0.36333333333333334
+bins + hue condition,"16-16-16, hue if S>60, weighted","hue if S>60, weighted",hsv,16-16-16,60,-1,True,False,l1,0.4666666666666667,0.5594444444444444
+bins + hue condition,"16-16-16, hue if S>60, weighted","hue if S>60, weighted",hsv,16-16-16,60,-1,True,False,chi2,0.5,0.575
+bins + hue condition,"16-16-16, hue if S>60, weighted","hue if S>60, weighted",hsv,16-16-16,60,-1,True,False,intersection,0.4666666666666667,0.5455555555555556
+bins + hue condition,"16-16-16, hue if S>60, weighted","hue if S>60, weighted",hsv,16-16-16,60,-1,True,False,hellinger,0.3333333333333333,0.39722222222222225
+bins + hue condition,"16-16-16, hue if S>60, weighted","hue if S>60, weighted",hsv,16-16-16,60,-1,True,False,wasserstein,0.4,0.4972222222222223
+bins + hue condition,"16-16-16, hue if S>60, V>20","hue if S>60, V>20",hsv,16-16-16,60,20,False,False,euclidean,0.26666666666666666,0.33388888888888885
+bins + hue condition,"16-16-16, hue if S>60, V>20","hue if S>60, V>20",hsv,16-16-16,60,20,False,False,l1,0.43333333333333335,0.5433333333333333
+bins + hue condition,"16-16-16, hue if S>60, V>20","hue if S>60, V>20",hsv,16-16-16,60,20,False,False,chi2,0.5666666666666667,0.6177777777777779
+bins + hue condition,"16-16-16, hue if S>60, V>20","hue if S>60, V>20",hsv,16-16-16,60,20,False,False,intersection,0.43333333333333335,0.5433333333333333
+bins + hue condition,"16-16-16, hue if S>60, V>20","hue if S>60, V>20",hsv,16-16-16,60,20,False,False,hellinger,0.5666666666666667,0.6222222222222222
+bins + hue condition,"16-16-16, hue if S>60, V>20","hue if S>60, V>20",hsv,16-16-16,60,20,False,False,wasserstein,0.4,0.49388888888888893
+bins + hue condition,"16-16-16, hue if S>60, V>20, weighted","hue if S>60, V>20, weighted",hsv,16-16-16,60,20,True,False,euclidean,0.3333333333333333,0.38166666666666665
+bins + hue condition,"16-16-16, hue if S>60, V>20, weighted","hue if S>60, V>20, weighted",hsv,16-16-16,60,20,True,False,l1,0.5,0.5772222222222222
+bins + hue condition,"16-16-16, hue if S>60, V>20, weighted","hue if S>60, V>20, weighted",hsv,16-16-16,60,20,True,False,chi2,0.5,0.5705555555555556
+bins + hue condition,"16-16-16, hue if S>60, V>20, weighted","hue if S>60, V>20, weighted",hsv,16-16-16,60,20,True,False,intersection,0.4666666666666667,0.5455555555555556
+bins + hue condition,"16-16-16, hue if S>60, V>20, weighted","hue if S>60, V>20, weighted",hsv,16-16-16,60,20,True,False,hellinger,0.3,0.3922222222222222
+bins + hue condition,"16-16-16, hue if S>60, V>20, weighted","hue if S>60, V>20, weighted",hsv,16-16-16,60,20,True,False,wasserstein,0.4,0.49388888888888893
+bins + hue condition,"16-16-16, hue if S>60, V>40","hue if S>60, V>40",hsv,16-16-16,60,40,False,False,euclidean,0.3,0.3711111111111111
+bins + hue condition,"16-16-16, hue if S>60, V>40","hue if S>60, V>40",hsv,16-16-16,60,40,False,False,l1,0.5,0.601111111111111
+bins + hue condition,"16-16-16, hue if S>60, V>40","hue if S>60, V>40",hsv,16-16-16,60,40,False,False,chi2,0.5333333333333333,0.6111111111111112
+bins + hue condition,"16-16-16, hue if S>60, V>40","hue if S>60, V>40",hsv,16-16-16,60,40,False,False,intersection,0.5,0.601111111111111
+bins + hue condition,"16-16-16, hue if S>60, V>40","hue if S>60, V>40",hsv,16-16-16,60,40,False,False,hellinger,0.5333333333333333,0.6205555555555555
+bins + hue condition,"16-16-16, hue if S>60, V>40","hue if S>60, V>40",hsv,16-16-16,60,40,False,False,wasserstein,0.43333333333333335,0.5205555555555555
+bins + hue condition,"16-16-16, hue if S>60, V>40, weighted","hue if S>60, V>40, weighted",hsv,16-16-16,60,40,True,False,euclidean,0.3333333333333333,0.38722222222222225
+bins + hue condition,"16-16-16, hue if S>60, V>40, weighted","hue if S>60, V>40, weighted",hsv,16-16-16,60,40,True,False,l1,0.4666666666666667,0.58
+bins + hue condition,"16-16-16, hue if S>60, V>40, weighted","hue if S>60, V>40, weighted",hsv,16-16-16,60,40,True,False,chi2,0.5,0.576111111111111
+bins + hue condition,"16-16-16, hue if S>60, V>40, weighted","hue if S>60, V>40, weighted",hsv,16-16-16,60,40,True,False,intersection,0.4666666666666667,0.5705555555555556
+bins + hue condition,"16-16-16, hue if S>60, V>40, weighted","hue if S>60, V>40, weighted",hsv,16-16-16,60,40,True,False,hellinger,0.26666666666666666,0.38277777777777783
+bins + hue condition,"16-16-16, hue if S>60, V>40, weighted","hue if S>60, V>40, weighted",hsv,16-16-16,60,40,True,False,wasserstein,0.43333333333333335,0.5205555555555555
+bins + hue condition,"16-16-16, hue if S>60, V>60","hue if S>60, V>60",hsv,16-16-16,60,60,False,False,euclidean,0.26666666666666666,0.33111111111111113
+bins + hue condition,"16-16-16, hue if S>60, V>60","hue if S>60, V>60",hsv,16-16-16,60,60,False,False,l1,0.5,0.591111111111111
+bins + hue condition,"16-16-16, hue if S>60, V>60","hue if S>60, V>60",hsv,16-16-16,60,60,False,False,chi2,0.5333333333333333,0.6055555555555556
+bins + hue condition,"16-16-16, hue if S>60, V>60","hue if S>60, V>60",hsv,16-16-16,60,60,False,False,intersection,0.5,0.591111111111111
+bins + hue condition,"16-16-16, hue if S>60, V>60","hue if S>60, V>60",hsv,16-16-16,60,60,False,False,hellinger,0.43333333333333335,0.5538888888888889
+bins + hue condition,"16-16-16, hue if S>60, V>60","hue if S>60, V>60",hsv,16-16-16,60,60,False,False,wasserstein,0.43333333333333335,0.5277777777777778
+bins + hue condition,"16-16-16, hue if S>60, V>60, weighted","hue if S>60, V>60, weighted",hsv,16-16-16,60,60,True,False,euclidean,0.3333333333333333,0.3927777777777778
+bins + hue condition,"16-16-16, hue if S>60, V>60, weighted","hue if S>60, V>60, weighted",hsv,16-16-16,60,60,True,False,l1,0.43333333333333335,0.5566666666666666
+bins + hue condition,"16-16-16, hue if S>60, V>60, weighted","hue if S>60, V>60, weighted",hsv,16-16-16,60,60,True,False,chi2,0.5,0.5861111111111111
+bins + hue condition,"16-16-16, hue if S>60, V>60, weighted","hue if S>60, V>60, weighted",hsv,16-16-16,60,60,True,False,intersection,0.4666666666666667,0.575
+bins + hue condition,"16-16-16, hue if S>60, V>60, weighted","hue if S>60, V>60, weighted",hsv,16-16-16,60,60,True,False,hellinger,0.26666666666666666,0.35666666666666663
+bins + hue condition,"16-16-16, hue if S>60, V>60, weighted","hue if S>60, V>60, weighted",hsv,16-16-16,60,60,True,False,wasserstein,0.43333333333333335,0.5277777777777778
+bins + hue condition,"8-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-8-4,20,40,True,False,euclidean,0.4,0.44722222222222224
+bins + hue condition,"8-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-8-4,20,40,True,False,l1,0.43333333333333335,0.5505555555555556
+bins + hue condition,"8-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-8-4,20,40,True,False,chi2,0.4,0.5255555555555556
+bins + hue condition,"8-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-8-4,20,40,True,False,intersection,0.43333333333333335,0.5427777777777777
+bins + hue condition,"8-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-8-4,20,40,True,False,hellinger,0.26666666666666666,0.3633333333333333
+bins + hue condition,"8-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-8-4,20,40,True,False,wasserstein,0.4,0.49388888888888893
+bins + hue condition,"8-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-8-8,20,40,True,False,euclidean,0.3333333333333333,0.41944444444444445
+bins + hue condition,"8-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-8-8,20,40,True,False,l1,0.5,0.5983333333333333
+bins + hue condition,"8-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-8-8,20,40,True,False,chi2,0.4,0.5361111111111112
+bins + hue condition,"8-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-8-8,20,40,True,False,intersection,0.43333333333333335,0.5355555555555556
+bins + hue condition,"8-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-8-8,20,40,True,False,hellinger,0.3333333333333333,0.4133333333333333
+bins + hue condition,"8-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-8-8,20,40,True,False,wasserstein,0.43333333333333335,0.5288888888888889
+bins + hue condition,"8-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-8-16,20,40,True,False,euclidean,0.3333333333333333,0.41611111111111115
+bins + hue condition,"8-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-8-16,20,40,True,False,l1,0.4666666666666667,0.5800000000000001
+bins + hue condition,"8-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-8-16,20,40,True,False,chi2,0.43333333333333335,0.5316666666666666
+bins + hue condition,"8-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-8-16,20,40,True,False,intersection,0.43333333333333335,0.5316666666666666
+bins + hue condition,"8-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-8-16,20,40,True,False,hellinger,0.3,0.39111111111111113
+bins + hue condition,"8-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-8-16,20,40,True,False,wasserstein,0.4,0.5122222222222222
+bins + hue condition,"8-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-16-4,20,40,True,False,euclidean,0.3333333333333333,0.3927777777777778
+bins + hue condition,"8-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-16-4,20,40,True,False,l1,0.43333333333333335,0.5477777777777778
+bins + hue condition,"8-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-16-4,20,40,True,False,chi2,0.43333333333333335,0.5288888888888889
+bins + hue condition,"8-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-16-4,20,40,True,False,intersection,0.43333333333333335,0.5427777777777777
+bins + hue condition,"8-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-16-4,20,40,True,False,hellinger,0.23333333333333334,0.3527777777777778
+bins + hue condition,"8-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-16-4,20,40,True,False,wasserstein,0.43333333333333335,0.5261111111111111
+bins + hue condition,"8-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-16-8,20,40,True,False,euclidean,0.3333333333333333,0.42055555555555557
+bins + hue condition,"8-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-16-8,20,40,True,False,l1,0.43333333333333335,0.5788888888888889
+bins + hue condition,"8-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-16-8,20,40,True,False,chi2,0.4,0.5455555555555556
+bins + hue condition,"8-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-16-8,20,40,True,False,intersection,0.43333333333333335,0.5538888888888889
+bins + hue condition,"8-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-16-8,20,40,True,False,hellinger,0.3333333333333333,0.4222222222222223
+bins + hue condition,"8-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-16-8,20,40,True,False,wasserstein,0.43333333333333335,0.5272222222222223
+bins + hue condition,"8-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-16-16,20,40,True,False,euclidean,0.26666666666666666,0.3577777777777778
+bins + hue condition,"8-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-16-16,20,40,True,False,l1,0.4666666666666667,0.5777777777777777
+bins + hue condition,"8-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-16-16,20,40,True,False,chi2,0.4666666666666667,0.5733333333333334
+bins + hue condition,"8-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-16-16,20,40,True,False,intersection,0.4666666666666667,0.5411111111111111
+bins + hue condition,"8-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-16-16,20,40,True,False,hellinger,0.3,0.3861111111111111
+bins + hue condition,"8-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-16-16,20,40,True,False,wasserstein,0.43333333333333335,0.5205555555555555
+bins + hue condition,"8-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-32-4,20,40,True,False,euclidean,0.3333333333333333,0.38555555555555554
+bins + hue condition,"8-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-32-4,20,40,True,False,l1,0.4666666666666667,0.5549999999999999
+bins + hue condition,"8-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-32-4,20,40,True,False,chi2,0.43333333333333335,0.5372222222222223
+bins + hue condition,"8-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-32-4,20,40,True,False,intersection,0.4666666666666667,0.5261111111111111
+bins + hue condition,"8-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-32-4,20,40,True,False,hellinger,0.26666666666666666,0.3705555555555556
+bins + hue condition,"8-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-32-4,20,40,True,False,wasserstein,0.43333333333333335,0.5244444444444445
+bins + hue condition,"8-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-32-8,20,40,True,False,euclidean,0.26666666666666666,0.35500000000000004
+bins + hue condition,"8-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-32-8,20,40,True,False,l1,0.4666666666666667,0.5916666666666667
+bins + hue condition,"8-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-32-8,20,40,True,False,chi2,0.43333333333333335,0.5522222222222223
+bins + hue condition,"8-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-32-8,20,40,True,False,intersection,0.4666666666666667,0.565
+bins + hue condition,"8-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-32-8,20,40,True,False,hellinger,0.3333333333333333,0.4055555555555556
+bins + hue condition,"8-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-32-8,20,40,True,False,wasserstein,0.43333333333333335,0.53
+bins + hue condition,"8-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-32-16,20,40,True,False,euclidean,0.26666666666666666,0.34555555555555556
+bins + hue condition,"8-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-32-16,20,40,True,False,l1,0.5,0.5944444444444444
+bins + hue condition,"8-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-32-16,20,40,True,False,chi2,0.43333333333333335,0.5411111111111111
+bins + hue condition,"8-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-32-16,20,40,True,False,intersection,0.43333333333333335,0.5311111111111111
+bins + hue condition,"8-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-32-16,20,40,True,False,hellinger,0.3,0.3777777777777778
+bins + hue condition,"8-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,8-32-16,20,40,True,False,wasserstein,0.43333333333333335,0.5272222222222223
+bins + hue condition,"16-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-8-4,20,40,True,False,euclidean,0.3333333333333333,0.43722222222222223
+bins + hue condition,"16-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-8-4,20,40,True,False,l1,0.43333333333333335,0.5611111111111111
+bins + hue condition,"16-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-8-4,20,40,True,False,chi2,0.5,0.5761111111111111
+bins + hue condition,"16-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-8-4,20,40,True,False,intersection,0.43333333333333335,0.5727777777777778
+bins + hue condition,"16-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-8-4,20,40,True,False,hellinger,0.3,0.4216666666666667
+bins + hue condition,"16-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-8-4,20,40,True,False,wasserstein,0.43333333333333335,0.5216666666666667
+bins + hue condition,"16-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-8-8,20,40,True,False,euclidean,0.36666666666666664,0.4538888888888889
+bins + hue condition,"16-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-8-8,20,40,True,False,l1,0.6,0.6527777777777779
+bins + hue condition,"16-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-8-8,20,40,True,False,chi2,0.5,0.5861111111111111
+bins + hue condition,"16-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-8-8,20,40,True,False,intersection,0.5,0.6038888888888889
+bins + hue condition,"16-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-8-8,20,40,True,False,hellinger,0.3333333333333333,0.4455555555555556
+bins + hue condition,"16-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-8-8,20,40,True,False,wasserstein,0.43333333333333335,0.5188888888888888
+bins + hue condition,"16-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-8-16,20,40,True,False,euclidean,0.4,0.4494444444444445
+bins + hue condition,"16-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-8-16,20,40,True,False,l1,0.6,0.6577777777777778
+bins + hue condition,"16-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-8-16,20,40,True,False,chi2,0.5,0.5844444444444445
+bins + hue condition,"16-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-8-16,20,40,True,False,intersection,0.5,0.5872222222222222
+bins + hue condition,"16-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-8-16,20,40,True,False,hellinger,0.3,0.4255555555555556
+bins + hue condition,"16-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-8-16,20,40,True,False,wasserstein,0.4,0.5105555555555555
+bins + hue condition,"16-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-4,20,40,True,False,euclidean,0.3333333333333333,0.4261111111111111
+bins + hue condition,"16-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-4,20,40,True,False,l1,0.4,0.55
+bins + hue condition,"16-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-4,20,40,True,False,chi2,0.4666666666666667,0.5677777777777777
+bins + hue condition,"16-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-4,20,40,True,False,intersection,0.4,0.5538888888888889
+bins + hue condition,"16-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-4,20,40,True,False,hellinger,0.26666666666666666,0.41055555555555556
+bins + hue condition,"16-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-4,20,40,True,False,wasserstein,0.4666666666666667,0.5455555555555556
+bins + hue condition,"16-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-8,20,40,True,False,euclidean,0.36666666666666664,0.45388888888888884
+bins + hue condition,"16-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-8,20,40,True,False,l1,0.5666666666666667,0.6472222222222221
+bins + hue condition,"16-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-8,20,40,True,False,chi2,0.5,0.6
+bins + hue condition,"16-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-8,20,40,True,False,intersection,0.4666666666666667,0.5777777777777778
+bins + hue condition,"16-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-8,20,40,True,False,hellinger,0.36666666666666664,0.47333333333333333
+bins + hue condition,"16-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-8,20,40,True,False,wasserstein,0.4666666666666667,0.5299999999999999
+bins + hue condition,"16-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-32-4,20,40,True,False,euclidean,0.3333333333333333,0.41777777777777775
+bins + hue condition,"16-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-32-4,20,40,True,False,l1,0.4,0.5466666666666666
+bins + hue condition,"16-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-32-4,20,40,True,False,chi2,0.5,0.5916666666666666
+bins + hue condition,"16-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-32-4,20,40,True,False,intersection,0.43333333333333335,0.5427777777777777
+bins + hue condition,"16-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-32-4,20,40,True,False,hellinger,0.3,0.4338888888888889
+bins + hue condition,"16-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-32-4,20,40,True,False,wasserstein,0.4666666666666667,0.543888888888889
+bins + hue condition,"16-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-32-8,20,40,True,False,euclidean,0.3,0.4188888888888888
+bins + hue condition,"16-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-32-8,20,40,True,False,l1,0.5666666666666667,0.6444444444444444
+bins + hue condition,"16-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-32-8,20,40,True,False,chi2,0.4666666666666667,0.5833333333333334
+bins + hue condition,"16-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-32-8,20,40,True,False,intersection,0.4666666666666667,0.5677777777777777
+bins + hue condition,"16-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-32-8,20,40,True,False,hellinger,0.3333333333333333,0.45944444444444443
+bins + hue condition,"16-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-32-8,20,40,True,False,wasserstein,0.43333333333333335,0.5188888888888888
+bins + hue condition,"16-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-32-16,20,40,True,False,euclidean,0.36666666666666664,0.43277777777777776
+bins + hue condition,"16-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-32-16,20,40,True,False,l1,0.5333333333333333,0.6233333333333333
+bins + hue condition,"16-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-32-16,20,40,True,False,chi2,0.5333333333333333,0.6
+bins + hue condition,"16-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-32-16,20,40,True,False,intersection,0.43333333333333335,0.5438888888888889
+bins + hue condition,"16-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-32-16,20,40,True,False,hellinger,0.3333333333333333,0.45222222222222225
+bins + hue condition,"16-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-32-16,20,40,True,False,wasserstein,0.43333333333333335,0.5166666666666667
+bins + hue condition,"32-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-8-4,20,40,True,False,euclidean,0.36666666666666664,0.4455555555555556
+bins + hue condition,"32-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-8-4,20,40,True,False,l1,0.5666666666666667,0.5944444444444444
+bins + hue condition,"32-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-8-4,20,40,True,False,chi2,0.5666666666666667,0.6033333333333333
+bins + hue condition,"32-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-8-4,20,40,True,False,intersection,0.5,0.5566666666666666
+bins + hue condition,"32-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-8-4,20,40,True,False,hellinger,0.3333333333333333,0.46055555555555555
+bins + hue condition,"32-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-8-4,20,40,True,False,wasserstein,0.43333333333333335,0.5055555555555556
+bins + hue condition,"32-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-8-8,20,40,True,False,euclidean,0.4,0.46111111111111114
+bins + hue condition,"32-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-8-8,20,40,True,False,l1,0.5666666666666667,0.606111111111111
+bins + hue condition,"32-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-8-8,20,40,True,False,chi2,0.6,0.615
+bins + hue condition,"32-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-8-8,20,40,True,False,intersection,0.5666666666666667,0.5983333333333333
+bins + hue condition,"32-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-8-8,20,40,True,False,hellinger,0.36666666666666664,0.4727777777777778
+bins + hue condition,"32-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-8-8,20,40,True,False,wasserstein,0.4,0.5161111111111111
+bins + hue condition,"32-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-8-16,20,40,True,False,euclidean,0.43333333333333335,0.46499999999999997
+bins + hue condition,"32-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-8-16,20,40,True,False,l1,0.5333333333333333,0.5783333333333334
+bins + hue condition,"32-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-8-16,20,40,True,False,chi2,0.5,0.5383333333333333
+bins + hue condition,"32-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-8-16,20,40,True,False,intersection,0.5333333333333333,0.5716666666666667
+bins + hue condition,"32-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-8-16,20,40,True,False,hellinger,0.3333333333333333,0.43111111111111117
+bins + hue condition,"32-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-8-16,20,40,True,False,wasserstein,0.4,0.5122222222222222
+bins + hue condition,"32-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-16-4,20,40,True,False,euclidean,0.3333333333333333,0.41111111111111115
+bins + hue condition,"32-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-16-4,20,40,True,False,l1,0.4666666666666667,0.5372222222222223
+bins + hue condition,"32-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-16-4,20,40,True,False,chi2,0.5,0.5549999999999999
+bins + hue condition,"32-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-16-4,20,40,True,False,intersection,0.4,0.5038888888888888
+bins + hue condition,"32-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-16-4,20,40,True,False,hellinger,0.36666666666666664,0.4872222222222222
+bins + hue condition,"32-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-16-4,20,40,True,False,wasserstein,0.43333333333333335,0.513888888888889
+bins + hue condition,"32-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-16-8,20,40,True,False,euclidean,0.36666666666666664,0.44
+bins + hue condition,"32-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-16-8,20,40,True,False,l1,0.4666666666666667,0.5455555555555556
+bins + hue condition,"32-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-16-8,20,40,True,False,chi2,0.5333333333333333,0.5816666666666667
+bins + hue condition,"32-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-16-8,20,40,True,False,intersection,0.5,0.5666666666666667
+bins + hue condition,"32-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-16-8,20,40,True,False,hellinger,0.4,0.49944444444444447
+bins + hue condition,"32-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-16-8,20,40,True,False,wasserstein,0.4,0.5172222222222221
+bins + hue condition,"32-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-16-16,20,40,True,False,euclidean,0.4,0.4527777777777777
+bins + hue condition,"32-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-16-16,20,40,True,False,l1,0.5,0.5538888888888889
+bins + hue condition,"32-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-16-16,20,40,True,False,chi2,0.4666666666666667,0.5277777777777778
+bins + hue condition,"32-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-16-16,20,40,True,False,intersection,0.5,0.5383333333333333
+bins + hue condition,"32-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-16-16,20,40,True,False,hellinger,0.3,0.4244444444444444
+bins + hue condition,"32-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-16-16,20,40,True,False,wasserstein,0.4,0.5066666666666667
+bins + hue condition,"32-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-32-4,20,40,True,False,euclidean,0.3,0.3888888888888889
+bins + hue condition,"32-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-32-4,20,40,True,False,l1,0.5,0.5577777777777778
+bins + hue condition,"32-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-32-4,20,40,True,False,chi2,0.5,0.5677777777777777
+bins + hue condition,"32-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-32-4,20,40,True,False,intersection,0.4666666666666667,0.5372222222222223
+bins + hue condition,"32-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-32-4,20,40,True,False,hellinger,0.3333333333333333,0.46888888888888886
+bins + hue condition,"32-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-32-4,20,40,True,False,wasserstein,0.43333333333333335,0.5122222222222222
+bins + hue condition,"32-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-32-8,20,40,True,False,euclidean,0.3,0.3777777777777777
+bins + hue condition,"32-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-32-8,20,40,True,False,l1,0.5333333333333333,0.5872222222222221
+bins + hue condition,"32-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-32-8,20,40,True,False,chi2,0.5333333333333333,0.5833333333333334
+bins + hue condition,"32-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-32-8,20,40,True,False,intersection,0.5333333333333333,0.5805555555555555
+bins + hue condition,"32-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-32-8,20,40,True,False,hellinger,0.3,0.45666666666666667
+bins + hue condition,"32-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-32-8,20,40,True,False,wasserstein,0.4,0.5172222222222221
+bins + hue condition,"32-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-32-16,20,40,True,False,euclidean,0.36666666666666664,0.43333333333333335
+bins + hue condition,"32-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-32-16,20,40,True,False,l1,0.5,0.5644444444444444
+bins + hue condition,"32-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-32-16,20,40,True,False,chi2,0.5,0.5361111111111112
+bins + hue condition,"32-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-32-16,20,40,True,False,intersection,0.5,0.5477777777777778
+bins + hue condition,"32-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-32-16,20,40,True,False,hellinger,0.3333333333333333,0.45222222222222225
+bins + hue condition,"32-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,32-32-16,20,40,True,False,wasserstein,0.4,0.5066666666666667
+bins + hue condition,"64-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-8-4,20,40,True,False,euclidean,0.3333333333333333,0.4027777777777778
+bins + hue condition,"64-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-8-4,20,40,True,False,l1,0.5666666666666667,0.6027777777777777
+bins + hue condition,"64-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-8-4,20,40,True,False,chi2,0.5333333333333333,0.58
+bins + hue condition,"64-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-8-4,20,40,True,False,intersection,0.5,0.5527777777777777
+bins + hue condition,"64-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-8-4,20,40,True,False,hellinger,0.36666666666666664,0.47777777777777775
+bins + hue condition,"64-8-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-8-4,20,40,True,False,wasserstein,0.43333333333333335,0.5122222222222222
+bins + hue condition,"64-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-8-8,20,40,True,False,euclidean,0.4,0.45111111111111113
+bins + hue condition,"64-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-8-8,20,40,True,False,l1,0.6,0.6194444444444444
+bins + hue condition,"64-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-8-8,20,40,True,False,chi2,0.5666666666666667,0.59
+bins + hue condition,"64-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-8-8,20,40,True,False,intersection,0.5333333333333333,0.58
+bins + hue condition,"64-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-8-8,20,40,True,False,hellinger,0.36666666666666664,0.46222222222222226
+bins + hue condition,"64-8-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-8-8,20,40,True,False,wasserstein,0.4,0.5161111111111111
+bins + hue condition,"64-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-8-16,20,40,True,False,euclidean,0.43333333333333335,0.45944444444444443
+bins + hue condition,"64-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-8-16,20,40,True,False,l1,0.5333333333333333,0.5844444444444444
+bins + hue condition,"64-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-8-16,20,40,True,False,chi2,0.5,0.5316666666666666
+bins + hue condition,"64-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-8-16,20,40,True,False,intersection,0.5333333333333333,0.5844444444444444
+bins + hue condition,"64-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-8-16,20,40,True,False,hellinger,0.36666666666666664,0.43944444444444447
+bins + hue condition,"64-8-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-8-16,20,40,True,False,wasserstein,0.4,0.5188888888888888
+bins + hue condition,"64-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-16-4,20,40,True,False,euclidean,0.3333333333333333,0.3983333333333334
+bins + hue condition,"64-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-16-4,20,40,True,False,l1,0.5333333333333333,0.586111111111111
+bins + hue condition,"64-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-16-4,20,40,True,False,chi2,0.5333333333333333,0.5633333333333332
+bins + hue condition,"64-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-16-4,20,40,True,False,intersection,0.43333333333333335,0.53
+bins + hue condition,"64-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-16-4,20,40,True,False,hellinger,0.4,0.49944444444444447
+bins + hue condition,"64-16-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-16-4,20,40,True,False,wasserstein,0.4666666666666667,0.543888888888889
+bins + hue condition,"64-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-16-8,20,40,True,False,euclidean,0.3,0.4011111111111111
+bins + hue condition,"64-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-16-8,20,40,True,False,l1,0.5333333333333333,0.5827777777777778
+bins + hue condition,"64-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-16-8,20,40,True,False,chi2,0.5666666666666667,0.59
+bins + hue condition,"64-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-16-8,20,40,True,False,intersection,0.5333333333333333,0.5788888888888889
+bins + hue condition,"64-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-16-8,20,40,True,False,hellinger,0.36666666666666664,0.47833333333333333
+bins + hue condition,"64-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-16-8,20,40,True,False,wasserstein,0.4,0.5172222222222221
+bins + hue condition,"64-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-16-16,20,40,True,False,euclidean,0.4,0.44277777777777777
+bins + hue condition,"64-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-16-16,20,40,True,False,l1,0.5,0.5583333333333333
+bins + hue condition,"64-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-16-16,20,40,True,False,chi2,0.4666666666666667,0.5299999999999999
+bins + hue condition,"64-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-16-16,20,40,True,False,intersection,0.5,0.5705555555555556
+bins + hue condition,"64-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-16-16,20,40,True,False,hellinger,0.36666666666666664,0.4577777777777778
+bins + hue condition,"64-16-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-16-16,20,40,True,False,wasserstein,0.4,0.5066666666666667
+bins + hue condition,"64-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-32-4,20,40,True,False,euclidean,0.3,0.36666666666666664
+bins + hue condition,"64-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-32-4,20,40,True,False,l1,0.5666666666666667,0.6038888888888888
+bins + hue condition,"64-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-32-4,20,40,True,False,chi2,0.5,0.5611111111111112
+bins + hue condition,"64-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-32-4,20,40,True,False,intersection,0.4666666666666667,0.5222222222222223
+bins + hue condition,"64-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-32-4,20,40,True,False,hellinger,0.36666666666666664,0.49111111111111116
+bins + hue condition,"64-32-4, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-32-4,20,40,True,False,wasserstein,0.4666666666666667,0.543888888888889
+bins + hue condition,"64-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-32-8,20,40,True,False,euclidean,0.26666666666666666,0.36666666666666664
+bins + hue condition,"64-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-32-8,20,40,True,False,l1,0.5666666666666667,0.6038888888888889
+bins + hue condition,"64-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-32-8,20,40,True,False,chi2,0.5333333333333333,0.576111111111111
+bins + hue condition,"64-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-32-8,20,40,True,False,intersection,0.5333333333333333,0.5911111111111111
+bins + hue condition,"64-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-32-8,20,40,True,False,hellinger,0.36666666666666664,0.4827777777777778
+bins + hue condition,"64-32-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-32-8,20,40,True,False,wasserstein,0.4,0.5144444444444444
+bins + hue condition,"64-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-32-16,20,40,True,False,euclidean,0.36666666666666664,0.4261111111111111
+bins + hue condition,"64-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-32-16,20,40,True,False,l1,0.5,0.5705555555555556
+bins + hue condition,"64-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-32-16,20,40,True,False,chi2,0.5,0.5494444444444445
+bins + hue condition,"64-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-32-16,20,40,True,False,intersection,0.4666666666666667,0.5605555555555557
+bins + hue condition,"64-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-32-16,20,40,True,False,hellinger,0.36666666666666664,0.46222222222222226
+bins + hue condition,"64-32-16, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,64-32-16,20,40,True,False,wasserstein,0.4,0.505
+current default,"16-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-8,20,40,True,False,euclidean,0.36666666666666664,0.45388888888888884
+current default,"16-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-8,20,40,True,False,l1,0.5666666666666667,0.6472222222222221
+current default,"16-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-8,20,40,True,False,chi2,0.5,0.6
+current default,"16-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-8,20,40,True,False,intersection,0.4666666666666667,0.5777777777777778
+current default,"16-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-8,20,40,True,False,hellinger,0.36666666666666664,0.47333333333333333
+current default,"16-16-8, hue if S>20, V>40, weighted","hue if S>20, V>40, weighted",hsv,16-16-8,20,40,True,False,wasserstein,0.4666666666666667,0.5299999999999999
