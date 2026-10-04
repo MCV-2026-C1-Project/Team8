@@ -119,3 +119,18 @@ MEASURES = {
     "hellinger": (hellinger, True),
     "wasserstein": (wasserstein, False),
 }
+
+
+def rank(q, db, measure_name, channel_sizes=None):
+    """Indices (rows) of db sorted from most to least similar to q.
+
+    Similarities are negated so a single ascending sort works for both kinds.
+    A stable sort keeps ties in database order, so results are reproducible.
+    Note: these are ROW indices; map them to image IDs with ids[rank(...)].
+    """
+    if measure_name not in MEASURES:
+        raise ValueError(f"Unknown measure '{measure_name}'. Options: {list(MEASURES)}")
+    func, higher_is_better = MEASURES[measure_name]
+    scores = (func(q, db, channel_sizes) if measure_name == "wasserstein"
+              else func(q, db))
+    return np.argsort(-scores if higher_is_better else scores, kind="stable")

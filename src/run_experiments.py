@@ -163,7 +163,7 @@ def run_experiments(experiments, desc_dir=DESC_DIR):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--output", type=Path, default=None,
-                    help="CSV path (default: results/experiments.csv; fusion: results/<descriptor>_fusion_experiments.csv)")
+                    help="CSV path (default: results/experiments.csv")
     ap.add_argument("--overwrite", action="store_true", help="Replace an existing output CSV")
     ap.add_argument("--grid", choices=list(GRIDS), default="default", help="Experiment grid to run")
     args = ap.parse_args()
