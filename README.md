@@ -40,8 +40,8 @@ Save the test set results to a `.pkl` file for submission:
 python src/run_retrieval.py --descriptor hsv --measure hellinger --query-set qst1 --no-gt --output results/qst1_method1.pkl
 ```
 
-- `--descriptor`: `hsv` or `ycbcr`
-- `--measure`: `euclidean`, `l1`, `chi2`, `intersection` or `hellinger`
+- `--descriptor`: `hsv`, `hsv_baseline`, `rgb`, `lab` or `ycbcr`
+- `--measure`: `euclidean`, `l1`, `chi2`, `intersection`, `hellinger` or `wasserstein`
 - `--k`: number of results returned per query (default 10)
 
 Descriptors are computed the first time a script needs them and cached in `descriptors/`. To compute them ahead of time, run `python src/compute_descriptors.py --data data/BBDD`. Run any script with `-h` to see the bin and range options.
