@@ -47,124 +47,139 @@ def load_image(path):
     return image
 
 
+
 def main():
-    parser = argparse.ArgumentParser(
-        description="Generate and evaluate color-based background masks."
-    )
-    parser.add_argument("--images", required=True,
-                        help="Folder containing QS2 images.")
-    parser.add_argument("--gt", required=True,
-                        help="Folder containing ground-truth masks.")
-    parser.add_argument("--output", default="results/background_masks",
-                        help="Folder for predicted masks and metrics.csv.")
-    parser.add_argument("--border-ratio", type=float, default=0.08)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--images", required=True)
+    parser.add_argument("--gt", required=True)
+    parser.add_argument("--output", default="results/background_masks")
     parser.add_argument("--threshold", type=float, default=15.0)
+    parser.add_argument("--border-ratio", type=float, default=0.08)
     parser.add_argument("--mad-multiplier", type=float, default=3.0)
     parser.add_argument("--sample-step", type=int, default=4)
+    parser.add_argument("--grid-search", action="store_true", help="Test thresholds and select the best one.")
     args = parser.parse_args()
+
+    thresholds = [10, 15, 20, 25] if args.grid_search else [args.threshold]
 
     image_dir = Path(args.images)
     gt_dir = Path(args.gt)
     output_dir = Path(args.output)
-    mask_dir = output_dir / "masks"
-    mask_dir.mkdir(parents=True, exist_ok=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     image_paths = sorted(
         p for p in image_dir.iterdir()
-        if p.suffix.lower() in {".jpg", ".jpeg", ".png"}
+        if p.suffix.lower() in {".jpg", ".jpeg"}
     )
 
     if not image_paths:
         raise ValueError(f"No images found in {image_dir}")
 
-    rows = []
-    total_tp = total_fp = total_fn = 0
-
-    for image_path in tqdm(image_paths, desc="Evaluating masks"):
-        # Find the matching ground-truth mask by image stem.
+    # Find matching ground-truth masks.
+    pairs = []
+    for image_path in image_paths:
         candidates = [
             gt_dir / f"{image_path.stem}{ext}"
             for ext in (".png", ".jpg", ".jpeg", ".bmp", ".tif")
         ]
         gt_path = next((p for p in candidates if p.is_file()), None)
 
-        if gt_path is None:
-            print(f"Skipping {image_path.name}: no ground truth found.")
-            continue
+        if gt_path is not None:
+            pairs.append((image_path, gt_path))
+        else:
+            print(f"Skipping {image_path.name}: ground truth not found.")
 
-        image = load_image(image_path)
-        gt = cv2.imread(str(gt_path), cv2.IMREAD_GRAYSCALE)
+    if not pairs:
+        raise ValueError("No matching image and ground-truth mask pairs found.")
 
-        if gt is None:
-            print(f"Skipping unreadable ground truth: {gt_path}")
-            continue
+    results = []
 
-        if image.shape[:2] != gt.shape[:2]:
-            raise ValueError(
-                f"Size mismatch for {image_path.name}: "
-                f"image={image.shape[:2]}, GT={gt.shape[:2]}"
+    for threshold in thresholds:
+        print(f"\nEvaluating threshold = {threshold}")
+
+        # Separate output directories for each threshold.
+        if args.grid_search:
+            mask_dir = output_dir / f"threshold_{threshold}" / "masks"
+        else:
+            mask_dir = output_dir / "masks"
+
+        mask_dir.mkdir(parents=True, exist_ok=True)
+        image_scores = []
+
+        for image_path, gt_path in tqdm(pairs):
+            image = load_image(image_path)
+            gt = cv2.imread(str(gt_path), cv2.IMREAD_GRAYSCALE)
+
+            if gt is None:
+                print(f"Could not read mask: {gt_path}")
+                continue
+
+            if image.shape[:2] != gt.shape[:2]:
+                raise ValueError(
+                    f"Image/mask size mismatch: {image_path.name}"
+                )
+
+            pred = foreground_mask(
+                image,
+                border_ratio=args.border_ratio,
+                threshold=threshold,
+                mad_multiplier=args.mad_multiplier,
+                sample_step=args.sample_step,
             )
 
-        pred = foreground_mask(
-            image,
-            border_ratio=args.border_ratio,
-            threshold=args.threshold,
-            mad_multiplier=args.mad_multiplier,
-            sample_step=args.sample_step,
-        )
+            scores = evaluate_mask(pred, gt)
+            image_scores.append(scores)
 
-        scores = evaluate_mask(pred, gt)
-        rows.append({"image": image_path.name, **scores})
+            cv2.imwrite(
+                str(mask_dir / f"{image_path.stem}.png"), pred
+            )
 
-        total_tp += scores["tp"]
-        total_fp += scores["fp"]
-        total_fn += scores["fn"]
+        if not image_scores:
+            continue
 
-        # Save each predicted mask.
-        cv2.imwrite(str(mask_dir / f"{image_path.stem}.png"), pred)
+        results.append({
+            "threshold": threshold,
+            "precision": np.mean([s["precision"] for s in image_scores]),
+            "recall": np.mean([s["recall"] for s in image_scores]),
+            "f1": np.mean([s["f1"] for s in image_scores]),
+        })
 
-    if not rows:
-        raise ValueError("No images could be evaluated. Check image/mask names.")
+    if not results:
+        raise ValueError("No images could be evaluated.")
 
-    # Macro average: every image contributes equally.
-    macro = {
-        key: float(np.mean([row[key] for row in rows]))
-        for key in ("precision", "recall", "f1")
-    }
+    # Sort by mean F1, highest first.
+    results.sort(key=lambda r: r["f1"], reverse=True)
 
-    # Global pixel scores: pool TP, FP and FN across all images.
-    global_precision = (
-        total_tp / (total_tp + total_fp)
-        if total_tp + total_fp else 0.0
-    )
-    global_recall = (
-        total_tp / (total_tp + total_fn)
-        if total_tp + total_fn else 0.0
-    )
-    global_f1 = (
-        2 * global_precision * global_recall /
-        (global_precision + global_recall)
-        if global_precision + global_recall else 0.0
-    )
+    if args.grid_search:
+        csv_path = output_dir / "threshold_comparison.csv"
+        with open(csv_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(
+                f, fieldnames=["threshold", "precision", "recall", "f1"]
+            )
+            writer.writeheader()
+            writer.writerows(results)
 
-    csv_path = output_dir / "metrics.csv"
-    with open(csv_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=rows[0].keys())
-        writer.writeheader()
-        writer.writerows(rows)
+        print("\n=== Grid search results (best F1 first) ===")
+        print(f"{'Threshold':>10} {'Precision':>12} {'Recall':>12} {'F1':>12}")
 
-    print(f"\nEvaluated images: {len(rows)}")
-    print("\nMacro-average (mean per image):")
-    for key, value in macro.items():
-        print(f"  {key.capitalize():<10}: {value:.4f}")
+        for r in results:
+            print(
+                f"{r['threshold']:>10} "
+                f"{r['precision']:>12.4f} "
+                f"{r['recall']:>12.4f} "
+                f"{r['f1']:>12.4f}"
+            )
 
-    print("\nGlobal pixel-level scores:")
-    print(f"  Precision : {global_precision:.4f}")
-    print(f"  Recall    : {global_recall:.4f}")
-    print(f"  F1        : {global_f1:.4f}")
+        print(f"\nBest threshold: {results[0]['threshold']}")
+        print(f"Best mean F1:   {results[0]['f1']:.4f}")
+        print(f"Comparison saved to: {csv_path}")
 
-    print(f"\nPredicted masks: {mask_dir}")
-    print(f"Per-image metrics: {csv_path}")
+    else:
+        r = results[0]
+        print(f"\nThreshold: {r['threshold']}")
+        print(f"Mean precision: {r['precision']:.4f}")
+        print(f"Mean recall:    {r['recall']:.4f}")
+        print(f"Mean F1:        {r['f1']:.4f}")
 
 
 if __name__ == "__main__":

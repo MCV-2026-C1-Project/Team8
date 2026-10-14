@@ -108,11 +108,38 @@ def foreground_mask(
     # Predict the background color at every pixel.
     background = (X @ coefficients).reshape(h, w, 3)
 
-    # Pixels sufficiently different from the predicted wall are foreground.
+    # Compute each pixel's Lab distance from the estimated wall color.
     distance = np.linalg.norm(lab - background, axis=2)
-    mask = (distance > adaptive_threshold).astype(np.uint8) * 255
+
+    # Candidate background pixels are sufficiently similar to the wall.
+    candidate_background = (
+        distance <= adaptive_threshold
+    ).astype(np.uint8)
+
+    # Label connected regions of candidate background pixels.
+    num_labels, labels = cv2.connectedComponents(
+        candidate_background,
+        connectivity=8,
+    )
+
+    # Only background regions connected to the image border
+    # are considered actual wall/background.
+    border_labels = np.unique(np.concatenate([
+        labels[0, :],
+        labels[-1, :],
+        labels[:, 0],
+        labels[:, -1],
+    ]))
+
+    background_mask = np.isin(labels, border_labels)
+    background_mask &= candidate_background.astype(bool)
+
+    # Everything else is foreground, including enclosed regions
+    # whose colors resemble the wall.
+    mask = (~background_mask).astype(np.uint8) * 255
 
     return mask
+
 
 
 def remove_background(image, **kwargs):

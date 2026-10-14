@@ -7,3 +7,4 @@ results/*.pkl
 results/**/*.pkl
 .pytest_cache/
 .venv/
+results/background_masks/thresholds
