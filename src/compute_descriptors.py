@@ -1,59 +1,48 @@
-"""Compute and save 1D colour histogram descriptors for an image folder.
-
-Examples:
-    py src/compute_descriptors.py --data data/BBDD --method all
-    py src/compute_descriptors.py --data data/qsd1_w1 --method ycbcr --chroma-range 64 192
-"""
+"""Precompute colour/spatial descriptors using the same settings as retrieval."""
 import argparse
 from pathlib import Path
 
-from descriptors import METHODS, DEFAULTS, compute_folder, method_tag
-from retrieval import save_descriptor_cache
+from descriptor_cli import add_descriptor_arguments, config_from_args, load_descriptor_document
+from descriptors import compute_folder, method_tag
+from retrieval import DESC_DIR, save_descriptor_cache
 
-ROOT = Path(__file__).resolve().parent.parent
+# Preserve --method all as the original Week 1 set, rather than silently
+# precomputing every new joint descriptor too.
+LEGACY_METHODS = ["ycbcr", "hsv", "hsv_baseline", "rgb", "lab"]
 
 
-def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--data", required=True, help="Folder with the .jpg images")
-    ap.add_argument("--name", default=None,
-                    help="Dataset prefix for output files (default: folder name before '_', lowercased)")
-    ap.add_argument("--method", choices=[*METHODS, "all"], default="all")
-    ap.add_argument("--ycbcr-bins", type=int, nargs=3, default=DEFAULTS["ycbcr"]["bins"], metavar=("Y", "CR", "CB"))
-    ap.add_argument("--chroma-range", type=int, nargs=2, default=DEFAULTS["ycbcr"]["chroma_range"], metavar=("LO", "HI"))
-    ap.add_argument("--chroma-overflow", action="store_true",
-                    help="Add below/above bins counting Cr/Cb pixels outside --chroma-range")
-    ap.add_argument("--hsv-bins", type=int, nargs=3, default=DEFAULTS["hsv"]["bins"], metavar=("H", "S", "V"))
-    ap.add_argument("--s-min", type=int, default=DEFAULTS["hsv"]["s_min"])
-    ap.add_argument("--v-min", type=int, default=DEFAULTS["hsv"]["v_min"])
-    ap.add_argument("--hue-valid-weight", action=argparse.BooleanOptionalAction, default=DEFAULTS["hsv"]["hue_valid_weight"],
-                    help="HSV only: scale Hue by the fraction of valid pixels")
-    ap.add_argument("--hue-smoothing", action=argparse.BooleanOptionalAction, default=DEFAULTS["hsv"]["hue_smoothing"],
-                    help="HSV only: circularly smooth the Hue histogram")
-    ap.add_argument("--rgb-bins", type=int, nargs=3, default=DEFAULTS["rgb"]["bins"], metavar=("R", "G", "B"))
-    ap.add_argument("--lab-bins", type=int, nargs=3, default=DEFAULTS["lab"]["bins"], metavar=("L", "A", "B"))
-    ap.add_argument("--out", default=str(ROOT / "descriptors"))
-    args = ap.parse_args()
-
-    name = args.name or Path(args.data).name.split("_")[0].lower()
-    params = {
-        "ycbcr": dict(bins=tuple(args.ycbcr_bins), chroma_range=tuple(args.chroma_range),
-                      chroma_overflow=args.chroma_overflow),
-        "hsv": dict(bins=tuple(args.hsv_bins), s_min=args.s_min, v_min=args.v_min,
-                    hue_valid_weight=args.hue_valid_weight, hue_smoothing=args.hue_smoothing),
-        "hsv_baseline": dict(bins=tuple(DEFAULTS["hsv_baseline"]["bins"])),
-        "rgb": dict(bins=tuple(args.rgb_bins)),
-        "lab": dict(bins=tuple(args.lab_bins)),
-    }
-    methods = list(METHODS) if args.method == "all" else [args.method]
-
-    out = Path(args.out)
-    out.mkdir(parents=True, exist_ok=True)
-    for m in methods:
-        ids, desc = compute_folder(args.data, m, **params[m])
-        path = out / f"{name}_{method_tag(m, **params[m])}.npz"
-        save_descriptor_cache(path, ids, desc, m, params[m])
-        print(f"Saved {path}  ids={ids.shape}  desc={desc.shape} {desc.dtype}")
+def main(argv=None):
+    ap = argparse.ArgumentParser(description=__doc__)
+    add_descriptor_arguments(ap, "--method", allow_all=True)
+    ap.add_argument("--data", required=True, type=Path)
+    ap.add_argument("--name", help="Cache prefix; default: folder name before underscore")
+    ap.add_argument("--out", "--cache-dir", dest="out", type=Path, default=DESC_DIR)
+    args = ap.parse_args(argv)
+    try:
+        base, _ = load_descriptor_document(args.config) if args.config else (None, None)
+        if base and args.descriptor == "all":
+            raise ValueError("--config describes one method and cannot be used with --method all")
+        methods = (LEGACY_METHODS if args.descriptor == "all" or (not args.descriptor and not base)
+                   else [args.descriptor or base["descriptor"]])
+        configs = []
+        for method in methods:
+            selected = argparse.Namespace(**vars(args))
+            if len(methods) > 1:
+                from descriptors import DEFAULTS
+                # Legacy --method all applies colour options only to their methods.
+                for key in set().union(*(p.keys() for p in DEFAULTS.values())) - set(DEFAULTS[method]):
+                    if hasattr(selected, key):
+                        setattr(selected, key, None)
+            configs.append(config_from_args(selected, base, method))
+        name = args.name or args.data.name.split("_")[0].lower()
+        for config in configs:
+            method, params = config["descriptor"], config["params"]
+            ids, desc = compute_folder(args.data, method, **params)
+            path = args.out / f"{name}_{method_tag(method, **params)}.npz"
+            save_descriptor_cache(path, ids, desc, method, params, args.data)
+            print(f"Saved {path} ids={ids.shape} desc={desc.shape} {desc.dtype}")
+    except (ValueError, TypeError, OSError, KeyError) as error:
+        ap.error(str(error))
 
 
 if __name__ == "__main__":

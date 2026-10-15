@@ -1,0 +1,90 @@
+{
+  "id": "phase_a",
+  "measures": [
+    "l1",
+    "chi2",
+    "hellinger"
+  ],
+  "spatial": [
+    {
+      "mode": "global"
+    }
+  ],
+  "experiments": [
+    {
+      "id": "week1_hsv_reference",
+      "descriptor": "hsv",
+      "params": {
+        "bins": [
+          16,
+          16,
+          16
+        ],
+        "s_min": 10,
+        "v_min": 40,
+        "hue_valid_weight": false,
+        "hue_smoothing": false
+      }
+    },
+    {
+      "id": "pure_hs",
+      "descriptor": "hsv_hs2d",
+      "params": {
+        "bins": [
+          16,
+          16
+        ],
+        "include_v": false
+      }
+    },
+    {
+      "descriptor": "hsv_hs2d",
+      "params": {
+        "bins": [
+          16,
+          16
+        ],
+        "include_v": true,
+        "v_bins": 8
+      }
+    },
+    {
+      "descriptor": "lab_ab2d",
+      "params": {
+        "bins": [
+          16,
+          16
+        ],
+        "include_l": true,
+        "l_bins": 8
+      }
+    },
+    {
+      "descriptor": "hsv_3d",
+      "grid": {
+        "bins": [
+          [
+            8,
+            8,
+            4
+          ],
+          [
+            8,
+            8,
+            8
+          ]
+        ]
+      }
+    },
+    {
+      "descriptor": "lab_3d",
+      "params": {
+        "bins": [
+          4,
+          8,
+          8
+        ]
+      }
+    }
+  ]
+}

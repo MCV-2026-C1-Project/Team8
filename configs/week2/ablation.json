@@ -1,0 +1,27 @@
+{
+  "id": "small_hs_ablation",
+  "measures": [
+    "l1"
+  ],
+  "experiments": [
+    {
+      "descriptor": "hsv_hs2d",
+      "grid": {
+        "bins": [
+          [
+            16,
+            16
+          ]
+        ],
+        "hue_smoothing": [
+          false,
+          true
+        ],
+        "chroma_weight": [
+          0.5,
+          0.7
+        ]
+      }
+    }
+  ]
+}

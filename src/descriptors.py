@@ -1,15 +1,14 @@
-"""1D per-channel colour histogram descriptors.
-
-All descriptors are concatenations of independent 1D histograms, one per
-channel, each normalised to sum to 1 by default. No joint (2D/3D)
-or spatial histograms and no image preprocessing (e.g. equalisation) are applied.
-"""
+"""Legacy 1D and joint colour descriptors with optional spatial concatenation."""
 import re
 from pathlib import Path
 
 import cv2
 import numpy as np
 from tqdm import tqdm
+
+from descriptor_config import JOINT_METHODS, descriptor_dim, hashed_tag, resolve_params
+from joint_histograms import hsv_hs2d, lab_ab2d, hsv_3d, lab_3d
+from spatial import spatial_descriptor
 
 YCBCR_DEFAULTS = dict(bins=(8, 32, 32), y_range=(0, 256), chroma_range=(0, 256),
                       chroma_overflow=False)
@@ -151,21 +150,27 @@ def lab_hist(img_bgr, bins=LAB_DEFAULTS["bins"]):
 
 
 METHODS = {"ycbcr": ycbcr_hist, "hsv": hsv_hist, "hsv_baseline": hsv_baseline_hist,
-           "rgb": rgb_hist, "lab": lab_hist}
+           "rgb": rgb_hist, "lab": lab_hist, "hsv_hs2d": hsv_hs2d,
+           "lab_ab2d": lab_ab2d, "hsv_3d": hsv_3d, "lab_3d": lab_3d}
 DEFAULTS = {"ycbcr": YCBCR_DEFAULTS, "hsv": HSV_DEFAULTS, "hsv_baseline": HSV_BASELINE_DEFAULTS,
-            "rgb": RGB_DEFAULTS, "lab": LAB_DEFAULTS}
+            "rgb": RGB_DEFAULTS, "lab": LAB_DEFAULTS,
+            "hsv_hs2d": dict(bins=(16, 16), s_min=10, v_min=40, filter_hue=True,
+                             achromatic_bin=True, hue_smoothing=False, include_v=True,
+                             v_bins=8, chroma_weight=0.7),
+            "lab_ab2d": dict(bins=(16, 16), include_l=True, l_bins=8, chroma_weight=0.7),
+            "hsv_3d": dict(bins=(8, 8, 4)), "lab_3d": dict(bins=(4, 8, 8))}
 
 
 def full_params(method, **params):
     """Default parameters of `method` updated with the given ones."""
-    p = dict(DEFAULTS[method])
-    p.update({k: v for k, v in params.items() if v is not None})
-    return p
+    return resolve_params(method, params)
 
 
 def method_tag(method, **params):
     """Canonical tag encoding every effective parameter, independent of defaults."""
     p = full_params(method, **params)
+    if method in JOINT_METHODS or "spatial" in p:
+        return hashed_tag(method, p)
     def number(value):
         return str(int(value)) if value == int(value) else str(float(value))
 
@@ -183,7 +188,14 @@ def method_tag(method, **params):
 
 
 def compute_descriptor(img_bgr, method, **params):
-    return METHODS[method](img_bgr, **full_params(method, **params))
+    if (not isinstance(img_bgr, np.ndarray) or img_bgr.dtype != np.uint8 or
+            img_bgr.ndim != 3 or img_bgr.shape[2] != 3 or not img_bgr.size):
+        raise ValueError("Expected a nonempty H x W x 3 uint8 BGR image")
+    params = full_params(method, **params)
+    spatial = params.pop("spatial", None)
+    if spatial is None:
+        return METHODS[method](img_bgr, **params)
+    return spatial_descriptor(img_bgr, lambda block: METHODS[method](block, **params), spatial)
 
 
 def compute_folder(folder, method, **params):
@@ -192,7 +204,8 @@ def compute_folder(folder, method, **params):
     Returns (ids: int64 [N], desc: float32 [N x D]); row i corresponds to ids[i].
     """
     paths, ids = list_images(folder)
-    assert paths, f"No .jpg images found in {folder}"
+    if not paths:
+        raise ValueError(f"No .jpg images found in {folder}")
     desc = [compute_descriptor(load_image(p), method, **params)
             for p in tqdm(paths, desc=f"{Path(folder).name}/{method}")]
     return np.asarray(ids, dtype=np.int64), np.stack(desc).astype(np.float32)
@@ -201,6 +214,8 @@ def compute_folder(folder, method, **params):
 def channel_sizes(method, **params):
     """Number of bins of each channel's slice in the descriptor."""
     p = full_params(method, **params)
+    if method in JOINT_METHODS or "spatial" in p:
+        raise ValueError("channel_sizes applies only to global independent 1D histograms")
     sizes = [int(b) for b in p["bins"]]
     if method == "ycbcr" and p["chroma_overflow"]:
         sizes[1] += 2

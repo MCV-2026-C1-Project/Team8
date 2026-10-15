@@ -1,12 +1,14 @@
 """Top-K retrieval and descriptor loading helpers (Week 1, Task 3)."""
 import json
+import hashlib
 import pickle
 from pathlib import Path
 from zipfile import BadZipFile
 
 import numpy as np
 
-from descriptors import channel_sizes, compute_folder, full_params, method_tag
+from descriptors import compute_folder, full_params, method_tag, list_images
+from descriptor_config import descriptor_dim, canonical_json, measure_channels, resolve_descriptor_config
 from distances import rank
 from metrics import normalize_gt
 
@@ -40,11 +42,22 @@ def _cache_metadata(method, params):
                                        default=lambda value: value.tolist(), allow_nan=False))
 
 
-def save_descriptor_cache(path, ids, desc, method, params):
+def source_identity(folder):
+    """Prevent cache reuse across different folders or modified image collections."""
+    paths, _ = list_images(folder)
+    if not paths:
+        raise ValueError(f"No .jpg images found in {folder}")
+    manifest = [(p.name, p.stat().st_size, p.stat().st_mtime_ns) for p in paths]
+    payload = canonical_json([str(Path(folder).resolve()), manifest])
+    return hashlib.sha256(payload.encode()).hexdigest()
+
+
+def save_descriptor_cache(path, ids, desc, method, params, folder=None):
     """Save arrays and effective descriptor identity, including for precomputation."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    np.savez(path, ids=ids, desc=desc, **_cache_metadata(method, params))
+    np.savez(path, ids=ids, desc=desc, source=source_identity(folder) if folder else "",
+             **_cache_metadata(method, params))
 
 
 def load_or_compute(name, folder, method, params, desc_dir=DESC_DIR):
@@ -55,6 +68,7 @@ def load_or_compute(name, folder, method, params, desc_dir=DESC_DIR):
     """
     params = full_params(method, **params)
     expected = _cache_metadata(method, params)
+    source = source_identity(folder)
     path = Path(desc_dir) / f"{name}_{expected['tag']}.npz"
     if path.exists():
         try:
@@ -62,10 +76,14 @@ def load_or_compute(name, folder, method, params, desc_dir=DESC_DIR):
                 if (d["method"].item() != expected["method"] or d["tag"].item() != expected["tag"] or
                         json.loads(d["params_json"].item()) != json.loads(expected["params_json"])):
                     raise ValueError("descriptor identity does not match the requested configuration")
+                if d["source"].item() != source:
+                    raise ValueError("source image folder or file metadata changed")
                 ids, desc = d["ids"], d["desc"]
                 if (ids.ndim != 1 or desc.ndim != 2 or
-                        desc.shape != (len(ids), sum(channel_sizes(method, **params))) or
+                        desc.shape != (len(ids), descriptor_dim(method, **params)) or
                         not np.issubdtype(ids.dtype, np.integer) or
+                        ids.tolist() != list_images(folder)[1] or
+                        np.any(desc < 0) or
                         not np.isfinite(desc).all()):
                     raise ValueError("invalid descriptor arrays")
                 return ids, desc
@@ -74,17 +92,51 @@ def load_or_compute(name, folder, method, params, desc_dir=DESC_DIR):
     else:
         print(f"{path.name} not found, computing it from {folder}")
     ids, desc = compute_folder(folder, method, **params)
-    save_descriptor_cache(path, ids, desc, method, params)
+    save_descriptor_cache(path, ids, desc, method, params, folder)
     return ids, desc
 
 
-def load_gt(query_folder):
+def load_gt(query_folder, gt_path=None):
     """Ground truth from gt_corresps.pkl: gt[i] = list of BBDD IDs for the i-th query."""
-    with open(Path(query_folder) / "gt_corresps.pkl", "rb") as f:
+    with open(gt_path or Path(query_folder) / "gt_corresps.pkl", "rb") as f:
         return normalize_gt(pickle.load(f))
 
 
 def query_folder(query_set):
     """'qsd1' -> data/qsd1_w1; an existing folder path is used as is."""
     p = Path(query_set)
-    return p if p.is_dir() else DATA_DIR / f"{query_set}_w1"
+    if p.is_dir() or p.parent != Path(".") or p.is_absolute():
+        return p
+    return DATA_DIR / (str(query_set) if "_w" in str(query_set) else f"{query_set}_w1")
+
+
+def load_configured_data(config, db_dir=BBDD_DIR, query_dir=DATA_DIR / "qsd1_w1", desc_dir=DESC_DIR):
+    """Shared extraction/cache path for experiments and final retrieval."""
+    config = resolve_descriptor_config(config)
+    method, params = config["descriptor"], config["params"]
+    db_ids, db_desc = load_or_compute("bbdd", db_dir, method, params, desc_dir)
+    q_ids, q_desc = load_or_compute(Path(query_dir).name.split("_")[0].lower(),
+                                   query_dir, method, params, desc_dir)
+    return db_ids, db_desc, q_ids, q_desc
+
+
+def retrieve_config(config, measure, db_dir=BBDD_DIR, query_dir=DATA_DIR / "qsd1_w1",
+                    desc_dir=DESC_DIR, k=10):
+    config = resolve_descriptor_config(config)
+    channels = measure_channels(config["descriptor"], config["params"], measure)
+    if k <= 0:
+        raise ValueError("k must be positive")
+    db_ids, db_desc, q_ids, q_desc = load_configured_data(config, db_dir, query_dir, desc_dir)
+    return q_ids, retrieve(q_desc, db_desc, db_ids, measure, k, channels)
+
+
+def validate_gt_order(q_ids, gt):
+    if len(q_ids) != len(gt) or q_ids.tolist() != list(range(len(gt))):
+        raise ValueError("Query IDs must follow ground-truth order (0, 1, ...) with one GT entry per image")
+
+
+def save_results(path, results):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("wb") as stream:
+        pickle.dump([[int(value) for value in row] for row in results], stream)

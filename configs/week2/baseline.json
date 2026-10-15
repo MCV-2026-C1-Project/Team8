@@ -1,0 +1,23 @@
+{
+  "id": "historical_baseline",
+  "measures": [
+    "l1"
+  ],
+  "experiments": [
+    {
+      "id": "week1_hsv_reference",
+      "descriptor": "hsv",
+      "params": {
+        "bins": [
+          16,
+          16,
+          16
+        ],
+        "s_min": 10,
+        "v_min": 40,
+        "hue_valid_weight": false,
+        "hue_smoothing": false
+      }
+    }
+  ]
+}
