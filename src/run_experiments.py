@@ -122,7 +122,7 @@ def run_experiments(experiments, desc_dir=DESC_DIR, *, db_dir=None, query_dir=No
         spatial = resolve_spatial(params.get("spatial"))
         for measure in job["measures"]:
             predictions = retrieve(q_desc, db_desc, db_ids, measure,
-                                   len(db_ids) if diagnostics is not None else 10,
+                                   len(db_ids) if diagnostics is not None else min(10, len(db_ids)),
                                    channel_sizes=measure_channels(method, params, measure))
             row = dict(descriptor=method, bins="-".join(map(str, params["bins"])),
                        parameters=canonical_json({k: v for k, v in params.items() if k != "bins"}),

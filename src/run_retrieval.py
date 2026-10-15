@@ -19,6 +19,8 @@ def main(argv=None):
     ap.add_argument("--cache-dir", type=Path, default=DESC_DIR)
     ap.add_argument("--gt", type=Path)
     ap.add_argument("--k", type=int, default=10)
+    ap.add_argument("--allow-truncate", action="store_true",
+                    help="Explicitly allow k > database size and return all available IDs")
     ap.add_argument("--no-gt", action="store_true")
     ap.add_argument("--output", type=Path, help="Save a list of lists of Python integer IDs")
     args = ap.parse_args(argv)
@@ -29,7 +31,8 @@ def main(argv=None):
         if measure is None:
             raise ValueError("Specify --measure or use an exported configuration with a measure")
         folder = args.query_dir if args.query_dir is not None else query_folder(args.query_set)
-        q_ids, results = retrieve_config(config, measure, args.db_dir, folder, args.cache_dir, args.k)
+        q_ids, results = retrieve_config(config, measure, args.db_dir, folder, args.cache_dir, args.k,
+                                         allow_truncate=args.allow_truncate)
         print(f"{folder.name}: {len(results)} queries, {config}, {measure}, k={args.k}")
         print(f"First 3 results: {results[:3]}")
         if not args.no_gt:

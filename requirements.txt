@@ -4,3 +4,4 @@ tqdm
 matplotlib
 pytest
 pandas
+seaborn

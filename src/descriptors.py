@@ -31,9 +31,22 @@ def parse_id(path):
 
 
 def list_images(folder):
-    """Return (paths, ids) of the .jpg files in `folder`, sorted by filename."""
-    paths = sorted(Path(folder).glob("*.jpg"), key=lambda p: p.name)
+    """Discover JPEG files (case-insensitive), sorted by filename; reject duplicate IDs.
+
+    Filename ordering preserves the existing lowercase .jpg query/GT order.
+    PNG files, including segmentation masks, are never included.
+    """
+    folder = Path(folder)
+    if not folder.is_dir():
+        raise FileNotFoundError(f"Image directory does not exist or is not a directory: {folder.resolve()}")
+    paths = sorted((p for p in folder.iterdir() if p.is_file() and p.suffix.lower() in {".jpg", ".jpeg"}),
+                   key=lambda p: p.name)
     ids = [parse_id(p) for p in paths]
+    seen = {}
+    for path, image_id in zip(paths, ids):
+        if image_id in seen:
+            raise ValueError(f"Duplicate image ID {image_id} in {folder}: {seen[image_id]} and {path.name}")
+        seen[image_id] = path.name
     return paths, ids
 
 
@@ -199,13 +212,13 @@ def compute_descriptor(img_bgr, method, **params):
 
 
 def compute_folder(folder, method, **params):
-    """Compute descriptors for all .jpg images in `folder`.
+    """Compute descriptors for all JPEG images (.jpg/.jpeg, any case) in `folder`.
 
     Returns (ids: int64 [N], desc: float32 [N x D]); row i corresponds to ids[i].
     """
     paths, ids = list_images(folder)
     if not paths:
-        raise ValueError(f"No .jpg images found in {folder}")
+        raise ValueError(f"No JPEG images (.jpg/.jpeg) found in {folder}")
     desc = [compute_descriptor(load_image(p), method, **params)
             for p in tqdm(paths, desc=f"{Path(folder).name}/{method}")]
     return np.asarray(ids, dtype=np.int64), np.stack(desc).astype(np.float32)

@@ -2,14 +2,15 @@
 import json
 import hashlib
 import pickle
+import re
 from pathlib import Path
 from zipfile import BadZipFile
 
 import numpy as np
 
 from descriptors import compute_folder, full_params, method_tag, list_images
-from descriptor_config import descriptor_dim, canonical_json, measure_channels, resolve_descriptor_config
-from distances import rank
+from descriptor_config import descriptor_dim, canonical_json, measure_channels, resolve_descriptor_config, positive_int
+from distances import MEASURES, rank
 from metrics import normalize_gt
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -18,15 +19,36 @@ DATA_DIR = ROOT / "data"
 BBDD_DIR = DATA_DIR / "BBDD"
 
 
-def retrieve(query_desc, db_desc, db_ids, measure_name, k, channel_sizes=None):
+def retrieve(query_desc, db_desc, db_ids, measure_name, k, channel_sizes=None, *, allow_truncate=False):
     """For each query, the IDs of the k most similar database images.
 
     query_desc: (Q, D) query descriptors, rows in sorted query-file order.
     db_desc:    (N, D) database descriptors.
     db_ids:     (N,)   database image IDs; db_ids[i] is the image of row i.
     channel_sizes: bins per channel, required only for Wasserstein.
+    K must be a positive integer no larger than N. Explicit allow_truncate=True
+    permits K > N and returns all N IDs; it never permits an empty database.
     Returns a list of Q lists of k plain Python ints (BBDD IDs), most similar first.
     """
+    k = positive_int(k, "k")
+    if not isinstance(allow_truncate, bool):
+        raise ValueError("allow_truncate must be a boolean")
+    query_desc, db_desc, db_ids = np.asarray(query_desc), np.asarray(db_desc), np.asarray(db_ids)
+    if query_desc.ndim != 2 or db_desc.ndim != 2:
+        raise ValueError("Query and database descriptors must be 2D arrays (images, dimensions)")
+    if db_desc.shape[0] == 0:
+        raise ValueError("The database must contain at least one descriptor")
+    if query_desc.shape[1] != db_desc.shape[1] or db_desc.shape[1] == 0:
+        raise ValueError("Query and database descriptor dimensions must agree and be positive")
+    if db_ids.ndim != 1 or len(db_ids) != len(db_desc):
+        raise ValueError("Database IDs must be a 1D array matching the number of descriptor rows")
+    if not np.issubdtype(db_ids.dtype, np.integer):
+        raise ValueError("Database IDs must be integers")
+    if k > len(db_desc) and not allow_truncate:
+        raise ValueError(f"k={k} exceeds database size {len(db_desc)}; reduce k or explicitly enable allow_truncate")
+    if measure_name not in MEASURES:
+        raise ValueError(f"Unknown measure {measure_name!r}")
+    k = min(k, len(db_desc))
     results = []
     for q in query_desc:
         rows = rank(q, db_desc, measure_name, channel_sizes)[:k]  # row indices, best first
@@ -46,7 +68,7 @@ def source_identity(folder):
     """Prevent cache reuse across different folders or modified image collections."""
     paths, _ = list_images(folder)
     if not paths:
-        raise ValueError(f"No .jpg images found in {folder}")
+        raise ValueError(f"No JPEG images (.jpg/.jpeg) found in {folder}")
     manifest = [(p.name, p.stat().st_size, p.stat().st_mtime_ns) for p in paths]
     payload = canonical_json([str(Path(folder).resolve()), manifest])
     return hashlib.sha256(payload.encode()).hexdigest()
@@ -103,11 +125,19 @@ def load_gt(query_folder, gt_path=None):
 
 
 def query_folder(query_set):
-    """'qsd1' -> data/qsd1_w1; an existing folder path is used as is."""
+    """Resolve a dataset ID or actual folder and fail clearly when it is missing.
+
+    Bare course aliases (qsd1/qst1) default to Week 1. Explicit week suffixes
+    are retained; qsd1_w2 never silently redirects to qsd1_w1.
+    """
     p = Path(query_set)
-    if p.is_dir() or p.parent != Path(".") or p.is_absolute():
-        return p
-    return DATA_DIR / (str(query_set) if "_w" in str(query_set) else f"{query_set}_w1")
+    if not p.is_dir() and re.fullmatch(r"qs[dt]\d+(?:_w\d+)?", str(query_set)):
+        p = DATA_DIR / (str(query_set) if "_w" in str(query_set) else f"{query_set}_w1")
+    if not p.is_dir():
+        hint = (" QSD1-W2 uses the QSD1-W1 cropped images; use qsd1 or data/qsd1_w1 if that is your available folder."
+                if str(query_set) == "qsd1_w2" else "")
+        raise FileNotFoundError(f"Query directory does not exist or is not a directory: {p.resolve()}.{hint}")
+    return p
 
 
 def load_configured_data(config, db_dir=BBDD_DIR, query_dir=DATA_DIR / "qsd1_w1", desc_dir=DESC_DIR):
@@ -121,13 +151,12 @@ def load_configured_data(config, db_dir=BBDD_DIR, query_dir=DATA_DIR / "qsd1_w1"
 
 
 def retrieve_config(config, measure, db_dir=BBDD_DIR, query_dir=DATA_DIR / "qsd1_w1",
-                    desc_dir=DESC_DIR, k=10):
+                    desc_dir=DESC_DIR, k=10, *, allow_truncate=False):
     config = resolve_descriptor_config(config)
     channels = measure_channels(config["descriptor"], config["params"], measure)
-    if k <= 0:
-        raise ValueError("k must be positive")
+    k = positive_int(k, "k")
     db_ids, db_desc, q_ids, q_desc = load_configured_data(config, db_dir, query_dir, desc_dir)
-    return q_ids, retrieve(q_desc, db_desc, db_ids, measure, k, channels)
+    return q_ids, retrieve(q_desc, db_desc, db_ids, measure, k, channels, allow_truncate=allow_truncate)
 
 
 def validate_gt_order(q_ids, gt):
