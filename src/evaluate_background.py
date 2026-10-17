@@ -54,14 +54,32 @@ def main():
     parser.add_argument("--gt", required=True)
     parser.add_argument("--output", default="results/background_masks")
     parser.add_argument("--threshold", type=float, default=20.0)
-    parser.add_argument("--border-ratio", type=float, default=0.08)
+    parser.add_argument("--border-ratio", type=float, default=0.04)
     parser.add_argument("--mad-multiplier", type=float, default=3.0)
     parser.add_argument("--sample-step", type=int, default=4)
     parser.add_argument("--l-weight", type=float, default=0.5)
     parser.add_argument("--grid-search", action="store_true", help="Test thresholds and select the best one.")
+    parser.add_argument("--closing-size", type=int, default=5)
+    parser.add_argument("--no-fill-interior", action="store_true",
+                        help="Disable all interior postprocessing (baseline).")
+    parser.add_argument("--enclosed-only", action="store_true",
+                        help="Fill enclosed holes only; do not fill horizontal spans.")
+    parser.add_argument("--method", choices=["quadratic", "color_distribution"],
+                        default="color_distribution")
+    parser.add_argument("--color-sigma", type=float, default=3.0)
+    parser.add_argument("--min-component-ratio", type=float, default=0.001)
+    parser.add_argument("--no-fill-columns", action="store_true")
+    parser.add_argument("--min-row-foreground", type=float, default=0.5,
+                        help="Clear rows below this foreground fraction; 0 disables.")
+    parser.add_argument("--min-col-foreground", type=float, default=0.5,
+                        help="Clear columns below this foreground fraction; 0 disables.")
     args = parser.parse_args()
 
-    thresholds = [10, 15, 20, 25] if args.grid_search else [args.threshold]
+    thresholds = (
+        ([2, 2.5, 3, 3.5, 4] if args.grid_search else [args.color_sigma])
+        if args.method == "color_distribution" else
+        ([10, 15, 20, 25] if args.grid_search else [args.threshold])
+    )
 
     image_dir = Path(args.images)
     gt_dir = Path(args.gt)
@@ -83,7 +101,7 @@ def main():
             gt_dir / f"{image_path.stem}{ext}"
             for ext in (".png", ".jpg", ".jpeg", ".bmp", ".tif")
         ]
-        gt_path = next((p for p in candidates if p.is_file()), None)
+        gt_path = next((p for p in candidates if p.is_file() and p.resolve() != image_path.resolve()), None)
 
         if gt_path is not None:
             pairs.append((image_path, gt_path))
@@ -127,6 +145,15 @@ def main():
                 mad_multiplier=args.mad_multiplier,
                 sample_step=args.sample_step,
                 l_weight=args.l_weight,
+                fill_interior=not args.no_fill_interior,
+                fill_rows=not args.enclosed_only,
+                closing_size=args.closing_size,
+                fill_columns=not args.no_fill_columns and not args.enclosed_only,
+                min_component_ratio=args.min_component_ratio,
+                method=args.method,
+                color_sigma=threshold,
+                min_row_foreground=args.min_row_foreground,
+                min_col_foreground=args.min_col_foreground,
             )
 
             scores = evaluate_mask(pred, gt)
