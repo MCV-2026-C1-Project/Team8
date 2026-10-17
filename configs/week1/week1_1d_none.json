@@ -1,0 +1,294 @@
+{
+  "id": "week1_global_1d_baseline_no_photometric",
+  "measures": [
+    "l1",
+    "chi2",
+    "hellinger",
+    "euclidean",
+    "intersection",
+    "wasserstein"
+  ],
+  "experiments": [
+    {
+      "id": "W1_HSV_1D",
+      "descriptor": "hsv",
+      "params": {
+        "normalization": "none"
+      },
+      "grid": {
+        "bins": [
+          [
+            8,
+            8,
+            8
+          ],
+          [
+            16,
+            16,
+            8
+          ],
+          [
+            16,
+            16,
+            16
+          ],
+          [
+            24,
+            24,
+            16
+          ],
+          [
+            32,
+            32,
+            16
+          ],
+          [
+            32,
+            32,
+            32
+          ],
+          [
+            64,
+            64,
+            32
+          ]
+        ],
+        "s_min": [
+          5,
+          10,
+          20
+        ],
+        "v_min": [
+          20,
+          40,
+          60
+        ],
+        "hue_valid_weight": [
+          false,
+          true
+        ],
+        "hue_smoothing": [
+          false,
+          true
+        ]
+      },
+      "spatial": {
+        "mode": "global"
+      }
+    },
+    {
+      "id": "W1_HSV_RAW_1D",
+      "descriptor": "hsv_baseline",
+      "params": {
+        "normalization": "none"
+      },
+      "grid": {
+        "bins": [
+          [
+            180,
+            256,
+            256
+          ],
+          [
+            36,
+            32,
+            32
+          ]
+        ]
+      },
+      "spatial": {
+        "mode": "global"
+      }
+    },
+    {
+      "id": "W1_RGB_1D",
+      "descriptor": "rgb",
+      "params": {
+        "normalization": "none"
+      },
+      "grid": {
+        "bins": [
+          [
+            8,
+            8,
+            8
+          ],
+          [
+            16,
+            16,
+            16
+          ],
+          [
+            32,
+            32,
+            32
+          ],
+          [
+            64,
+            64,
+            64
+          ],
+          [
+            16,
+            32,
+            16
+          ],
+          [
+            32,
+            16,
+            32
+          ]
+        ]
+      },
+      "spatial": {
+        "mode": "global"
+      }
+    },
+    {
+      "id": "W1_LAB_1D",
+      "descriptor": "lab",
+      "params": {
+        "normalization": "none"
+      },
+      "grid": {
+        "bins": [
+          [
+            8,
+            8,
+            8
+          ],
+          [
+            16,
+            16,
+            16
+          ],
+          [
+            32,
+            32,
+            32
+          ],
+          [
+            64,
+            64,
+            64
+          ],
+          [
+            4,
+            32,
+            32
+          ],
+          [
+            8,
+            32,
+            32
+          ],
+          [
+            16,
+            32,
+            32
+          ],
+          [
+            8,
+            64,
+            64
+          ],
+          [
+            16,
+            64,
+            64
+          ],
+          [
+            32,
+            64,
+            64
+          ]
+        ]
+      },
+      "spatial": {
+        "mode": "global"
+      }
+    },
+    {
+      "id": "W1_YCBCR_1D",
+      "descriptor": "ycbcr",
+      "params": {
+        "normalization": "none"
+      },
+      "grid": {
+        "bins": [
+          [
+            8,
+            8,
+            8
+          ],
+          [
+            16,
+            16,
+            16
+          ],
+          [
+            32,
+            32,
+            32
+          ],
+          [
+            64,
+            64,
+            64
+          ],
+          [
+            4,
+            32,
+            32
+          ],
+          [
+            8,
+            32,
+            32
+          ],
+          [
+            16,
+            32,
+            32
+          ],
+          [
+            8,
+            64,
+            64
+          ],
+          [
+            16,
+            64,
+            64
+          ],
+          [
+            32,
+            64,
+            64
+          ]
+        ],
+        "chroma_range": [
+          [
+            0,
+            256
+          ],
+          [
+            64,
+            192
+          ],
+          [
+            96,
+            160
+          ]
+        ],
+        "chroma_overflow": [
+          false,
+          true
+        ]
+      },
+      "spatial": {
+        "mode": "global"
+      }
+    }
+  ]
+}

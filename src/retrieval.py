@@ -161,6 +161,8 @@ def query_masks(folder, mask_source="pred"):
     if mask_source not in ("pred", "gt"):
         raise ValueError("mask_source must be pred or gt")
     paths, ids = list_images(folder)
+    if not paths:
+        raise ValueError(f"No JPEG images (.jpg/.jpeg) found in {folder}")
     images, masks = [], []
     for path in tqdm(paths, desc=f"{Path(folder).name}/masks ({mask_source})"):
         image = load_image(path)
@@ -170,6 +172,10 @@ def query_masks(folder, mask_source="pred"):
             mask = cv2.imread(str(path.with_suffix(".png")), cv2.IMREAD_GRAYSCALE)
             if mask is None:
                 raise FileNotFoundError(f"Ground-truth mask not found: {path.with_suffix('.png')}")
+        if mask.shape != image.shape[:2]:
+            raise ValueError(f"Mask and image sizes differ: {path}")
+        if not np.any(mask):
+            raise ValueError(f"Foreground mask is empty: {path}; cannot compute a painting descriptor")
         images.append(image)
         masks.append(mask)
     return paths, np.asarray(ids, dtype=np.int64), images, masks

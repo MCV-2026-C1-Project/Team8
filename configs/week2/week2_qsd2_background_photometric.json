@@ -1,0 +1,288 @@
+{
+  "id": "week2_qsd2_masked_photometric_v1",
+  "db_dir": "data/BBDD",
+  "query_dir": "data/qsd2_w2",
+  "gt": "data/qsd2_w2/gt_corresps.pkl",
+  "measures": [
+    "l1",
+    "chi2",
+    "hellinger"
+  ],
+  "experiments": [
+    {
+      "id": "QSD2_Lab_1D",
+      "descriptor": "lab",
+      "grid": {
+        "bins": [
+          [
+            32,
+            32,
+            32
+          ],
+          [
+            64,
+            64,
+            64
+          ]
+        ],
+        "normalization": [
+          "none",
+          "photometric"
+        ]
+      },
+      "spatial": {
+        "mode": "global"
+      }
+    },
+    {
+      "id": "QSD2_YCrCb_1D",
+      "descriptor": "ycbcr",
+      "grid": {
+        "bins": [
+          [
+            32,
+            32,
+            32
+          ],
+          [
+            64,
+            64,
+            64
+          ]
+        ],
+        "normalization": [
+          "none",
+          "photometric"
+        ]
+      },
+      "spatial": {
+        "mode": "global"
+      }
+    },
+    {
+      "id": "QSD2_Lab_1D_spatial",
+      "descriptor": "lab",
+      "grid": {
+        "bins": [
+          [
+            32,
+            32,
+            32
+          ],
+          [
+            64,
+            64,
+            64
+          ]
+        ],
+        "normalization": [
+          "none",
+          "photometric"
+        ]
+      },
+      "spatial": [
+        {
+          "mode": "grid",
+          "grids": [
+            2
+          ]
+        },
+        {
+          "mode": "pyramid",
+          "grids": [
+            1,
+            2
+          ],
+          "level_weights": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "mode": "pyramid",
+          "grids": [
+            1,
+            2,
+            4
+          ],
+          "level_weights": [
+            0.4,
+            0.35,
+            0.25
+          ]
+        }
+      ]
+    },
+    {
+      "id": "QSD2_YCrCb_1D_spatial",
+      "descriptor": "ycbcr",
+      "grid": {
+        "bins": [
+          [
+            32,
+            32,
+            32
+          ],
+          [
+            64,
+            64,
+            64
+          ]
+        ],
+        "normalization": [
+          "none",
+          "photometric"
+        ]
+      },
+      "spatial": [
+        {
+          "mode": "grid",
+          "grids": [
+            2
+          ]
+        },
+        {
+          "mode": "pyramid",
+          "grids": [
+            1,
+            2
+          ],
+          "level_weights": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "mode": "pyramid",
+          "grids": [
+            1,
+            2,
+            4
+          ],
+          "level_weights": [
+            0.4,
+            0.35,
+            0.25
+          ]
+        }
+      ]
+    },
+    {
+      "id": "QSD2_Lab_ab_2D",
+      "descriptor": "lab_ab2d",
+      "params": {
+        "include_l": true,
+        "l_bins": 8,
+        "chroma_weight": 0.7
+      },
+      "grid": {
+        "bins": [
+          [
+            12,
+            12
+          ],
+          [
+            16,
+            16
+          ]
+        ],
+        "normalization": [
+          "none",
+          "photometric"
+        ]
+      },
+      "spatial": [
+        {
+          "mode": "global"
+        },
+        {
+          "mode": "grid",
+          "grids": [
+            2
+          ]
+        },
+        {
+          "mode": "pyramid",
+          "grids": [
+            1,
+            2
+          ],
+          "level_weights": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "mode": "pyramid",
+          "grids": [
+            1,
+            2,
+            4
+          ],
+          "level_weights": [
+            0.4,
+            0.35,
+            0.25
+          ]
+        }
+      ]
+    },
+    {
+      "id": "QSD2_Lab_3D",
+      "descriptor": "lab_3d",
+      "grid": {
+        "bins": [
+          [
+            8,
+            8,
+            8
+          ],
+          [
+            16,
+            16,
+            8
+          ]
+        ],
+        "normalization": [
+          "none",
+          "photometric"
+        ]
+      },
+      "spatial": [
+        {
+          "mode": "global"
+        },
+        {
+          "mode": "grid",
+          "grids": [
+            2
+          ]
+        },
+        {
+          "mode": "pyramid",
+          "grids": [
+            1,
+            2
+          ],
+          "level_weights": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "mode": "pyramid",
+          "grids": [
+            1,
+            2,
+            4
+          ],
+          "level_weights": [
+            0.4,
+            0.35,
+            0.25
+          ]
+        }
+      ]
+    }
+  ]
+}

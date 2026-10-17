@@ -25,12 +25,20 @@ def resolve_params(method, supplied):
     if method not in DEFAULTS:
         raise ValueError(f"Unknown descriptor {method!r}; choose from {list(DEFAULTS)}")
     supplied = {k: v for k, v in supplied.items() if v is not None}
-    unknown = set(supplied) - set(DEFAULTS[method]) - {"spatial"}
+    unknown = set(supplied) - set(DEFAULTS[method]) - {"spatial", "normalization"}
     if unknown:
         raise ValueError(f"Unknown parameters for {method}: {sorted(unknown)}")
     params = dict(DEFAULTS[method])
     params.update(supplied)
     spatial = resolve_spatial(params.pop("spatial", None))
+    normalization = params.pop("normalization", "none")
+    if normalization not in ("none", "photometric"):
+        raise ValueError("normalization must be 'none' or 'photometric'")
+    if normalization == "photometric":
+        if method not in {"lab", "ycbcr", "lab_ab2d", "lab_3d"}:
+            raise ValueError("Photometric normalization supports only lab, ycbcr, lab_ab2d and lab_3d descriptors")
+        params["normalization"] = normalization
+    # Omit the disabled setting so all existing tags and cache metadata survive.
     count = 2 if method in {"hsv_hs2d", "lab_ab2d"} else 3
     bins = params["bins"]
     if not isinstance(bins, (tuple, list)) or len(bins) != count:

@@ -4,13 +4,15 @@ import json
 from pathlib import Path
 
 from descriptor_config import resolve_descriptor_config
-from descriptors import METHODS, DEFAULTS, method_tag
+from descriptors import METHODS, DEFAULTS, MASKABLE_METHODS, method_tag
 
 
 def add_descriptor_arguments(parser, method_flag="--descriptor", allow_all=False):
     parser.add_argument(method_flag, dest="descriptor", choices=[*METHODS, *(["all"] if allow_all else [])])
     parser.add_argument("--config", type=Path, help="JSON descriptor/export (experiment runner: JSON suite)")
     parser.add_argument("--bins", type=int, nargs="+", help="Two joint bins or three 1D/3D bins")
+    parser.add_argument("--normalization", choices=("none", "photometric"), default=None,
+                        help="Lab/YCbCr preprocessing before partitioning (foreground statistics with masks); default: none")
     for method in ("hsv", "ycbcr", "rgb", "lab"):
         parser.add_argument(f"--{method}-bins", type=int, nargs=3, help="Legacy per-channel bin option")
     for key in ("s-min", "v-min", "chroma-weight"):
@@ -47,7 +49,7 @@ def config_from_args(args, base=None, method=None):
         for alias in ("hsv", "ycbcr", "rgb", "lab"):
             if alias != method and getattr(args, alias + "_bins", None) is not None:
                 raise ValueError(f"--{alias}-bins applies only to {alias}; use --bins for {method}")
-    for key in set().union(*(p.keys() for p in DEFAULTS.values())):
+    for key in set().union(*(p.keys() for p in DEFAULTS.values())) | {"normalization"}:
         value = getattr(args, key, None)
         if value is not None:
             params[key] = value
@@ -68,4 +70,7 @@ def config_from_args(args, base=None, method=None):
         if args.level_weights is not None:
             spatial["level_weights"] = args.level_weights
         params["spatial"] = spatial
-    return resolve_descriptor_config(dict(descriptor=method, params=params))
+    config = resolve_descriptor_config(dict(descriptor=method, params=params))
+    if getattr(args, "remove_background", False) and method not in MASKABLE_METHODS:
+        raise ValueError(f"Foreground masks are supported only for {sorted(MASKABLE_METHODS)}, not {method}")
+    return config

@@ -1,4 +1,4 @@
-"""Joint colour histograms; no resizing, equalisation or foreground processing."""
+"""Joint colour histograms with optional masks; no resizing or equalisation."""
 import cv2
 import numpy as np
 
@@ -17,10 +17,10 @@ def distribution(counts):
     return counts / mass
 
 
-def combine(chroma, image, channel, bins, include, weight):
+def combine(chroma, image, channel, bins, include, weight, mask=None):
     if not include:
         return chroma
-    light = distribution(joint_hist(image, [channel], [bins], [(0, 256)]))
+    light = distribution(joint_hist(image, [channel], [bins], [(0, 256)], mask))
     return np.concatenate([weight * chroma, (1 - weight) * light])
 
 
@@ -44,10 +44,17 @@ def hsv_hs2d(img_bgr, bins=(16, 16), s_min=10, v_min=40,
     return combine(chroma, hsv, 2, v_bins, include_v, chroma_weight)
 
 
-def lab_ab2d(img_bgr, bins=(16, 16), include_l=True, l_bins=8, chroma_weight=0.7):
+def lab_ab2d(img_bgr, bins=(16, 16), include_l=True, l_bins=8, chroma_weight=0.7, mask=None):
     lab = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2Lab)
-    chroma = distribution(joint_hist(lab, [1, 2], bins, [(0, 256)] * 2))
-    return combine(chroma, lab, 0, l_bins, include_l, chroma_weight)
+    return lab_ab2d_from_color(lab, bins, include_l, l_bins, chroma_weight, mask)
+
+
+def lab_ab2d_from_color(lab, bins=(16, 16), include_l=True, l_bins=8, chroma_weight=0.7, mask=None):
+    """Joint a/b and optional L histograms from an already prepared Lab image."""
+    if mask is not None and not np.any(mask):
+        return np.zeros(int(np.prod(bins)) + (l_bins if include_l else 0), dtype=np.float32)
+    chroma = distribution(joint_hist(lab, [1, 2], bins, [(0, 256)] * 2, mask))
+    return combine(chroma, lab, 0, l_bins, include_l, chroma_weight, mask)
 
 
 def hsv_3d(img_bgr, bins=(8, 8, 4)):
@@ -55,6 +62,13 @@ def hsv_3d(img_bgr, bins=(8, 8, 4)):
     return distribution(joint_hist(hsv, [0, 1, 2], bins, [(0, 180), (0, 256), (0, 256)]))
 
 
-def lab_3d(img_bgr, bins=(4, 8, 8)):
+def lab_3d(img_bgr, bins=(4, 8, 8), mask=None):
     lab = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2Lab)
-    return distribution(joint_hist(lab, [0, 1, 2], bins, [(0, 256)] * 3))
+    return lab_3d_from_color(lab, bins, mask)
+
+
+def lab_3d_from_color(lab, bins=(4, 8, 8), mask=None):
+    """Joint Lab histogram from an already prepared Lab image."""
+    if mask is not None and not np.any(mask):
+        return np.zeros(int(np.prod(bins)), dtype=np.float32)
+    return distribution(joint_hist(lab, [0, 1, 2], bins, [(0, 256)] * 3, mask))

@@ -42,6 +42,26 @@ Retrieval ranks database paintings by their similarity to each query. The output
 
 Histogram bins and other parameters are configurable through Python, JSON or CLI options.
 
+### Photometric normalisation
+
+Optional photometric normalisation supports `lab`, `ycbcr`, `lab_ab2d` and `lab_3d` in global, grid and pyramid layouts.
+It centres each channel around 128 and scales all channels using the luminance standard deviation (target 50), then clips.
+The transformation runs once per complete image, before spatial partitioning; histograms use the prepared float32 pixels.
+The default `--normalization none` preserves existing values and caches; exported configurations retain the selected mode.
+RGB/HSV remain unnormalised baselines.
+
+```bash
+python src/run_retrieval.py --descriptor lab_ab2d --normalization photometric --spatial-mode pyramid --grids 1 2 --measure l1
+```
+
+With `--remove-background`, Lab/YCbCr statistics and histogram counts use only foreground pixels; preparation runs once before trimming or partitioning. All four Lab/YCbCr families support masks with `none` or `photometric`; RGB keeps its existing mask support and HSV masks remain unsupported. Empty foreground masks raise an error.
+Experiments also accept `--mask-source pred|gt`, `--trim-mode block|bbox` or `--no-trim`. GT masks are development diagnostics only. Database caches are reused; masked queries are never cached.
+Masked CSVs and exported provenance record the mask source/trim policy and `replay_flags`; replay those flags explicitly with `run_retrieval.py --config` (loading the descriptor alone does not enable masking).
+
+```sh
+python src/run_experiments.py --config configs/week2/week2_qsd2_background_photometric.json --remove-background --mask-source pred --trim-mode block --cache-dir descriptors --output results/week2/qsd2_pred.csv --export-best results/week2/qsd2_pred_best.json
+```
+
 ### Spatial histograms (Week 2)
 
 - **`global`**: one descriptor for the entire image.
@@ -63,12 +83,12 @@ python src/run_experiments.py --grid ycbcr --output config_results/ycbcr.csv
 python src/sweep_hsv.py --output config_results/hsv_sweep.csv
 ```
 
-**JSON** — edit the experiment suites in `configs/week2/`:
+**JSON** — edit the experiment suites in `configs/week1/` and `configs/week2/`:
 
 ```sh
-python src/run_experiments.py --config configs/week2/phase_a.json --output results/week2/phase_a.csv
-python src/run_experiments.py --config configs/week2/phase_b.json --output results/week2/phase_b.csv
-python src/run_experiments.py --config configs/week2/phase_c.json --output results/week2/phase_c.csv --export-best results/week2/best_config.json
+python src/run_experiments.py --config configs/week1/week1_1d_none.json --cache-dir descriptors --output results/week1/1d_none.csv --export-best results/week1/1d_none_best.json
+python src/run_experiments.py --config configs/week1/week1_1d_photometric.json --cache-dir descriptors --output results/week1/1d_photometric.csv --export-best results/week1/1d_photometric_best.json
+python src/run_experiments.py --config configs/week2/week2_joint_spatial_normalization.json --cache-dir descriptors --output results/week2/joint_spatial.csv --export-best results/week2/best_config.json
 ```
 
 The example suites compare colour histograms, spatial layouts and pyramid weights. Their settings can be modified freely.
