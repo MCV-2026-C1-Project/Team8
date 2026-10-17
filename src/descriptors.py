@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 from descriptor_config import JOINT_METHODS, descriptor_dim, hashed_tag, resolve_params
 from joint_histograms import hsv_hs2d, lab_ab2d, hsv_3d, lab_3d
-from spatial import resolve_spatial, spatial_descriptor, trim_background_blocks
+from spatial import crop_to_foreground, resolve_spatial, spatial_descriptor, trim_background_blocks
 
 YCBCR_DEFAULTS = dict(bins=(8, 32, 32), y_range=(0, 256), chroma_range=(0, 256),
                       chroma_overflow=False)
@@ -202,11 +202,13 @@ def method_tag(method, **params):
     return tag
 
 
-def compute_descriptor(img_bgr, method, mask=None, trim=True, **params):
+def compute_descriptor(img_bgr, method, mask=None, trim="block", **params):
     """Descriptor of an image; with a mask, only foreground (nonzero) pixels are counted.
 
-    For spatial layouts with a mask and trim=True, block rows/columns that are
-    almost only background are removed first (see trim_background_blocks).
+    For spatial layouts with a mask, the background around the painting is removed
+    first: trim="block" deletes block rows/columns that are almost only background
+    (trim_background_blocks), trim="bbox" crops to the foreground's bounding box
+    (crop_to_foreground), and trim=None keeps the whole image.
     """
     if (not isinstance(img_bgr, np.ndarray) or img_bgr.dtype != np.uint8 or
             img_bgr.ndim != 3 or img_bgr.shape[2] != 3 or not img_bgr.size):
@@ -225,8 +227,12 @@ def compute_descriptor(img_bgr, method, mask=None, trim=True, **params):
     if spatial is None:
         return METHODS[method](img_bgr, mask=mask, **params)
     spatial = resolve_spatial(spatial)
-    if trim:
+    if trim == "block":
         img_bgr, mask = trim_background_blocks(img_bgr, mask, max(spatial["grids"]))
+    elif trim == "bbox":
+        img_bgr, mask = crop_to_foreground(img_bgr, mask)
+    elif trim is not None:
+        raise ValueError("trim must be 'block', 'bbox' or None")
     return spatial_descriptor(img_bgr, lambda block, block_mask: METHODS[method](block, mask=block_mask, **params),
                               spatial, mask)
 

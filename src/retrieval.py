@@ -175,7 +175,7 @@ def query_masks(folder, mask_source="pred"):
     return paths, np.asarray(ids, dtype=np.int64), images, masks
 
 
-def compute_masked_queries(config, images, masks, trim=True):
+def compute_masked_queries(config, images, masks, trim="block"):
     """Foreground-only query descriptors. Not cached: the cache tag ignores masks."""
     config = resolve_descriptor_config(config)
     desc = [compute_descriptor(image, config["descriptor"], mask=mask, trim=trim, **config["params"])
@@ -184,7 +184,7 @@ def compute_masked_queries(config, images, masks, trim=True):
 
 
 def retrieve_config(config, measure, db_dir=BBDD_DIR, query_dir=DATA_DIR / "qsd1_w1",
-                    desc_dir=DESC_DIR, k=10, *, allow_truncate=False, masks=None, trim=True):
+                    desc_dir=DESC_DIR, k=10, *, allow_truncate=False, masks=None, trim="block"):
     """masks=(query ids, images, masks) computes foreground-only query descriptors."""
     config = resolve_descriptor_config(config)
     channels = measure_channels(config["descriptor"], config["params"], measure)

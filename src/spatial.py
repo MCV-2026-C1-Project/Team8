@@ -41,10 +41,14 @@ def block_slices(shape, grid):
             yield slice(ys[row], ys[row + 1]), slice(xs[col], xs[col + 1])
 
 
-def trim_background_blocks(image, mask, grid, min_fraction=0.01):
+# Block rows/columns with less foreground than this are trimmed (shadows, labels, specks).
+TRIM_MIN_FRACTION = 0.10
+
+
+def trim_background_blocks(image, mask, grid, min_fraction=TRIM_MIN_FRACTION):
     """Delete block rows/columns that are (almost) only background, then repeat on the result.
 
-    A block row or column is background when less than min_fraction of its pixels
+    A block row or column is background when less than min_fraction (default 10 %) of its pixels
     are foreground. Its pixel rows/columns are removed and the rest stitched together;
     the grid is laid again on the new image until nothing more can be removed.
     """
@@ -67,6 +71,27 @@ def trim_background_blocks(image, mask, grid, min_fraction=0.01):
             break
         image, mask, fg = (a[rows][:, cols] for a in (image, mask, fg))
     return image, mask
+
+
+# Pixel rows/columns with less foreground than this lie outside the painting's box.
+BBOX_MIN_FRACTION = 0.10
+
+
+def crop_to_foreground(image, mask, min_fraction=BBOX_MIN_FRACTION):
+    """Crop image and mask to the foreground's bounding box, at pixel resolution.
+
+    The box spans from the first to the last pixel row (column) in which at least
+    min_fraction of the pixels are foreground, so isolated specks or labels on the
+    wall do not stretch it. Without any such row or column nothing is cropped.
+    """
+    fg = mask > 0
+    rows = np.flatnonzero(fg.mean(axis=1) >= min_fraction)
+    cols = np.flatnonzero(fg.mean(axis=0) >= min_fraction)
+    if not len(rows) or not len(cols):
+        return image, mask
+    ys = slice(rows[0], rows[-1] + 1)
+    xs = slice(cols[0], cols[-1] + 1)
+    return image[ys, xs], mask[ys, xs]
 
 
 def spatial_descriptor(image, extract_color, config, mask=None):

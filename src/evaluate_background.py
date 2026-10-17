@@ -53,10 +53,11 @@ def main():
     parser.add_argument("--images", required=True)
     parser.add_argument("--gt", required=True)
     parser.add_argument("--output", default="results/background_masks")
-    parser.add_argument("--threshold", type=float, default=25.0)
+    parser.add_argument("--threshold", type=float, default=20.0)
     parser.add_argument("--border-ratio", type=float, default=0.08)
     parser.add_argument("--mad-multiplier", type=float, default=3.0)
     parser.add_argument("--sample-step", type=int, default=4)
+    parser.add_argument("--l-weight", type=float, default=0.5)
     parser.add_argument("--grid-search", action="store_true", help="Test thresholds and select the best one.")
     args = parser.parse_args()
 
@@ -125,6 +126,7 @@ def main():
                 threshold=threshold,
                 mad_multiplier=args.mad_multiplier,
                 sample_step=args.sample_step,
+                l_weight=args.l_weight,
             )
 
             scores = evaluate_mask(pred, gt)

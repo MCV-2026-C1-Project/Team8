@@ -29,8 +29,10 @@ def main(argv=None):
                     help="Compute query descriptors only on foreground pixels")
     ap.add_argument("--mask-source", choices=("pred", "gt"), default="pred",
                     help="pred: foreground_mask; gt: <stem>.png next to each query")
+    ap.add_argument("--trim-mode", choices=("block", "bbox"), default="block",
+                    help="block: delete background block rows/columns; bbox: crop to the foreground box")
     ap.add_argument("--no-trim", action="store_true",
-                    help="Keep background-only block rows/columns instead of trimming them")
+                    help="Keep the whole image instead of removing the background around the painting")
     ap.add_argument("--save-masks", type=Path, help="Write the query masks as <stem>.png")
     args = ap.parse_args(argv)
     try:
@@ -52,8 +54,8 @@ def main(argv=None):
                     cv2.imwrite(str(args.save_masks / f"{path.stem}.png"), mask)
         q_ids, results = retrieve_config(config, measure, args.db_dir, folder, args.cache_dir, args.k,
                                          allow_truncate=args.allow_truncate, masks=masks,
-                                         trim=not args.no_trim)
-        mode = (f"foreground ({args.mask_source} mask, {'no trim' if args.no_trim else 'trim'})"
+                                         trim=None if args.no_trim else args.trim_mode)
+        mode = (f"foreground ({args.mask_source} mask, {'no trim' if args.no_trim else args.trim_mode + ' trim'})"
                 if args.remove_background else "full image")
         print(f"{folder.name}: {len(results)} queries, {config}, {measure}, k={args.k}, {mode}")
         print(f"First 3 results: {results[:3]}")

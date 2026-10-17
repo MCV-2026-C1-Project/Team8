@@ -5,9 +5,10 @@ import numpy as np
 def foreground_mask(
     image,
     border_ratio=0.08,
-    threshold=25.0,
+    threshold=20.0,
     mad_multiplier=3.0,
     sample_step=4,
+    l_weight=0.5,
 ):
     """
     Estimate a smoothly varying wall color from image borders.
@@ -24,6 +25,9 @@ def foreground_mask(
         Controls the adaptive threshold based on border residuals.
     sample_step : int
         Spacing between sampled border pixels.
+    l_weight : float
+        Weight of lightness (L) in the Lab distance. Values below 1 make
+        illumination changes on the wall matter less than changes in colour.
 
     Returns
     -------
@@ -34,6 +38,7 @@ def foreground_mask(
         raise ValueError("Input image is empty.")
 
     lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB).astype(np.float32)
+    lab[..., 0] *= l_weight
     h, w = lab.shape[:2]
 
     # Normalize pixel coordinates.
