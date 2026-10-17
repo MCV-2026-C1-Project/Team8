@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 from descriptor_config import JOINT_METHODS, descriptor_dim, hashed_tag, resolve_params
 from joint_histograms import hsv_hs2d, lab_ab2d, hsv_3d, lab_3d
-from spatial import spatial_descriptor
+from spatial import resolve_spatial, spatial_descriptor, trim_background_blocks
 
 YCBCR_DEFAULTS = dict(bins=(8, 32, 32), y_range=(0, 256), chroma_range=(0, 256),
                       chroma_overflow=False)
@@ -142,29 +142,31 @@ def hsv_baseline_hist(img_bgr, bins=HSV_BASELINE_DEFAULTS["bins"]):
     ])
 
 
-def _three_channel_hist(image, bins):
-    """Concatenate normalised 1D histograms of three uint8 channels."""
+def _three_channel_hist(image, bins, mask=None):
+    """Concatenate normalised 1D histograms of three uint8 channels (optionally masked)."""
     if len(bins) != 3 or any(int(b) != b or b <= 0 for b in bins):
         raise ValueError("bins must contain three positive integers")
     return np.concatenate([
-        _norm(_hist(channel, size, (0, 256)))
+        _norm(_hist(channel, size, (0, 256), mask))
         for channel, size in zip(cv2.split(image), bins)
     ])
 
 
-def rgb_hist(img_bgr, bins=RGB_DEFAULTS["bins"]):
+def rgb_hist(img_bgr, bins=RGB_DEFAULTS["bins"], mask=None):
     """Independent 1D histograms in true R, G, B order, each summing to 1."""
-    return _three_channel_hist(cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB), bins)
+    return _three_channel_hist(cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB), bins, mask)
 
 
-def lab_hist(img_bgr, bins=LAB_DEFAULTS["bins"]):
+def lab_hist(img_bgr, bins=LAB_DEFAULTS["bins"], mask=None):
     """L, a, b histograms using OpenCV uint8 Lab encoding (all in [0, 256))."""
-    return _three_channel_hist(cv2.cvtColor(img_bgr, cv2.COLOR_BGR2Lab), bins)
+    return _three_channel_hist(cv2.cvtColor(img_bgr, cv2.COLOR_BGR2Lab), bins, mask)
 
 
 METHODS = {"ycbcr": ycbcr_hist, "hsv": hsv_hist, "hsv_baseline": hsv_baseline_hist,
            "rgb": rgb_hist, "lab": lab_hist, "hsv_hs2d": hsv_hs2d,
            "lab_ab2d": lab_ab2d, "hsv_3d": hsv_3d, "lab_3d": lab_3d}
+# Methods whose histograms can be restricted to foreground pixels.
+MASKABLE_METHODS = {"rgb", "lab"}
 DEFAULTS = {"ycbcr": YCBCR_DEFAULTS, "hsv": HSV_DEFAULTS, "hsv_baseline": HSV_BASELINE_DEFAULTS,
             "rgb": RGB_DEFAULTS, "lab": LAB_DEFAULTS,
             "hsv_hs2d": dict(bins=(16, 16), s_min=10, v_min=40, filter_hue=True,
@@ -200,15 +202,33 @@ def method_tag(method, **params):
     return tag
 
 
-def compute_descriptor(img_bgr, method, **params):
+def compute_descriptor(img_bgr, method, mask=None, trim=True, **params):
+    """Descriptor of an image; with a mask, only foreground (nonzero) pixels are counted.
+
+    For spatial layouts with a mask and trim=True, block rows/columns that are
+    almost only background are removed first (see trim_background_blocks).
+    """
     if (not isinstance(img_bgr, np.ndarray) or img_bgr.dtype != np.uint8 or
             img_bgr.ndim != 3 or img_bgr.shape[2] != 3 or not img_bgr.size):
         raise ValueError("Expected a nonempty H x W x 3 uint8 BGR image")
     params = full_params(method, **params)
     spatial = params.pop("spatial", None)
+    if mask is None:
+        if spatial is None:
+            return METHODS[method](img_bgr, **params)
+        return spatial_descriptor(img_bgr, lambda block: METHODS[method](block, **params), spatial)
+    if method not in MASKABLE_METHODS:
+        raise ValueError(f"Foreground masks are supported only for {sorted(MASKABLE_METHODS)}, not {method}")
+    if mask.shape != img_bgr.shape[:2]:
+        raise ValueError("Mask and image sizes differ")
+    mask = (mask > 0).astype(np.uint8) * 255
     if spatial is None:
-        return METHODS[method](img_bgr, **params)
-    return spatial_descriptor(img_bgr, lambda block: METHODS[method](block, **params), spatial)
+        return METHODS[method](img_bgr, mask=mask, **params)
+    spatial = resolve_spatial(spatial)
+    if trim:
+        img_bgr, mask = trim_background_blocks(img_bgr, mask, max(spatial["grids"]))
+    return spatial_descriptor(img_bgr, lambda block, block_mask: METHODS[method](block, mask=block_mask, **params),
+                              spatial, mask)
 
 
 def compute_folder(folder, method, **params):

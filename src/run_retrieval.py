@@ -2,10 +2,12 @@
 import argparse
 from pathlib import Path
 
+import cv2
+
 from descriptor_cli import add_descriptor_arguments, config_from_args, load_descriptor_document
 from distances import MEASURES
 from metrics import mapk
-from retrieval import (BBDD_DIR, DESC_DIR, load_gt, query_folder, retrieve_config,
+from retrieval import (BBDD_DIR, DESC_DIR, load_gt, query_folder, query_masks, retrieve_config,
                        save_results, validate_gt_order)
 
 
@@ -23,6 +25,13 @@ def main(argv=None):
                     help="Explicitly allow k > database size and return all available IDs")
     ap.add_argument("--no-gt", action="store_true")
     ap.add_argument("--output", type=Path, help="Save a list of lists of Python integer IDs")
+    ap.add_argument("--remove-background", action="store_true",
+                    help="Compute query descriptors only on foreground pixels")
+    ap.add_argument("--mask-source", choices=("pred", "gt"), default="pred",
+                    help="pred: foreground_mask; gt: <stem>.png next to each query")
+    ap.add_argument("--no-trim", action="store_true",
+                    help="Keep background-only block rows/columns instead of trimming them")
+    ap.add_argument("--save-masks", type=Path, help="Write the query masks as <stem>.png")
     args = ap.parse_args(argv)
     try:
         base, saved_measure = load_descriptor_document(args.config) if args.config else (None, None)
@@ -31,9 +40,22 @@ def main(argv=None):
         if measure is None:
             raise ValueError("Specify --measure or use an exported configuration with a measure")
         folder = args.query_dir if args.query_dir is not None else query_folder(args.query_set)
+        if (args.no_trim or args.save_masks or args.mask_source != "pred") and not args.remove_background:
+            raise ValueError("--mask-source, --no-trim and --save-masks require --remove-background")
+        masks = None
+        if args.remove_background:
+            paths, ids, images, query_mask_list = query_masks(folder, args.mask_source)
+            masks = (ids, images, query_mask_list)
+            if args.save_masks:
+                args.save_masks.mkdir(parents=True, exist_ok=True)
+                for path, mask in zip(paths, query_mask_list):
+                    cv2.imwrite(str(args.save_masks / f"{path.stem}.png"), mask)
         q_ids, results = retrieve_config(config, measure, args.db_dir, folder, args.cache_dir, args.k,
-                                         allow_truncate=args.allow_truncate)
-        print(f"{folder.name}: {len(results)} queries, {config}, {measure}, k={args.k}")
+                                         allow_truncate=args.allow_truncate, masks=masks,
+                                         trim=not args.no_trim)
+        mode = (f"foreground ({args.mask_source} mask, {'no trim' if args.no_trim else 'trim'})"
+                if args.remove_background else "full image")
+        print(f"{folder.name}: {len(results)} queries, {config}, {measure}, k={args.k}, {mode}")
         print(f"First 3 results: {results[:3]}")
         if not args.no_gt:
             gt = load_gt(folder, args.gt)

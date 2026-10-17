@@ -5,7 +5,7 @@ import numpy as np
 def foreground_mask(
     image,
     border_ratio=0.08,
-    threshold=15.0,
+    threshold=25.0,
     mad_multiplier=3.0,
     sample_step=4,
 ):

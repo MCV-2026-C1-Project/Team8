@@ -8,3 +8,4 @@ results/**/*.pkl
 .pytest_cache/
 .venv/
 results/background_masks/thresholds
+results/background_masks/masks/

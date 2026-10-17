@@ -6,12 +6,15 @@ import re
 from pathlib import Path
 from zipfile import BadZipFile
 
+import cv2
 import numpy as np
+from tqdm import tqdm
 
-from descriptors import compute_folder, full_params, method_tag, list_images
+from descriptors import compute_descriptor, compute_folder, full_params, method_tag, list_images, load_image
 from descriptor_config import descriptor_dim, canonical_json, measure_channels, resolve_descriptor_config, positive_int
 from distances import MEASURES, rank
 from metrics import normalize_gt
+from remove_background import foreground_mask
 
 ROOT = Path(__file__).resolve().parent.parent
 DESC_DIR = ROOT / "descriptors"
@@ -150,12 +153,48 @@ def load_configured_data(config, db_dir=BBDD_DIR, query_dir=DATA_DIR / "qsd1_w1"
     return db_ids, db_desc, q_ids, q_desc
 
 
+def query_masks(folder, mask_source="pred"):
+    """Foreground masks (255 = painting) of the query images, in list_images order.
+
+    pred: computed with foreground_mask; gt: read from <stem>.png next to each image.
+    """
+    if mask_source not in ("pred", "gt"):
+        raise ValueError("mask_source must be pred or gt")
+    paths, ids = list_images(folder)
+    images, masks = [], []
+    for path in tqdm(paths, desc=f"{Path(folder).name}/masks ({mask_source})"):
+        image = load_image(path)
+        if mask_source == "pred":
+            mask = foreground_mask(image)
+        else:
+            mask = cv2.imread(str(path.with_suffix(".png")), cv2.IMREAD_GRAYSCALE)
+            if mask is None:
+                raise FileNotFoundError(f"Ground-truth mask not found: {path.with_suffix('.png')}")
+        images.append(image)
+        masks.append(mask)
+    return paths, np.asarray(ids, dtype=np.int64), images, masks
+
+
+def compute_masked_queries(config, images, masks, trim=True):
+    """Foreground-only query descriptors. Not cached: the cache tag ignores masks."""
+    config = resolve_descriptor_config(config)
+    desc = [compute_descriptor(image, config["descriptor"], mask=mask, trim=trim, **config["params"])
+            for image, mask in zip(images, masks)]
+    return np.stack(desc).astype(np.float32)
+
+
 def retrieve_config(config, measure, db_dir=BBDD_DIR, query_dir=DATA_DIR / "qsd1_w1",
-                    desc_dir=DESC_DIR, k=10, *, allow_truncate=False):
+                    desc_dir=DESC_DIR, k=10, *, allow_truncate=False, masks=None, trim=True):
+    """masks=(query ids, images, masks) computes foreground-only query descriptors."""
     config = resolve_descriptor_config(config)
     channels = measure_channels(config["descriptor"], config["params"], measure)
     k = positive_int(k, "k")
-    db_ids, db_desc, q_ids, q_desc = load_configured_data(config, db_dir, query_dir, desc_dir)
+    if masks is None:
+        db_ids, db_desc, q_ids, q_desc = load_configured_data(config, db_dir, query_dir, desc_dir)
+    else:
+        db_ids, db_desc = load_or_compute("bbdd", db_dir, config["descriptor"], config["params"], desc_dir)
+        q_ids, images, query_masks_ = masks
+        q_desc = compute_masked_queries(config, images, query_masks_, trim)
     return q_ids, retrieve(q_desc, db_desc, db_ids, measure, k, channels, allow_truncate=allow_truncate)
 
 

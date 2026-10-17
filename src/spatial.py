@@ -41,13 +41,51 @@ def block_slices(shape, grid):
             yield slice(ys[row], ys[row + 1]), slice(xs[col], xs[col + 1])
 
 
-def spatial_descriptor(image, extract_color, config):
-    """A level contributes its weight in total, divided equally among its cells."""
+def trim_background_blocks(image, mask, grid, min_fraction=0.01):
+    """Delete block rows/columns that are (almost) only background, then repeat on the result.
+
+    A block row or column is background when less than min_fraction of its pixels
+    are foreground. Its pixel rows/columns are removed and the rest stitched together;
+    the grid is laid again on the new image until nothing more can be removed.
+    """
+    fg = mask > 0
+    while True:
+        height, width = fg.shape
+        if min(height, width) < grid:
+            break
+        ys = np.linspace(0, height, grid + 1, dtype=int)
+        xs = np.linspace(0, width, grid + 1, dtype=int)
+        keep_rows = [fg[ys[i]:ys[i + 1]].mean() >= min_fraction for i in range(grid)]
+        keep_cols = [fg[:, xs[j]:xs[j + 1]].mean() >= min_fraction for j in range(grid)]
+        if all(keep_rows) and all(keep_cols):
+            break
+        if not any(keep_rows) or not any(keep_cols):
+            break  # Never delete everything; keep the current image.
+        rows = np.concatenate([np.arange(ys[i], ys[i + 1]) for i in range(grid) if keep_rows[i]])
+        cols = np.concatenate([np.arange(xs[j], xs[j + 1]) for j in range(grid) if keep_cols[j]])
+        if min(len(rows), len(cols)) < grid:
+            break
+        image, mask, fg = (a[rows][:, cols] for a in (image, mask, fg))
+    return image, mask
+
+
+def spatial_descriptor(image, extract_color, config, mask=None):
+    """A level contributes its weight in total, divided equally among its cells.
+
+    With a mask, extract_color(block, block_mask) counts only foreground pixels and
+    a block without foreground contributes an all-zero histogram.
+    """
     blocks = []
     for grid, weight in zip(config["grids"], config["level_weights"]):
         for ys, xs in block_slices(image.shape, grid):
-            block = extract_color(image[ys, xs]).astype(np.float32)
+            if mask is None:
+                block = extract_color(image[ys, xs]).astype(np.float32)
+            else:
+                block = extract_color(image[ys, xs], mask[ys, xs]).astype(np.float32)
             mass = block.sum()
+            if mask is not None and mass == 0:
+                blocks.append(block)
+                continue
             if not np.isfinite(mass) or mass <= 0:
                 raise ValueError("Spatial colour descriptor must have positive finite mass")
             blocks.append((block / mass) * (weight / (grid * grid)))

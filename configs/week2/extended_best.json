@@ -1,0 +1,34 @@
+{
+  "config": {
+    "descriptor": "lab",
+    "params": {
+      "bins": [
+        8,
+        64,
+        64
+      ],
+      "spatial": {
+        "grids": [
+          5
+        ],
+        "level_weights": [
+          1.0
+        ],
+        "mode": "grid"
+      }
+    }
+  },
+  "measure": "l1",
+  "tag": "lab_8-64-64_7fc79500da6b288358d52ba6",
+  "select_by": "map1",
+  "development_metrics": {
+    "map1": 0.8333333333333334,
+    "map5": 0.8733333333333333
+  },
+  "provenance": {
+    "source": "configs\\week2\\week2_extended.json",
+    "db_dir": "D:\\Hugo\\Master\\C1\\Team8\\data\\BBDD",
+    "query_dir": "D:\\Hugo\\Master\\C1\\Team8\\data\\qsd1_w1",
+    "gt": "D:\\Hugo\\Master\\C1\\Team8\\data\\qsd1_w1\\gt_corresps.pkl"
+  }
+}

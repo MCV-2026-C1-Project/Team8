@@ -53,7 +53,7 @@ def main():
     parser.add_argument("--images", required=True)
     parser.add_argument("--gt", required=True)
     parser.add_argument("--output", default="results/background_masks")
-    parser.add_argument("--threshold", type=float, default=15.0)
+    parser.add_argument("--threshold", type=float, default=25.0)
     parser.add_argument("--border-ratio", type=float, default=0.08)
     parser.add_argument("--mad-multiplier", type=float, default=3.0)
     parser.add_argument("--sample-step", type=int, default=4)
@@ -128,7 +128,7 @@ def main():
             )
 
             scores = evaluate_mask(pred, gt)
-            image_scores.append(scores)
+            image_scores.append({"image": image_path.name, **scores})
 
             cv2.imwrite(
                 str(mask_dir / f"{image_path.stem}.png"), pred
@@ -175,6 +175,14 @@ def main():
         print(f"Comparison saved to: {csv_path}")
 
     else:
+        csv_path = output_dir / "metrics.csv"
+        with open(csv_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(
+                f, fieldnames=["image", "precision", "recall", "f1", "tp", "fp", "fn"]
+            )
+            writer.writeheader()
+            writer.writerows(image_scores)
+
         r = results[0]
         print(f"\nThreshold: {r['threshold']}")
         print(f"Mean precision: {r['precision']:.4f}")
