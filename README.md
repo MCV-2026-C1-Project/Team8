@@ -23,6 +23,21 @@ Extract the course datasets into `data/` (git-ignored): `data/BBDD/`, `data/qsd1
 
 QSD2 background masks (default `foreground_mask`): mean precision 0.969, recall 0.985, F1 0.976 per image. Ground-truth masks give the same QSD2 retrieval scores as the predicted ones.
 
+### Retrieval results
+
+<p align="center">
+  <img src="plots/week1_vs_week2_qsd1.png" width="500" alt="Week 1 versus Week 2 retrieval performance">
+  <br>
+  <sub>Figure 1. Week 1 versus Week 2 retrieval performance on QSD1.</sub>
+</p>
+
+<p align="center">
+  <img src="plots/qsd2_retrieval.png" width="500" alt="Effect of background removal on QSD2 retrieval">
+  <br>
+  <sub>Figure 2. Effect of background removal on QSD2 retrieval.</sub>
+</p>
+
+
 ## Retrieval
 
 ```sh
@@ -90,6 +105,10 @@ Select a representation using `--spatial-mode`, `--grids` and `--level-weights`.
 The default `color_distribution` method learns the wall’s Lab colour distribution from border pixels, accounting for brightness changes. Only wall-like regions connected to the image boundary are removed, preserving enclosed painting regions with similar colours.
 
 Postprocessing closes gaps, removes small components, fills painting interiors and suppresses rows or columns with little foreground. The alternative `quadratic` method models spatial variations in wall colour using a quadratic surface.
+
+### Segmentation examples
+
+![Predicted masks and errors against ground truth](plots/mask_examples.png)
 
 ### Evaluate segmentation
 
@@ -185,7 +204,7 @@ python src/run_experiments.py --descriptor hsv_hs2d --spatial-mode grid --grids 
 
 Use `--dry-run` to preview experiments, `--overwrite` to replace existing outputs and `-h` for more options. `--export-best` saves a configuration that can be reused with `run_retrieval.py`.
 
-## Plots
+## Generating plots
 
 Each script in `src/visualizations/` produces one figure in `plots/` (`--output` to change it; `-h` for options):
 
