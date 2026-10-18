@@ -97,7 +97,7 @@ Place development JPEG images and their matching ground-truth PNG masks in `data
 
 ```sh
 # Evaluate the colour-distribution model using the retrieval tolerance
-python src/evaluate_background.py --images data/qsd2_w2 --gt data/qsd2_w2 --method color_distribution --color-sigma 5.5 --output results/background_masks
+python src/evaluate_background.py --images data/qsd2_w2 --gt data/qsd2_w2 --method color_distribution --color-sigma 4.0 --output results/background_masks
 
 # Search colour-distribution tolerances on the development set
 python src/evaluate_background.py --images data/qsd2_w2 --gt data/qsd2_w2 --method color_distribution --grid-search --output results/background_masks_sweep
@@ -119,7 +119,7 @@ A single run saves `<output>/masks/<query_id>.png` and per-image precision, reca
 | `--no-fill-interior` | Disable interior refinement; final row/column filtering still runs |
 | `--min-row-foreground`, `--min-col-foreground` | Final foreground-fraction cutoffs; use 0 to disable an axis |
 
-The default colour tolerance is `color_sigma=5.5`, selected experimentally for achieving the highest mean F1 on the development set. This value is used consistently for background-removal evaluation and retrieval.
+The default colour tolerance is `color_sigma=4.0`, selected experimentally for achieving the highest mean F1 on the development set. This value is used consistently for background-removal evaluation and retrieval.
 
 ## Retrieve with foreground masks and export QST2 results
 
