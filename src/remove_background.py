@@ -91,7 +91,7 @@ def foreground_mask(
     fill_columns=True,
     min_component_ratio=0.001,
     method="color_distribution",
-    color_sigma=3.0,
+    color_sigma=5.5,
     min_row_foreground=0.5,
     min_col_foreground=0.5,
 ):

@@ -76,7 +76,7 @@ def main():
     args = parser.parse_args()
 
     thresholds = (
-        ([2, 2.5, 3, 3.5, 4] if args.grid_search else [args.color_sigma])
+        ([2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6] if args.grid_search else [args.color_sigma])
         if args.method == "color_distribution" else
         ([10, 15, 20, 25] if args.grid_search else [args.threshold])
     )
