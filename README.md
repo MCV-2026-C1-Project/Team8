@@ -119,6 +119,8 @@ A single run saves `<output>/masks/<query_id>.png` and per-image precision, reca
 | `--no-fill-interior` | Disable interior refinement; final row/column filtering still runs |
 | `--min-row-foreground`, `--min-col-foreground` | Final foreground-fraction cutoffs; use 0 to disable an axis |
 
+The default colour tolerance is `color_sigma=5.5`, selected experimentally for achieving the highest mean F1 on the development set. This value is used consistently for background-removal evaluation and retrieval.
+
 ## Retrieve with foreground masks and export QST2 results
 
 Enable predicted masks explicitly, including when loading an exported descriptor configuration:
