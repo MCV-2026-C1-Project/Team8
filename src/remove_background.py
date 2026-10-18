@@ -149,7 +149,9 @@ def foreground_mask(
         if fill_interior:
             mask = fill_painting_interior(mask, closing_size, fill_rows,
                                          fill_columns, min_component_ratio)
-        return suppress_sparse_lines(mask, min_row_foreground, min_col_foreground)
+        cleaned = suppress_sparse_lines(mask, min_row_foreground, min_col_foreground)
+        # A painting narrower/shorter than the cutoffs would be erased entirely; keep it.
+        return cleaned if cleaned.any() else mask
 
     lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB).astype(np.float32)
     lab[..., 0] *= l_weight
