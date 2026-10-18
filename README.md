@@ -70,6 +70,57 @@ python src/run_experiments.py --config configs/week2/week2_qsd2_background_photo
 
 Select a representation using `--spatial-mode`, `--grids` and `--level-weights`. Background removal is handled separately from the cropped-image retrieval experiments.
 
+### Background removal (Week 2)
+`src/remove_background.py` estimates the wall colour from the image borders and returns a binary mask at the original image resolution: 255 = painting, 0 = background. Segmentation uses colour, connectivity and mask postprocessing; it does not use edge/contour detection or object detectors.
+
+**Method**
+The default `color_distribution` method learns the wall’s Lab colour distribution from border pixels, accounting for brightness changes. Only wall-like regions connected to the image boundary are removed, preserving enclosed painting regions with similar colours.
+
+Postprocessing closes gaps, removes small components, fills painting interiors and suppresses rows or columns with little foreground. The output is a binary mask: 255 = painting, 0 = background.
+
+The alternative `quadratic` method models spatial variations in wall colour using a quadratic surface. Both methods use colour and mask connectivity without edge detection, contours or object detectors.
+
+### Evaluate segmentations
+Place development JPEG images and their matching ground-truth PNG masks in `data/qsd2_w2/` (for example, `00001.jpg` and `00001.png`). Use `--gt` to select a separate mask directory if needed.
+
+```sh
+# Evaluate the colour-distribution model using the retrieval tolerance
+python src/evaluate_background.py --images data/qsd2_w2 --gt data/qsd2_w2 --method color_distribution --color-sigma 5.5 --output results/background_masks
+
+# Search colour-distribution tolerances on the development set
+python src/evaluate_background.py --images data/qsd2_w2 --gt data/qsd2_w2 --method color_distribution --grid-search --output results/background_masks_sweep
+
+# Evaluate the spatial quadratic baseline
+python src/evaluate_background.py --images data/qsd2_w2 --gt data/qsd2_w2 --method quadratic --threshold 20 --output results/background_masks_quadratic
+```
+
+A single run saves `<output>/masks/<query_id>.png` and per-image precision, recall, F1 and pixel counts in `<output>/metrics.csv`. Printed scores are macro averages over images. Grid search saves masks under `<output>/threshold_<value>/masks/` and a `threshold_comparison.csv` ranked by mean F1. It tests colour tolerances from 2 to 6 (step 0.5) for `color_distribution`, or Lab thresholds 10, 15, 20 and 25 for `quadratic`.
+
+| Option | Purpose |
+|---|---|
+| `--color-sigma` | Mahalanobis tolerance for `color_distribution`; larger values classify more colours as wall |
+| `--threshold`, `--mad-multiplier`, `--l-weight` | Minimum Lab threshold, adaptive scale and lightness weight for `quadratic` |
+| `--border-ratio`, `--sample-step` | Border width fraction and sampling spacing |
+| `--closing-size`, `--min-component-ratio` | Closing kernel size and minimum component area fraction |
+| `--enclosed-only` | Disable both horizontal and vertical span filling; keep closing, component filtering and enclosed-hole filling |
+| `--no-fill-columns` | Disable vertical span filling only |
+| `--no-fill-interior` | Disable interior refinement; final row/column filtering still runs |
+| `--min-row-foreground`, `--min-col-foreground` | Final foreground-fraction cutoffs; use 0 to disable an axis |
+
+## Retrieve with foreground masks and export QST2 results
+
+Enable predicted masks explicitly, including when loading an exported descriptor configuration:
+
+```sh
+# Evaluate foreground-only retrieval on the development set
+python src/run_retrieval.py --config results/week2/qsd2_best.json --query-set data/qsd2_w2 --remove-background --mask-source pred --trim-mode block
+
+# Export top-10 rankings and masks for blind QST2 evaluation
+python src/run_retrieval.py --config results/week2/qsd2_best.json --query-set data/qst2_w2 --remove-background --mask-source pred --trim-mode block --no-gt --k 10 --output results/week2/QST2/method1/result.pkl --save-masks results/week2/QST2/method1
+```
+
+The QST2 output directory contains `result.pkl` and one mask per query, with the same basename and a `.png` extension (for example, `00001.jpg` → `00001.png`). The pickle contains one ranked list of 10 integer database IDs per query. `--save-masks` saves the original-resolution masks before descriptor trimming. Ground-truth masks (`--mask-source gt`) are for development diagnostics only.
+
 ## Experiments
 
 Use `src/run_experiments.py` to compare descriptors, distances and spatial representations. Experiments can be configured in three ways:
