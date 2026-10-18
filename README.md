@@ -134,7 +134,9 @@ python src/run_retrieval.py --config results/week2/qsd2_best.json --query-set da
 ```
 
 The QST2 output directory contains `result.pkl` and one mask per query, with the same basename and a `.png` extension (for example, `00001.jpg` → `00001.png`). The pickle contains one ranked list of 10 integer database IDs per query. `--save-masks` saves the original-resolution masks before descriptor trimming. Ground-truth masks (`--mask-source gt`) are for development diagnostics only.
+
 =======
+
 ## Background removal (Week 2)
 
 `src/remove_background.py` (`foreground_mask`) separates the painting from the wall using colour only (no edges, contours or rectangle fitting):
