@@ -25,9 +25,17 @@ QSD2 background masks (default `foreground_mask`): mean precision 0.969, recall 
 
 ### Retrieval results
 
-![Week 1 versus Week 2 retrieval performance](plots/week1_vs_week2_qsd1.png)
+<p align="center">
+  <img src="plots/week1_vs_week2_qsd1.png" width="500" alt="Week 1 versus Week 2 retrieval performance">
+  <br>
+  <sub>Figure 1. Week 1 versus Week 2 retrieval performance on QSD1.</sub>
+</p>
 
-![Effect of background removal on QSD2 retrieval](plots/qsd2_retrieval.png)
+<p align="center">
+  <img src="plots/qsd2_retrieval.png" width="500" alt="Effect of background removal on QSD2 retrieval">
+  <br>
+  <sub>Figure 2. Effect of background removal on QSD2 retrieval.</sub>
+</p>
 
 
 ## Retrieval
