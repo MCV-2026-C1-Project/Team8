@@ -1,0 +1,51 @@
+{
+  "config": {
+    "descriptor": "lab_3d",
+    "params": {
+      "bins": [
+        8,
+        8,
+        8
+      ],
+      "normalization": "photometric",
+      "spatial": {
+        "grids": [
+          1,
+          2,
+          4
+        ],
+        "level_weights": [
+          0.4,
+          0.35,
+          0.25
+        ],
+        "mode": "pyramid"
+      }
+    }
+  },
+  "measure": "chi2",
+  "tag": "lab_3d_8-8-8_52797604181a1701a27755e3",
+  "select_by": "map1",
+  "development_metrics": {
+    "map1": 0.9,
+    "map5": 0.9333333333333333
+  },
+  "provenance": {
+    "source": "configs\\week2\\week2_qsd2_background_photometric.json",
+    "db_dir": "D:\\Hugo\\Master\\C1\\Team8\\data\\BBDD",
+    "query_dir": "D:\\Hugo\\Master\\C1\\Team8\\data\\qsd2_w2",
+    "gt": "D:\\Hugo\\Master\\C1\\Team8\\data\\qsd2_w2\\gt_corresps.pkl",
+    "retrieval": {
+      "remove_background": true,
+      "mask_source": "gt",
+      "trim": "block"
+    },
+    "replay_flags": [
+      "--remove-background",
+      "--mask-source",
+      "gt",
+      "--trim-mode",
+      "block"
+    ]
+  }
+}

@@ -1,79 +1,76 @@
-"""Retrieve the top-K BBDD images for every query and (optionally) evaluate mAP@K.
-
-Examples:
-    py src/run_retrieval.py --descriptor hsv --measure hellinger
-    py src/run_retrieval.py --descriptor ycbcr --measure chi2 --chroma-range 64 192
-    py src/run_retrieval.py --descriptor hsv --measure hellinger --query-set qst1 --no-gt --output results/qst1_method1.pkl
-"""
+"""Top-K retrieval using legacy CLI options or a complete exported configuration."""
 import argparse
-import pickle
 from pathlib import Path
 
-from descriptors import METHODS, DEFAULTS, channel_sizes
+import cv2
+
+from descriptor_cli import add_descriptor_arguments, config_from_args, load_descriptor_document
 from distances import MEASURES
 from metrics import mapk
-from retrieval import BBDD_DIR, load_gt, load_or_compute, query_folder, retrieve
+from retrieval import (BBDD_DIR, DESC_DIR, load_gt, query_folder, query_masks, retrieve_config,
+                       save_results, validate_gt_order)
 
 
-def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--descriptor", choices=list(METHODS), required=True)
-    ap.add_argument("--measure", choices=list(MEASURES), required=True)
-    ap.add_argument("--query-set", default="qsd1",
-                    help="Query set name (e.g. qsd1 -> data/qsd1_w1) or a folder path")
-    ap.add_argument("--k", type=int, default=10, help="Number of results per query")
-    ap.add_argument("--no-gt", action="store_true", help="Query set has no ground truth: skip evaluation")
-    ap.add_argument("--output", default=None, help="Save results (list of lists of IDs) to this .pkl")
-    # Descriptor parameters (same defaults as compute_descriptors.py)
-    ap.add_argument("--ycbcr-bins", type=int, nargs=3, default=DEFAULTS["ycbcr"]["bins"], metavar=("Y", "CR", "CB"))
-    ap.add_argument("--chroma-range", type=int, nargs=2, default=DEFAULTS["ycbcr"]["chroma_range"], metavar=("LO", "HI"))
-    ap.add_argument("--chroma-overflow", action="store_true",
-                    help="Add below/above bins counting Cr/Cb pixels outside --chroma-range")
-    ap.add_argument("--hsv-bins", type=int, nargs=3, default=DEFAULTS["hsv"]["bins"], metavar=("H", "S", "V"))
-    ap.add_argument("--s-min", type=int, default=DEFAULTS["hsv"]["s_min"])
-    ap.add_argument("--v-min", type=int, default=DEFAULTS["hsv"]["v_min"])
-    ap.add_argument("--hue-valid-weight", action="store_true", default=DEFAULTS["hsv"]["hue_valid_weight"],
-                    help="HSV only: scale Hue by the fraction of valid pixels")
-    ap.add_argument("--hue-smoothing", action="store_true", default=DEFAULTS["hsv"]["hue_smoothing"],
-                    help="HSV only: circularly smooth the Hue histogram")
-    ap.add_argument("--rgb-bins", type=int, nargs=3, default=DEFAULTS["rgb"]["bins"], metavar=("R", "G", "B"))
-    ap.add_argument("--lab-bins", type=int, nargs=3, default=DEFAULTS["lab"]["bins"], metavar=("L", "A", "B"))
-    args = ap.parse_args()
-
-    params = {
-        "ycbcr": dict(bins=tuple(args.ycbcr_bins), chroma_range=tuple(args.chroma_range),
-                      chroma_overflow=args.chroma_overflow),
-        "hsv": dict(bins=tuple(args.hsv_bins), s_min=args.s_min, v_min=args.v_min,
-                    hue_valid_weight=args.hue_valid_weight, hue_smoothing=args.hue_smoothing),
-        "hsv_baseline": dict(bins=tuple(DEFAULTS["hsv_baseline"]["bins"])),
-        "rgb": dict(bins=tuple(args.rgb_bins)),
-        "lab": dict(bins=tuple(args.lab_bins)),
-    }[args.descriptor]
-
-    q_folder = query_folder(args.query_set)
-    q_name = Path(args.query_set).name.split("_")[0].lower()
-
-    # Same descriptor function and parameters for the database and the queries.
-    db_ids, db_desc = load_or_compute("bbdd", BBDD_DIR, args.descriptor, params)
-    q_ids, q_desc = load_or_compute(q_name, q_folder, args.descriptor, params)
-
-    results = retrieve(q_desc, db_desc, db_ids, args.measure, args.k,
-                       channel_sizes=channel_sizes(args.descriptor, **params))
-    print(f"{q_name}: {len(results)} queries, {args.descriptor} {params}, {args.measure}, k={args.k}")
-    print(f"First 3 results: {results[:3]}")
-
-    if not args.no_gt:
-        gt = load_gt(q_folder)
-        assert len(gt) == len(results), f"{len(gt)} GT entries but {len(results)} queries"
-        for k in (1, 5):
-            print(f"mAP@{k}: {mapk(gt, results, k):.4f}")
-
-    if args.output:
-        out = Path(args.output)
-        out.parent.mkdir(parents=True, exist_ok=True)
-        with open(out, "wb") as f:
-            pickle.dump(results, f)
-        print(f"Saved results to {out}")
+def main(argv=None):
+    ap = argparse.ArgumentParser(description=__doc__)
+    add_descriptor_arguments(ap)
+    ap.add_argument("--measure", choices=list(MEASURES))
+    ap.add_argument("--query-set", default="qsd1", help="Dataset alias or original image folder")
+    ap.add_argument("--query-dir", type=Path, help="Explicit query folder; overrides --query-set")
+    ap.add_argument("--db-dir", type=Path, default=BBDD_DIR)
+    ap.add_argument("--cache-dir", type=Path, default=DESC_DIR)
+    ap.add_argument("--gt", type=Path)
+    ap.add_argument("--k", type=int, default=10)
+    ap.add_argument("--allow-truncate", action="store_true",
+                    help="Explicitly allow k > database size and return all available IDs")
+    ap.add_argument("--no-gt", action="store_true")
+    ap.add_argument("--output", type=Path, help="Save a list of lists of Python integer IDs")
+    ap.add_argument("--remove-background", action="store_true",
+                    help="Compute query descriptors only on foreground pixels")
+    ap.add_argument("--mask-source", choices=("pred", "gt"), default="pred",
+                    help="pred: foreground_mask; gt: <stem>.png next to each query")
+    ap.add_argument("--trim-mode", choices=("block", "bbox"), default="block",
+                    help="block: delete background block rows/columns; bbox: crop to the foreground box")
+    ap.add_argument("--no-trim", action="store_true",
+                    help="Keep the whole image instead of removing the background around the painting")
+    ap.add_argument("--save-masks", type=Path, help="Write the query masks as <stem>.png")
+    args = ap.parse_args(argv)
+    try:
+        base, saved_measure = load_descriptor_document(args.config) if args.config else (None, None)
+        config = config_from_args(args, base)
+        measure = args.measure or saved_measure
+        if measure is None:
+            raise ValueError("Specify --measure or use an exported configuration with a measure")
+        folder = args.query_dir if args.query_dir is not None else query_folder(args.query_set)
+        if (args.no_trim or args.save_masks or args.mask_source != "pred") and not args.remove_background:
+            raise ValueError("--mask-source, --no-trim and --save-masks require --remove-background")
+        masks = None
+        if args.remove_background:
+            paths, ids, images, query_mask_list = query_masks(folder, args.mask_source)
+            masks = (ids, images, query_mask_list)
+            if args.save_masks:
+                args.save_masks.mkdir(parents=True, exist_ok=True)
+                for path, mask in zip(paths, query_mask_list):
+                    cv2.imwrite(str(args.save_masks / f"{path.stem}.png"), mask)
+        q_ids, results = retrieve_config(config, measure, args.db_dir, folder, args.cache_dir, args.k,
+                                         allow_truncate=args.allow_truncate, masks=masks,
+                                         trim=None if args.no_trim else args.trim_mode)
+        mode = (f"foreground ({args.mask_source} mask, {'no trim' if args.no_trim else args.trim_mode + ' trim'})"
+                if args.remove_background else "full image")
+        print(f"{folder.name}: {len(results)} queries, {config}, {measure}, k={args.k}, {mode}")
+        print(f"First 3 results: {results[:3]}")
+        if not args.no_gt:
+            gt = load_gt(folder, args.gt)
+            validate_gt_order(q_ids, gt)
+            for k in (1, 5):
+                if args.k >= k:
+                    print(f"mAP@{k}: {mapk(gt, results, k):.4f}")
+        if args.output:
+            save_results(args.output, results)
+            print(f"Saved results to {args.output}")
+        return results
+    except (ValueError, TypeError, OSError, KeyError) as error:
+        ap.error(str(error))
 
 
 if __name__ == "__main__":

@@ -37,6 +37,10 @@ def mapk(actual, predicted, k=10):
     actual:    list of lists of relevant IDs, one per query.
     predicted: list of lists of retrieved IDs, one per query (same order).
     """
+    if len(actual) != len(predicted):
+        raise ValueError(f"Ground truth has {len(actual)} queries but predictions have {len(predicted)}")
+    if len(actual) == 0:
+        raise ValueError("mAP requires at least one query; evaluation collections cannot be empty")
     return np.mean([apk(a, p, k) for a, p in zip(actual, predicted)])
 
 

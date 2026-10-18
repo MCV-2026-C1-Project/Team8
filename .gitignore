@@ -7,3 +7,10 @@ results/*.pkl
 results/**/*.pkl
 .pytest_cache/
 .venv/
+results/background_masks/thresholds
+results/background_masks/masks/
+results/background_masks_filtered/masks/
+results/background_masks_sweep/**/masks/
+results/week2/background
+results/week2/background_search
+results/week2/QSD2

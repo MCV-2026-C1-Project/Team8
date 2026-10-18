@@ -1,0 +1,38 @@
+{
+  "config": {
+    "descriptor": "hsv",
+    "params": {
+      "bins": [
+        16,
+        16,
+        16
+      ],
+      "hue_smoothing": false,
+      "hue_valid_weight": false,
+      "s_min": 10.0,
+      "spatial": {
+        "grids": [
+          1
+        ],
+        "level_weights": [
+          1.0
+        ],
+        "mode": "global"
+      },
+      "v_min": 40.0
+    }
+  },
+  "measure": "intersection",
+  "tag": "hsv_16-16-16_s10v40_hw0_hs0",
+  "select_by": "map1",
+  "development_metrics": {
+    "map1": 0.6,
+    "map5": 0.6716666666666666
+  },
+  "provenance": {
+    "source": "configs\\week1\\week1_1d_none.json",
+    "db_dir": "D:\\Hugo\\Master\\C1\\Team8\\data\\BBDD",
+    "query_dir": "D:\\Hugo\\Master\\C1\\Team8\\data\\qsd1_w1",
+    "gt": "D:\\Hugo\\Master\\C1\\Team8\\data\\qsd1_w1\\gt_corresps.pkl"
+  }
+}

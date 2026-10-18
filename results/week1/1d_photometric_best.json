@@ -1,0 +1,35 @@
+{
+  "config": {
+    "descriptor": "lab",
+    "params": {
+      "bins": [
+        16,
+        64,
+        64
+      ],
+      "normalization": "photometric",
+      "spatial": {
+        "grids": [
+          1
+        ],
+        "level_weights": [
+          1.0
+        ],
+        "mode": "global"
+      }
+    }
+  },
+  "measure": "intersection",
+  "tag": "lab_16-64-64_norm-photometric",
+  "select_by": "map1",
+  "development_metrics": {
+    "map1": 0.9333333333333333,
+    "map5": 0.9416666666666667
+  },
+  "provenance": {
+    "source": "configs\\week1\\week1_1d_photometric.json",
+    "db_dir": "D:\\Hugo\\Master\\C1\\Team8\\data\\BBDD",
+    "query_dir": "D:\\Hugo\\Master\\C1\\Team8\\data\\qsd1_w1",
+    "gt": "D:\\Hugo\\Master\\C1\\Team8\\data\\qsd1_w1\\gt_corresps.pkl"
+  }
+}

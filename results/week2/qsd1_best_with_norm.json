@@ -1,0 +1,44 @@
+{
+  "config": {
+    "descriptor": "ycbcr",
+    "params": {
+      "bins": [
+        64,
+        64,
+        64
+      ],
+      "chroma_overflow": false,
+      "chroma_range": [
+        0.0,
+        256.0
+      ],
+      "normalization": "photometric",
+      "spatial": {
+        "grids": [
+          4
+        ],
+        "level_weights": [
+          1.0
+        ],
+        "mode": "grid"
+      },
+      "y_range": [
+        0.0,
+        256.0
+      ]
+    }
+  },
+  "measure": "l1",
+  "tag": "ycbcr_64-64-64_c9b1f9d6d0b6dbdee6d525e0",
+  "select_by": "map1",
+  "development_metrics": {
+    "map1": 0.9666666666666667,
+    "map5": 0.9777777777777777
+  },
+  "provenance": {
+    "source": "configs\\week2\\week2_joint_spatial_normalization.json",
+    "db_dir": "D:\\Hugo\\Master\\C1\\Team8\\data\\BBDD",
+    "query_dir": "D:\\Hugo\\Master\\C1\\Team8\\data\\qsd1_w1",
+    "gt": "D:\\Hugo\\Master\\C1\\Team8\\data\\qsd1_w1\\gt_corresps.pkl"
+  }
+}

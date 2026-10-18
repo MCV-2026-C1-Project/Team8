@@ -1,0 +1,159 @@
+{
+  "id": "week1_global_1d_lab_ycbcr_photometric",
+  "measures": [
+    "l1",
+    "chi2",
+    "hellinger",
+    "euclidean",
+    "intersection",
+    "wasserstein"
+  ],
+  "experiments": [
+    {
+      "id": "W1_LAB_1D_photometric",
+      "descriptor": "lab",
+      "params": {
+        "normalization": "photometric"
+      },
+      "grid": {
+        "bins": [
+          [
+            8,
+            8,
+            8
+          ],
+          [
+            16,
+            16,
+            16
+          ],
+          [
+            32,
+            32,
+            32
+          ],
+          [
+            64,
+            64,
+            64
+          ],
+          [
+            4,
+            32,
+            32
+          ],
+          [
+            8,
+            32,
+            32
+          ],
+          [
+            16,
+            32,
+            32
+          ],
+          [
+            8,
+            64,
+            64
+          ],
+          [
+            16,
+            64,
+            64
+          ],
+          [
+            32,
+            64,
+            64
+          ]
+        ]
+      },
+      "spatial": {
+        "mode": "global"
+      }
+    },
+    {
+      "id": "W1_YCBCR_1D_photometric",
+      "descriptor": "ycbcr",
+      "params": {
+        "normalization": "photometric"
+      },
+      "grid": {
+        "bins": [
+          [
+            8,
+            8,
+            8
+          ],
+          [
+            16,
+            16,
+            16
+          ],
+          [
+            32,
+            32,
+            32
+          ],
+          [
+            64,
+            64,
+            64
+          ],
+          [
+            4,
+            32,
+            32
+          ],
+          [
+            8,
+            32,
+            32
+          ],
+          [
+            16,
+            32,
+            32
+          ],
+          [
+            8,
+            64,
+            64
+          ],
+          [
+            16,
+            64,
+            64
+          ],
+          [
+            32,
+            64,
+            64
+          ]
+        ],
+        "chroma_range": [
+          [
+            0,
+            256
+          ],
+          [
+            64,
+            192
+          ],
+          [
+            96,
+            160
+          ]
+        ],
+        "chroma_overflow": [
+          false,
+          true
+        ]
+      },
+      "spatial": {
+        "mode": "global"
+      }
+    }
+  ]
+}

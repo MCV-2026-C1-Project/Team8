@@ -1,15 +1,16 @@
-"""1D per-channel colour histogram descriptors.
-
-All descriptors are concatenations of independent 1D histograms, one per
-channel, each normalised to sum to 1 by default. No joint (2D/3D)
-or spatial histograms and no image preprocessing (e.g. equalisation) are applied.
-"""
+"""Legacy 1D and joint colour descriptors with optional spatial concatenation."""
 import re
 from pathlib import Path
 
 import cv2
 import numpy as np
 from tqdm import tqdm
+
+from descriptor_config import JOINT_METHODS, descriptor_dim, hashed_tag, resolve_params
+from joint_histograms import (hsv_hs2d, lab_ab2d, hsv_3d, lab_3d,
+                              lab_ab2d_from_color, lab_3d_from_color)
+from photometric import color_image
+from spatial import crop_to_foreground, resolve_spatial, spatial_descriptor, trim_background_blocks
 
 YCBCR_DEFAULTS = dict(bins=(8, 32, 32), y_range=(0, 256), chroma_range=(0, 256),
                       chroma_overflow=False)
@@ -32,9 +33,22 @@ def parse_id(path):
 
 
 def list_images(folder):
-    """Return (paths, ids) of the .jpg files in `folder`, sorted by filename."""
-    paths = sorted(Path(folder).glob("*.jpg"), key=lambda p: p.name)
+    """Discover JPEG files (case-insensitive), sorted by filename; reject duplicate IDs.
+
+    Filename ordering preserves the existing lowercase .jpg query/GT order.
+    PNG files, including segmentation masks, are never included.
+    """
+    folder = Path(folder)
+    if not folder.is_dir():
+        raise FileNotFoundError(f"Image directory does not exist or is not a directory: {folder.resolve()}")
+    paths = sorted((p for p in folder.iterdir() if p.is_file() and p.suffix.lower() in {".jpg", ".jpeg"}),
+                   key=lambda p: p.name)
     ids = [parse_id(p) for p in paths]
+    seen = {}
+    for path, image_id in zip(paths, ids):
+        if image_id in seen:
+            raise ValueError(f"Duplicate image ID {image_id} in {folder}: {seen[image_id]} and {path.name}")
+        seen[image_id] = path.name
     return paths, ids
 
 
@@ -59,34 +73,43 @@ def _hist(channel, bins, rng, mask=None):
     return cv2.calcHist([channel], [0], mask, [int(bins)], [float(rng[0]), float(rng[1])])
 
 
-def _chroma_hist(channel, bins, rng, overflow):
+def _chroma_hist(channel, bins, rng, overflow, mask=None):
     """Histogram over [lo, hi); with overflow, pixels below/above get their own end bins.
 
     calcHist drops out-of-range pixels, so without overflow the histogram only
     describes the kept pixels. The overflow bins keep how many were dropped
     (and on which side), so the in-range bins sum to the kept fraction.
     """
-    h = _hist(channel, bins, rng).ravel()
+    h = _hist(channel, bins, rng, mask).ravel()
     if not overflow:
         return _norm(h)
-    below = np.count_nonzero(channel < rng[0])
-    above = np.count_nonzero(channel >= rng[1])
+    foreground = channel if mask is None else channel[mask > 0]
+    below = np.count_nonzero(foreground < rng[0])
+    above = np.count_nonzero(foreground >= rng[1])
     return _norm(np.concatenate([[below], h, [above]]))
 
 
 def ycbcr_hist(img_bgr, bins=YCBCR_DEFAULTS["bins"], y_range=YCBCR_DEFAULTS["y_range"],
                chroma_range=YCBCR_DEFAULTS["chroma_range"],
-               chroma_overflow=YCBCR_DEFAULTS["chroma_overflow"]):
+               chroma_overflow=YCBCR_DEFAULTS["chroma_overflow"], normalization="none", mask=None):
     """Concatenated 1D histograms of Y, Cr, Cb (OpenCV order: Y, Cr, Cb).
 
     With chroma_overflow, Cr and Cb each get bins + 2 values (below, range, above).
     """
-    ycrcb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2YCrCb)
+    return ycbcr_hist_from_color(color_image(img_bgr, "ycbcr", normalization, mask), bins,
+                                 y_range, chroma_range, chroma_overflow, mask)
+
+
+def ycbcr_hist_from_color(ycrcb, bins=YCBCR_DEFAULTS["bins"],
+                          y_range=YCBCR_DEFAULTS["y_range"],
+                          chroma_range=YCBCR_DEFAULTS["chroma_range"],
+                          chroma_overflow=YCBCR_DEFAULTS["chroma_overflow"], mask=None):
+    """Independent histograms from an already prepared Y, Cr, Cb image."""
     y, cr, cb = cv2.split(ycrcb)
     return np.concatenate([
-        _norm(_hist(y, bins[0], y_range)),
-        _chroma_hist(cr, bins[1], chroma_range, chroma_overflow),
-        _chroma_hist(cb, bins[2], chroma_range, chroma_overflow),
+        _norm(_hist(y, bins[0], y_range, mask)),
+        _chroma_hist(cr, bins[1], chroma_range, chroma_overflow, mask),
+        _chroma_hist(cb, bins[2], chroma_range, chroma_overflow, mask),
     ])
 
 
@@ -130,42 +153,50 @@ def hsv_baseline_hist(img_bgr, bins=HSV_BASELINE_DEFAULTS["bins"]):
     ])
 
 
-def _three_channel_hist(image, bins):
-    """Concatenate normalised 1D histograms of three uint8 channels."""
+def _three_channel_hist(image, bins, mask=None):
+    """Concatenate normalised 1D histograms in [0, 256), optionally masked."""
     if len(bins) != 3 or any(int(b) != b or b <= 0 for b in bins):
         raise ValueError("bins must contain three positive integers")
     return np.concatenate([
-        _norm(_hist(channel, size, (0, 256)))
+        _norm(_hist(channel, size, (0, 256), mask))
         for channel, size in zip(cv2.split(image), bins)
     ])
 
 
-def rgb_hist(img_bgr, bins=RGB_DEFAULTS["bins"]):
+def rgb_hist(img_bgr, bins=RGB_DEFAULTS["bins"], mask=None):
     """Independent 1D histograms in true R, G, B order, each summing to 1."""
-    return _three_channel_hist(cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB), bins)
+    return _three_channel_hist(cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB), bins, mask)
 
 
-def lab_hist(img_bgr, bins=LAB_DEFAULTS["bins"]):
-    """L, a, b histograms using OpenCV uint8 Lab encoding (all in [0, 256))."""
-    return _three_channel_hist(cv2.cvtColor(img_bgr, cv2.COLOR_BGR2Lab), bins)
+def lab_hist(img_bgr, bins=LAB_DEFAULTS["bins"], mask=None, normalization="none"):
+    """L, a, b histograms in [0, 256), optionally photometrically normalised."""
+    return _three_channel_hist(color_image(img_bgr, "lab", normalization, mask), bins, mask)
 
 
 METHODS = {"ycbcr": ycbcr_hist, "hsv": hsv_hist, "hsv_baseline": hsv_baseline_hist,
-           "rgb": rgb_hist, "lab": lab_hist}
+           "rgb": rgb_hist, "lab": lab_hist, "hsv_hs2d": hsv_hs2d,
+           "lab_ab2d": lab_ab2d, "hsv_3d": hsv_3d, "lab_3d": lab_3d}
+# Methods whose histograms can be restricted to foreground pixels.
+MASKABLE_METHODS = {"rgb", "lab", "ycbcr", "lab_ab2d", "lab_3d"}
 DEFAULTS = {"ycbcr": YCBCR_DEFAULTS, "hsv": HSV_DEFAULTS, "hsv_baseline": HSV_BASELINE_DEFAULTS,
-            "rgb": RGB_DEFAULTS, "lab": LAB_DEFAULTS}
+            "rgb": RGB_DEFAULTS, "lab": LAB_DEFAULTS,
+            "hsv_hs2d": dict(bins=(16, 16), s_min=10, v_min=40, filter_hue=True,
+                             achromatic_bin=True, hue_smoothing=False, include_v=True,
+                             v_bins=8, chroma_weight=0.7),
+            "lab_ab2d": dict(bins=(16, 16), include_l=True, l_bins=8, chroma_weight=0.7),
+            "hsv_3d": dict(bins=(8, 8, 4)), "lab_3d": dict(bins=(4, 8, 8))}
 
 
 def full_params(method, **params):
     """Default parameters of `method` updated with the given ones."""
-    p = dict(DEFAULTS[method])
-    p.update({k: v for k, v in params.items() if v is not None})
-    return p
+    return resolve_params(method, params)
 
 
 def method_tag(method, **params):
     """Canonical tag encoding every effective parameter, independent of defaults."""
     p = full_params(method, **params)
+    if method in JOINT_METHODS or "spatial" in p:
+        return hashed_tag(method, p)
     def number(value):
         return str(int(value)) if value == int(value) else str(float(value))
 
@@ -179,20 +210,65 @@ def method_tag(method, **params):
         tag += f"_s{number(p['s_min'])}v{number(p['v_min'])}"
         tag += f"_hw{int(p['hue_valid_weight'])}"
         tag += f"_hs{int(p['hue_smoothing'])}"
+    if p.get("normalization") == "photometric":
+        tag += "_norm-photometric"
     return tag
 
 
-def compute_descriptor(img_bgr, method, **params):
-    return METHODS[method](img_bgr, **full_params(method, **params))
+def compute_descriptor(img_bgr, method, mask=None, trim="block", **params):
+    """Descriptor of an image; with a mask, only foreground (nonzero) pixels are counted.
+
+    For spatial layouts with a mask, the background around the painting is removed
+    first: trim="block" deletes block rows/columns that are almost only background
+    (trim_background_blocks), trim="bbox" crops to the foreground's bounding box
+    (crop_to_foreground), and trim=None keeps the whole image.
+    Photometric preparation uses the complete foreground before any trimming.
+    """
+    if (not isinstance(img_bgr, np.ndarray) or img_bgr.dtype != np.uint8 or
+            img_bgr.ndim != 3 or img_bgr.shape[2] != 3 or not img_bgr.size):
+        raise ValueError("Expected a nonempty H x W x 3 uint8 BGR image")
+    params = full_params(method, **params)
+    spatial = params.pop("spatial", None)
+    if mask is not None:
+        if method not in MASKABLE_METHODS:
+            raise ValueError(f"Foreground masks are supported only for {sorted(MASKABLE_METHODS)}, not {method}")
+        if not isinstance(mask, np.ndarray) or mask.shape != img_bgr.shape[:2]:
+            raise ValueError("Mask and image sizes differ")
+        mask = (mask > 0).astype(np.uint8) * 255
+        if not np.any(mask):
+            raise ValueError("Foreground mask is empty; cannot compute a painting descriptor")
+    extract_color = METHODS[method]
+    if params.get("normalization") == "photometric":
+        params.pop("normalization")
+        # Prepare before trimming/partitioning, using the complete foreground.
+        img_bgr = color_image(img_bgr, "ycbcr" if method == "ycbcr" else "lab", "photometric", mask)
+        extract_color = {"lab": _three_channel_hist, "ycbcr": ycbcr_hist_from_color,
+                         "lab_ab2d": lab_ab2d_from_color, "lab_3d": lab_3d_from_color}[method]
+    if mask is None:
+        if spatial is None:
+            return extract_color(img_bgr, **params)
+        return spatial_descriptor(img_bgr, lambda block: extract_color(block, **params), spatial)
+    if spatial is None:
+        return extract_color(img_bgr, mask=mask, **params)
+    spatial = resolve_spatial(spatial)
+    if trim == "block":
+        img_bgr, mask = trim_background_blocks(img_bgr, mask, max(spatial["grids"]))
+    elif trim == "bbox":
+        img_bgr, mask = crop_to_foreground(img_bgr, mask)
+    elif trim is not None:
+        raise ValueError("trim must be 'block', 'bbox' or None")
+    return spatial_descriptor(img_bgr, lambda block, block_mask: extract_color(block, mask=block_mask, **params),
+                              spatial, mask)
 
 
 def compute_folder(folder, method, **params):
-    """Compute descriptors for all .jpg images in `folder`.
+    """Compute descriptors for all JPEG images (.jpg/.jpeg, any case) in `folder`.
 
     Returns (ids: int64 [N], desc: float32 [N x D]); row i corresponds to ids[i].
     """
     paths, ids = list_images(folder)
-    assert paths, f"No .jpg images found in {folder}"
+    if not paths:
+        raise ValueError(f"No JPEG images (.jpg/.jpeg) found in {folder}")
     desc = [compute_descriptor(load_image(p), method, **params)
             for p in tqdm(paths, desc=f"{Path(folder).name}/{method}")]
     return np.asarray(ids, dtype=np.int64), np.stack(desc).astype(np.float32)
@@ -201,6 +277,8 @@ def compute_folder(folder, method, **params):
 def channel_sizes(method, **params):
     """Number of bins of each channel's slice in the descriptor."""
     p = full_params(method, **params)
+    if method in JOINT_METHODS or "spatial" in p:
+        raise ValueError("channel_sizes applies only to global independent 1D histograms")
     sizes = [int(b) for b in p["bins"]]
     if method == "ycbcr" and p["chroma_overflow"]:
         sizes[1] += 2
