@@ -10,4 +10,5 @@ results/**/*.pkl
 results/background_masks/thresholds
 results/background_masks/masks/
 results/background_masks_filtered/masks/
-results/week2
+results/week2/background
+results/week2/background_search
