@@ -14,7 +14,7 @@ def suite_settings(experiments):
         return dict(experiments=experiments)
     if not isinstance(experiments, dict):
         raise ValueError("An experiment suite must be a dictionary or a list of experiments")
-    unknown = set(experiments) - {"id", "experiments", "spatial", "measures", "db_dir", "query_dir", "gt"}
+    unknown = set(experiments) - {"id", "experiments", "spatial", "measures", "db_dir", "query_dir", "gt", "query_filters"}
     if unknown:
         raise ValueError(f"Unknown suite settings: {sorted(unknown)}")
     if not isinstance(experiments.get("experiments"), list) or not experiments["experiments"]:
@@ -68,4 +68,9 @@ def expand_experiments(experiments, max_combinations=MAX_COMBINATIONS):
                 identifier = str(entry.get("id", suite.get("id", f"experiment_{index + 1}")))
                 if identifier not in job["ids"]:
                     job["ids"].append(identifier)
-    return list(jobs.values())
+    from filter_noise import expand_filter_grid
+    filters = expand_filter_grid(suite.get("query_filters"))
+    expanded = [dict(job, query_filter=f) for job in jobs.values() for f in filters]
+    if sum(len(job["measures"]) for job in expanded) > max_combinations:
+        raise ValueError(f"Filter/descriptor grid exceeds {max_combinations} evaluations")
+    return expanded

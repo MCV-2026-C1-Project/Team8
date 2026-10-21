@@ -12,7 +12,8 @@ import csv
 import json
 from pathlib import Path
 
-from descriptors import MASKABLE_METHODS, method_tag
+from descriptors import MASKABLE_METHODS, method_tag, compute_folder
+from filter_noise import make_filter
 from distances import MEASURES
 from metrics import mapk
 from retrieval import (BBDD_DIR, DATA_DIR, DESC_DIR, ROOT, load_gt, retrieve,
@@ -68,7 +69,7 @@ GRIDS = {"default": EXPERIMENTS, "lab": LAB_EXPERIMENTS, "ycbcr": YCBCR_EXPERIME
 
 FIELDS = ["descriptor", "bins", "parameters", "measure", "map1", "map5",
           "spatial_mode", "spatial_grids", "level_weights", "dimension", "tag",
-          "config_json", "experiment_ids"]
+          "config_json", "experiment_ids", "query_filter"]
 MASK_FIELDS = ["background_mode", "mask_source", "trim_policy"]
 
 
@@ -80,6 +81,8 @@ def validate_mask_settings(jobs, remove_background=False, mask_source="pred", tr
         raise ValueError("mask_source must be pred/gt and trim must be block/bbox/None")
     if not remove_background and (mask_source != "pred" or trim != "block"):
         raise ValueError("Mask source and trim settings require background removal")
+    if remove_background and any(j["query_filter"]["name"] != "none" for j in jobs):
+        raise ValueError("Query filters cannot be combined with background removal")
     if remove_background:
         unsupported = sorted({j["config"]["descriptor"] for j in jobs} - MASKABLE_METHODS)
         if unsupported:
@@ -139,7 +142,14 @@ def run_experiments(experiments, desc_dir=DESC_DIR, *, db_dir=None, query_dir=No
         method, params = config["descriptor"], config["params"]
         tag = method_tag(method, **params)
         print(f"[{index}/{len(jobs)}] {tag} ({descriptor_dim(method, **params)} values)")
-        if remove_background:
+        filter_config = dict(job["query_filter"])
+        filter_name = filter_config.pop("name")
+        print(f"  Query filter: {job['query_filter']}")
+        if filter_name != "none":
+            db_ids, db_desc = load_or_compute("bbdd", db_dir, method, params, desc_dir)
+            q_ids, q_desc = compute_folder(query_dir, method,
+                                           preprocess=make_filter(filter_name, **filter_config), **params)
+        elif remove_background:
             db_ids, db_desc = load_or_compute("bbdd", db_dir, method, params, desc_dir)
             q_desc = compute_masked_queries(config, images, masks, trim)
         else:
@@ -150,14 +160,15 @@ def run_experiments(experiments, desc_dir=DESC_DIR, *, db_dir=None, query_dir=No
             predictions = retrieve(q_desc, db_desc, db_ids, measure,
                                    len(db_ids) if diagnostics is not None else min(10, len(db_ids)),
                                    channel_sizes=measure_channels(method, params, measure))
-            row = dict(descriptor=method, bins="-".join(map(str, params["bins"])),
+            row = dict(descriptor=method, bins="-".join(map(str, params.get("bins", []))),
                        parameters=canonical_json({k: v for k, v in params.items() if k != "bins"}),
                        measure=measure, map1=float(mapk(ground_truth, predictions, 1)),
                        map5=float(mapk(ground_truth, predictions, 5)),
                        spatial_mode=spatial["mode"], spatial_grids=canonical_json(spatial["grids"]),
                        level_weights=canonical_json(spatial["level_weights"]),
                        dimension=descriptor_dim(method, **params), tag=tag,
-                       config_json=canonical_json(config), experiment_ids=canonical_json(job["ids"]))
+                       config_json=canonical_json(config), experiment_ids=canonical_json(job["ids"]),
+                       query_filter=canonical_json(job["query_filter"]))
             if remove_background:
                 row.update(background_mode="foreground", mask_source=mask_source,
                            trim_policy="none" if trim is None else trim)
@@ -166,7 +177,7 @@ def run_experiments(experiments, desc_dir=DESC_DIR, *, db_dir=None, query_dir=No
                 for qid, actual, predicted in zip(q_ids, ground_truth, predictions):
                     first = next((i for i, value in enumerate(predicted, 1) if value in actual), None)
                     diagnostics.append(dict(tag=tag, measure=measure, query_id=int(qid),
-                                            gt=actual, top_ids=predicted[:10], first_relevant_rank=first))
+                                            query_filter=job["query_filter"], gt=actual, top_ids=predicted[:10], first_relevant_rank=first))
             print(f"  {measure}: mAP@1={row['map1']:.4f} mAP@5={row['map5']:.4f}")
         del db_desc, q_desc
     return sorted_rows(rows, select_by)
@@ -192,6 +203,7 @@ def export_best(rows, path, select_by="map1", provenance=None, overwrite=False):
         # Descriptor loading deliberately does not enable segmentation automatically.
         provenance["replay_flags"] = ["--remove-background", "--mask-source", best["mask_source"]]
         provenance["replay_flags"] += ["--no-trim"] if trim == "none" else ["--trim-mode", trim]
+    provenance["query_filter"] = json.loads(best["query_filter"])
     document = dict(config=json.loads(best["config_json"]), measure=best["measure"],
                     tag=best["tag"], select_by=select_by,
                     development_metrics={key: best[key] for key in ("map1", "map5")},
@@ -257,6 +269,7 @@ def main(argv=None):
                 print(f"{method_tag(config['descriptor'], **config['params'])} "
                       f"dim={descriptor_dim(config['descriptor'], **config['params'])} measures={job['measures']}")
                 print(canonical_json(config))
+                print("query_filter=" + canonical_json(job["query_filter"]))
             print(f"{len(jobs)} extraction configurations; {sum(len(j['measures']) for j in jobs)} evaluations")
             return
         output = args.output or ROOT / "results" / "experiments.csv"
@@ -287,8 +300,10 @@ def main(argv=None):
         print(f"Saved {len(rows)} evaluations to {output}; best by {args.select_by}:")
         for row in rows[:10]:
             print(f"  {row['map1']:.4f} / {row['map5']:.4f}  {row['tag']} / {row['measure']}")
-    except (ValueError, TypeError, OSError, KeyError) as error:
-        ap.error(str(error))
+    # except (ValueError, TypeError, OSError, KeyError) as error:
+    #     ap.error(str(error))
+    except (ValueError, TypeError, OSError, KeyError):
+        raise
 
 
 if __name__ == "__main__":

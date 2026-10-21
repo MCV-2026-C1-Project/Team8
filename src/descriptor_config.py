@@ -38,6 +38,34 @@ def resolve_params(method, supplied):
         if method not in {"lab", "ycbcr", "lab_ab2d", "lab_3d"}:
             raise ValueError("Photometric normalization supports only lab, ycbcr, lab_ab2d and lab_3d descriptors")
         params["normalization"] = normalization
+    from descriptors import TEXTURE_METHODS
+    if method in TEXTURE_METHODS:
+        params["resize"] = positive_int(params["resize"], "resize")
+        size = params["resize"]
+        if method in {"lbp", "multiscale_lbp"}:
+            radii = [params["radius"]] if method == "lbp" else params["radii"]
+            points = [params["points"]] if method == "lbp" else params["points"]
+            if (not isinstance(radii, (list, tuple)) or not isinstance(points, (list, tuple))
+                    or not radii or len(radii) != len(points)):
+                raise ValueError("radii and points require matching nonempty lists")
+            for radius, count in zip(radii, points):
+                if (isinstance(radius, bool) or not isinstance(radius, Real) or
+                        not math.isfinite(radius) or radius <= 0 or 2*math.ceil(radius) >= size):
+                    raise ValueError("LBP radius must be positive and leave valid pixels")
+                positive_int(count, "points")
+            if method == "multiscale_lbp":
+                params["radii"], params["points"] = list(radii), list(points)
+        elif method == "dct":
+            params["n_coeffs"] = positive_int(params["n_coeffs"], "n_coeffs")
+            if size % 2 or params["n_coeffs"] >= size**2:
+                raise ValueError("DCT resize must be even and n_coeffs <= resize**2 - 1")
+        else:
+            params["levels"] = positive_int(params["levels"], "levels")
+            if params["levels"] > int(math.log2(size)) or size % (2**params["levels"]):
+                raise ValueError("Wavelet resize must be divisible by 2**levels")
+        if spatial["mode"] != "global":
+            params["spatial"] = spatial
+        return params
     # Omit the disabled setting so all existing tags and cache metadata survive.
     count = 2 if method in {"hsv_hs2d", "lab_ab2d"} else 3
     bins = params["bins"]
@@ -100,7 +128,15 @@ def resolve_descriptor_config(config):
 
 def descriptor_dim(method, **params):
     p = resolve_params(method, params)
-    if method in {"hsv_3d", "lab_3d"}:
+    if method == "lbp":
+        size = p["points"] + 2
+    elif method == "multiscale_lbp":
+        size = sum(count + 2 for count in p["points"])
+    elif method == "dct":
+        size = p["n_coeffs"]
+    elif method == "wavelet":
+        size = 6 * p["levels"]
+    elif method in {"hsv_3d", "lab_3d"}:
         size = math.prod(p["bins"])
     elif method == "hsv_hs2d":
         size = math.prod(p["bins"]) + int(p["achromatic_bin"]) + (p["v_bins"] if p["include_v"] else 0)
@@ -113,7 +149,7 @@ def descriptor_dim(method, **params):
 
 def hashed_tag(method, params):
     digest = hashlib.sha256(canonical_json(dict(version=1, descriptor=method, params=params)).encode()).hexdigest()[:24]
-    return f"{method}_{'-'.join(map(str, params['bins']))}_{digest}"
+    return f"{method}_{'-'.join(map(str, params.get('bins', [])))}_{digest}"
 
 
 def measure_channels(method, params, measure):
@@ -123,6 +159,11 @@ def measure_channels(method, params, measure):
     params = resolve_params(method, params)
     if measure not in MEASURES:
         raise ValueError(f"Unknown measure {measure!r}")
+    from descriptors import TEXTURE_METHODS
+    if method in {"dct", "wavelet"} and measure not in {"l1", "euclidean"}:
+        raise ValueError(f"{method} supports l1 or euclidean distances")
+    if method in TEXTURE_METHODS and measure == "wasserstein":
+        raise ValueError("Wasserstein is unsupported for texture descriptors")
     if measure == "wasserstein":
         if method in JOINT_METHODS or "spatial" in params:
             raise ValueError("Wasserstein supports only global independent 1D histograms, not joint or spatial descriptors")
