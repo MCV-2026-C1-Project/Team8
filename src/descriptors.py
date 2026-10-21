@@ -173,104 +173,9 @@ def lab_hist(img_bgr, bins=LAB_DEFAULTS["bins"], mask=None, normalization="none"
     return _three_channel_hist(color_image(img_bgr, "lab", normalization, mask), bins, mask)
 
 
-# ----------------------------------------------------------------------------
-# Texture descriptors
-# ----------------------------------------------------------------------------
-
-def _texture_gray(image, resize):
-    """Square canonical resolution; direct functions follow the repo BGR convention."""
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) if image.ndim == 3 else image
-    return cv2.resize(gray, (resize, resize), interpolation=cv2.INTER_AREA)
-
-def lbp_descriptor(img_bgr, radius=1, points=8, resize=256):
-    """Rotation-invariant uniform circular LBP (P+2 bins), L1 normalised.
-
-    Bilinear circular samples compare >= the centre. Uniform patterns have at
-    most two circular bit transitions; their bin is the number of set bits.
-    Other patterns share bin P+1. Exclude a radius-wide image boundary.
-    """
-    gray = _texture_gray(img_bgr, resize).astype(np.float32)
-    margin = int(np.ceil(radius))
-    if 2 * margin >= resize:
-        raise ValueError("LBP radius leaves no valid pixels")
-    yy, xx = np.mgrid[margin:resize-margin, margin:resize-margin].astype(np.float32)
-    centre = gray[margin:resize-margin, margin:resize-margin]
-    bits = []
-    for p in range(points):
-        angle = 2 * np.pi * p / points
-        sample = cv2.remap(gray, (xx + radius * np.cos(angle)).astype(np.float32),
-                           (yy - radius * np.sin(angle)).astype(np.float32), cv2.INTER_LINEAR)
-        bits.append(sample >= centre)
-    bits = np.stack(bits)
-    transitions = np.sum(bits != np.roll(bits, 1, axis=0), axis=0)
-    codes = np.where(transitions <= 2, bits.sum(axis=0), points + 1)
-    return _norm(np.bincount(codes.ravel(), minlength=points + 2))
-
-def multiscale_lbp_descriptor(img_bgr, radii=(1, 2, 3), points=(8, 16, 24), resize=256):
-    """Concatenate equally weighted LBP histograms at paired radii/point counts."""
-    if len(radii) != len(points) or not len(radii):
-        raise ValueError("radii and points must have matching nonzero lengths")
-    return np.concatenate([lbp_descriptor(img_bgr, radius, count, resize)
-                           for radius, count in zip(radii, points)]) / len(radii)
-
-def dct_descriptor(img_bgr, n_coeffs=64, resize=256):
-    """Signed low-frequency DCT AC coefficients in zigzag order, L2 normalised.
-
-    Remove mean brightness and standardise contrast before the orthonormal DCT.
-    DC is omitted. Use L1/Euclidean distance, not histogram distances.
-    Combine with the existing spatial grid for block DCT.
-    """
-    gray = _texture_gray(img_bgr, resize).astype(np.float32)
-    gray -= gray.mean()
-    gray /= max(float(gray.std()), 1e-6)
-    coeff = cv2.dct(gray)
-    values = []
-    for diagonal in range(1, 2 * resize - 1):
-        pairs = [(y, diagonal-y) for y in range(max(0, diagonal-resize+1),
-                                               min(resize-1, diagonal)+1)]
-        if diagonal % 2 == 0:
-            pairs.reverse()
-        for y, x in pairs:
-            values.append(coeff[y, x])
-            if len(values) == n_coeffs:
-                vector = np.asarray(values, dtype=np.float32)
-                return vector / max(float(np.linalg.norm(vector)), 1e-6)
-    raise ValueError("n_coeffs exceeds available AC coefficients")
-
-def wavelet_descriptor(img_bgr, levels=3, resize=256):
-    """Haar detail statistics: mean absolute value and std of LH/HL/HH per level.
-
-    Standardise brightness/contrast first. Approximation band is decomposed
-    recursively; no approximation/DC statistics are included. L2 normalised.
-    This uses an orthonormal separable Haar transform, requiring no dependency.
-    """
-    gray = _texture_gray(img_bgr, resize).astype(np.float32)
-    gray -= gray.mean()
-    gray /= max(float(gray.std()), 1e-6)
-    features = []
-    for _ in range(levels):
-        low = (gray[:, 0::2] + gray[:, 1::2]) / np.sqrt(2)
-        high = (gray[:, 0::2] - gray[:, 1::2]) / np.sqrt(2)
-        approximation = (low[0::2] + low[1::2]) / np.sqrt(2)
-        details = [(low[0::2] - low[1::2]) / np.sqrt(2),
-                   (high[0::2] + high[1::2]) / np.sqrt(2),
-                   (high[0::2] - high[1::2]) / np.sqrt(2)]
-        for band in details:
-            features.extend([np.abs(band).mean(), band.std()])
-        gray = approximation
-    vector = np.asarray(features, dtype=np.float32)
-    return vector / max(float(np.linalg.norm(vector)), 1e-6)
-
-
-
-TEXTURE_METHODS = {"lbp", "multiscale_lbp", "dct", "wavelet"}
-
 METHODS = {"ycbcr": ycbcr_hist, "hsv": hsv_hist, "hsv_baseline": hsv_baseline_hist,
            "rgb": rgb_hist, "lab": lab_hist, "hsv_hs2d": hsv_hs2d,
            "lab_ab2d": lab_ab2d, "hsv_3d": hsv_3d, "lab_3d": lab_3d}
-METHODS.update(lbp=lbp_descriptor, multiscale_lbp=multiscale_lbp_descriptor,
-               dct=dct_descriptor, wavelet=wavelet_descriptor)
-
 # Methods whose histograms can be restricted to foreground pixels.
 MASKABLE_METHODS = {"rgb", "lab", "ycbcr", "lab_ab2d", "lab_3d"}
 DEFAULTS = {"ycbcr": YCBCR_DEFAULTS, "hsv": HSV_DEFAULTS, "hsv_baseline": HSV_BASELINE_DEFAULTS,
@@ -280,10 +185,6 @@ DEFAULTS = {"ycbcr": YCBCR_DEFAULTS, "hsv": HSV_DEFAULTS, "hsv_baseline": HSV_BA
                              v_bins=8, chroma_weight=0.7),
             "lab_ab2d": dict(bins=(16, 16), include_l=True, l_bins=8, chroma_weight=0.7),
             "hsv_3d": dict(bins=(8, 8, 4)), "lab_3d": dict(bins=(4, 8, 8))}
-
-DEFAULTS.update(lbp=dict(radius=1, points=8, resize=256),
-                multiscale_lbp=dict(radii=(1, 2, 3), points=(8, 16, 24), resize=256),
-                dct=dict(n_coeffs=64, resize=256), wavelet=dict(levels=3, resize=256))
 
 
 def full_params(method, **params):
