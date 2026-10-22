@@ -154,13 +154,13 @@ def hashed_tag(method, params):
 
 def measure_channels(method, params, measure):
     """Validate compatibility before any extraction; preserve legacy W1 formulas."""
-    from descriptors import channel_sizes
+    from descriptors import channel_sizes, DESCRIPTOR_PROPERTIES
     from distances import MEASURES
     params = resolve_params(method, params)
     if measure not in MEASURES:
         raise ValueError(f"Unknown measure {measure!r}")
     from descriptors import TEXTURE_METHODS
-    if method in {"dct", "wavelet"} and measure not in {"l1", "euclidean"}:
+    if not DESCRIPTOR_PROPERTIES[method]["histogram"] and measure not in {"l1", "euclidean"}:
         raise ValueError(f"{method} supports l1 or euclidean distances")
     if method in TEXTURE_METHODS and measure == "wasserstein":
         raise ValueError("Wasserstein is unsupported for texture descriptors")

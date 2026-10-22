@@ -1,6 +1,6 @@
 # Team 8 — Museum Painting Retrieval (C1)
 
-Colour-histogram-based image retrieval for the UAB museum painting project (Weeks 1–2).
+Colour and texture image retrieval for the UAB museum painting project (Weeks 1–3).
 
 ## Setup
 

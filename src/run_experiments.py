@@ -12,13 +12,12 @@ import csv
 import json
 from pathlib import Path
 
-from descriptors import MASKABLE_METHODS, method_tag, compute_folder
-from filter_noise import make_filter
+from descriptors import MASKABLE_METHODS, method_tag
+from filter_noise import query_preprocessor
 from distances import MEASURES
 from metrics import mapk
 from retrieval import (BBDD_DIR, DATA_DIR, DESC_DIR, ROOT, load_gt, retrieve,
-                       load_configured_data, validate_gt_order, query_masks,
-                       compute_masked_queries, load_or_compute)
+                       load_configured_data, validate_gt_order, query_masks)
 from descriptor_config import canonical_json, descriptor_dim, measure_channels
 from descriptor_cli import add_descriptor_arguments, config_from_args
 from experiment_config import expand_experiments, suite_settings
@@ -133,27 +132,21 @@ def run_experiments(experiments, desc_dir=DESC_DIR, *, db_dir=None, query_dir=No
     if "qst" in query_dir.name.lower():
         raise ValueError("Experiment selection requires development queries, not a QST test set")
     ground_truth = load_gt(query_dir, gt_path)
+    masked_queries = None
     if remove_background:
         _, q_ids, images, masks = query_masks(query_dir, mask_source)
         validate_gt_order(q_ids, ground_truth)
+        masked_queries = (q_ids, images, masks)
     rows = []
     for index, job in enumerate(jobs, 1):
         config = job["config"]
         method, params = config["descriptor"], config["params"]
         tag = method_tag(method, **params)
         print(f"[{index}/{len(jobs)}] {tag} ({descriptor_dim(method, **params)} values)")
-        filter_config = dict(job["query_filter"])
-        filter_name = filter_config.pop("name")
         print(f"  Query filter: {job['query_filter']}")
-        if filter_name != "none":
-            db_ids, db_desc = load_or_compute("bbdd", db_dir, method, params, desc_dir)
-            q_ids, q_desc = compute_folder(query_dir, method,
-                                           preprocess=make_filter(filter_name, **filter_config), **params)
-        elif remove_background:
-            db_ids, db_desc = load_or_compute("bbdd", db_dir, method, params, desc_dir)
-            q_desc = compute_masked_queries(config, images, masks, trim)
-        else:
-            db_ids, db_desc, q_ids, q_desc = load_configured_data(config, db_dir, query_dir, desc_dir)
+        db_ids, db_desc, q_ids, q_desc = load_configured_data(
+            config, db_dir, query_dir, desc_dir,
+            query_preprocess=query_preprocessor(job["query_filter"]), masks=masked_queries, trim=trim)
         validate_gt_order(q_ids, ground_truth)
         spatial = resolve_spatial(params.get("spatial"))
         for measure in job["measures"]:
@@ -300,10 +293,9 @@ def main(argv=None):
         print(f"Saved {len(rows)} evaluations to {output}; best by {args.select_by}:")
         for row in rows[:10]:
             print(f"  {row['map1']:.4f} / {row['map5']:.4f}  {row['tag']} / {row['measure']}")
-    # except (ValueError, TypeError, OSError, KeyError) as error:
-    #     ap.error(str(error))
-    except (ValueError, TypeError, OSError, KeyError):
-        raise
+    except (ValueError, OSError) as error:
+        # Expected validation / filesystem failures; programming errors propagate.
+        ap.error(str(error))
 
 
 if __name__ == "__main__":

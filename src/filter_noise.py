@@ -15,6 +15,7 @@ import cv2
 import numpy as np
 from functools import partial
 from itertools import product
+from numbers import Real
 import json
 
 
@@ -29,13 +30,13 @@ def _image(image):
 
 
 def _kernel(ksize):
-    if not isinstance(ksize, (int, np.integer)) or ksize < 1 or ksize % 2 != 1:
+    if isinstance(ksize, bool) or not isinstance(ksize, (int, np.integer)) or ksize < 1 or ksize % 2 != 1:
         raise ValueError('ksize must be a positive odd integer')
     return int(ksize)
 
 
 def _positive(value, name):
-    if not np.isfinite(value) or value <= 0:
+    if isinstance(value, bool) or not isinstance(value, Real) or not np.isfinite(value) or value <= 0:
         raise ValueError(f'{name} must be finite and positive')
     return float(value)
 
@@ -127,6 +128,64 @@ def log_spectrum(image):
 FILTER_NAMES = (
     "none", "average", "gaussian", "median", "ideal", "rejection"
 )
+FILTER_PARAMETERS = {
+    "none": set(),
+    "average": {"ksize", "noise_threshold"},
+    "gaussian": {"ksize", "sigma", "noise_threshold"},
+    "median": {"ksize", "noise_threshold"},
+    "ideal": {"cutoff", "noise_threshold"},
+    "rejection": {"notches", "radius", "noise_threshold"},
+}
+FILTER_DEFAULTS = dict(ksize=3, sigma=1.0, cutoff=30.0, radius=3.0)
+
+
+def resolve_filter_config(config=None):
+    """Validate a single replayable policy, using the experiment-grid defaults.
+
+    Missing noise_threshold and JSON null both mean unconditional filtering.
+    Image-dependent notch bounds are checked when the filter sees an image.
+    """
+    if config is None:
+        config = {"name": "none"}
+    if not isinstance(config, dict):
+        raise ValueError("Query filter configuration must be a dictionary")
+    name = config.get("name")
+    if not isinstance(name, str) or name not in FILTER_PARAMETERS:
+        raise ValueError(f"Unknown filter {name!r}; choose from {FILTER_NAMES}")
+    unknown = set(config) - {"name"} - FILTER_PARAMETERS[name]
+    if unknown:
+        raise ValueError(f"Unsupported parameters for {name}: {sorted(unknown)}")
+    result = {key: value for key, value in FILTER_DEFAULTS.items() if key in FILTER_PARAMETERS[name]}
+    result.update(config)
+    if "ksize" in result:
+        result["ksize"] = _kernel(result["ksize"])
+    for key in ("sigma", "cutoff", "radius"):
+        if key in result:
+            result[key] = _positive(result[key], key)
+    threshold = result.get("noise_threshold")
+    if threshold is not None:
+        if (isinstance(threshold, bool) or not isinstance(threshold, Real) or
+                not np.isfinite(threshold) or threshold < 0):
+            raise ValueError("noise_threshold must be finite and nonnegative or null")
+        result["noise_threshold"] = float(threshold)
+    if name == "rejection":
+        notches = result.get("notches")
+        if not isinstance(notches, (list, tuple)) or not notches:
+            raise ValueError("Frequency rejection requires at least one notch")
+        for pair in notches:
+            if (not isinstance(pair, (list, tuple)) or len(pair) != 2 or
+                    any(isinstance(v, bool) or not isinstance(v, Real) or not np.isfinite(v) for v in pair)):
+                raise ValueError("notches must contain finite (dy, dx) pairs")
+            if pair[0] == 0 and pair[1] == 0:
+                raise ValueError("Do not reject DC (the mean image intensity)")
+        result["notches"] = [list(map(float, pair)) for pair in notches]
+    return result
+
+
+def query_preprocessor(config=None):
+    """Return None for the cacheable original-image path, else an image callable."""
+    config = resolve_filter_config(config)
+    return None if config["name"] == "none" else make_filter(**config)
 
 
 def _make_unconditional_filter(
@@ -170,20 +229,15 @@ def _make_unconditional_filter(
         f"Unknown filter {name!r}. Choose from {FILTER_NAMES}."
     )
 
-def make_filter(name="none", *, noise_threshold=None, **params):
+def make_filter(name="none", **params):
     """Filter all images, or only those whose noise score exceeds a threshold."""
-    base_filter = _make_unconditional_filter(name, **params)
+    config = resolve_filter_config(dict(name=name, **params))
+    noise_threshold = config.pop("noise_threshold", None)
+    base_filter = _make_unconditional_filter(**config)
 
     # JSON null means apply filtering to every image.
     if noise_threshold is None or name == "none":
         return base_filter
-
-    if (
-        isinstance(noise_threshold, bool)
-        or not np.isfinite(noise_threshold)
-        or noise_threshold < 0
-    ):
-        raise ValueError("noise_threshold must be finite and nonnegative")
 
     # Lazy import avoids a circular import with noise_detection.py.
     from noise_detection import needs_filtering
@@ -201,26 +255,6 @@ def make_filter(name="none", *, noise_threshold=None, **params):
 
 def expand_filter_grid(entries=None):
     """Expand filter settings into individual configurations."""
-    allowed = {
-        "none": set(),
-        "average": {"ksize"},
-        "gaussian": {"ksize", "sigma"},
-        "median": {"ksize"},
-        "ideal": {"cutoff"},
-        "rejection": {"notches", "radius"},
-    }
-
-    for name in allowed:
-        if name != "none":
-            allowed[name].add("noise_threshold")
-
-    defaults = {
-        "ksize": 3,
-        "sigma": 1.0,
-        "cutoff": 30.0,
-        "radius": 3.0,
-    }
-
     if entries is None:
         entries = [{"name": "none"}]
 
@@ -239,13 +273,13 @@ def expand_filter_grid(entries=None):
         name = entry.get("name")
         grid = entry.get("grid", {})
 
-        if name not in allowed:
+        if not isinstance(name, str) or name not in FILTER_PARAMETERS:
             raise ValueError(f"Unknown filter: {name!r}")
 
         if not isinstance(grid, dict):
             raise ValueError("Filter grid must be a dictionary")
 
-        unknown = set(grid) - allowed[name]
+        unknown = set(grid) - FILTER_PARAMETERS[name]
         if unknown:
             raise ValueError(
                 f"Unsupported parameters for {name}: {sorted(unknown)}"
@@ -265,17 +299,7 @@ def expand_filter_grid(entries=None):
             raise ValueError("Filter grid exceeds 5000 configurations")
 
         for values in product(*grid.values()):
-            params = {
-                key: defaults[key]
-                for key in allowed[name]
-                if key in defaults
-            }
-            params.update(zip(grid.keys(), values))
-
-            # Check that the factory accepts this configuration.
-            make_filter(name, **params)
-
-            config = {"name": name, **params}
+            config = resolve_filter_config({"name": name, **dict(zip(grid, values))})
             key = json.dumps(config, sort_keys=True)
             configurations[key] = config
 

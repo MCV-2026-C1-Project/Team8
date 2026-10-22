@@ -10,7 +10,8 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 
-from descriptors import compute_descriptor, compute_folder, full_params, method_tag, list_images, load_image
+from descriptors import (DESCRIPTOR_PROPERTIES, compute_descriptor, compute_folder,
+                         full_params, method_tag, list_images, load_image)
 from descriptor_config import descriptor_dim, canonical_json, measure_channels, resolve_descriptor_config, positive_int
 from distances import MEASURES, rank
 from metrics import normalize_gt
@@ -85,6 +86,20 @@ def save_descriptor_cache(path, ids, desc, method, params, folder=None):
              **_cache_metadata(method, params))
 
 
+def descriptor_cache_path(name, folder, method, params, desc_dir=DESC_DIR):
+    """Shared source-aware filename; None selects the full folder name as prefix.
+
+    Resolve relative paths and symlinks before hashing. The namespace depends on
+    location, not file timestamps: changed images invalidate the same cache via
+    source_identity rather than leaving a new cache behind on every edit.
+    Explicit names remain supported, but never replace the source namespace.
+    """
+    folder = Path(folder).resolve()
+    digest = hashlib.sha256(str(folder).encode()).hexdigest()[:24]
+    name = name or folder.name.lower() or "images"
+    return Path(desc_dir) / f"{name}_{digest}_{method_tag(method, **params)}.npz"
+
+
 def load_or_compute(name, folder, method, params, desc_dir=DESC_DIR):
     """Reuse only canonical caches with matching metadata and valid array shapes.
 
@@ -94,7 +109,7 @@ def load_or_compute(name, folder, method, params, desc_dir=DESC_DIR):
     params = full_params(method, **params)
     expected = _cache_metadata(method, params)
     source = source_identity(folder)
-    path = Path(desc_dir) / f"{name}_{expected['tag']}.npz"
+    path = descriptor_cache_path(name, folder, method, params, desc_dir)
     if path.exists():
         try:
             with np.load(path, allow_pickle=False) as d:
@@ -108,7 +123,9 @@ def load_or_compute(name, folder, method, params, desc_dir=DESC_DIR):
                         desc.shape != (len(ids), descriptor_dim(method, **params)) or
                         not np.issubdtype(ids.dtype, np.integer) or
                         ids.tolist() != list_images(folder)[1] or
-                        np.any(desc < 0) or
+                        not np.issubdtype(desc.dtype, np.number) or
+                        np.issubdtype(desc.dtype, np.complexfloating) or
+                        (DESCRIPTOR_PROPERTIES[method]["nonnegative"] and np.any(desc < 0)) or
                         not np.isfinite(desc).all()):
                     raise ValueError("invalid descriptor arrays")
                 return ids, desc
@@ -143,13 +160,34 @@ def query_folder(query_set):
     return p
 
 
-def load_configured_data(config, db_dir=BBDD_DIR, query_dir=DATA_DIR / "qsd1_w1", desc_dir=DESC_DIR):
-    """Shared extraction/cache path for experiments and final retrieval."""
+def load_configured_data(config, db_dir=BBDD_DIR, query_dir=DATA_DIR / "qsd1_w1", desc_dir=DESC_DIR,
+                         *, query_preprocess=None, masks=None, trim="block"):
+    """Shared extraction/cache path for experiments and final retrieval.
+
+    query_preprocess maps one BGR image to one BGR image before extraction.
+    Only original, unmasked images have persistent descriptor caches: arbitrary
+    callables and masks have no stable cache identity. Database caches are always
+    retained, and query IDs follow the original sorted filenames.
+    """
     config = resolve_descriptor_config(config)
+    if query_preprocess is not None:
+        if not callable(query_preprocess):
+            raise ValueError("query_preprocess must be callable or None")
+        if masks is not None:
+            raise ValueError("Query preprocessing cannot be combined with foreground masks")
     method, params = config["descriptor"], config["params"]
-    db_ids, db_desc = load_or_compute("bbdd", db_dir, method, params, desc_dir)
-    q_ids, q_desc = load_or_compute(Path(query_dir).name.split("_")[0].lower(),
-                                   query_dir, method, params, desc_dir)
+    db_ids, db_desc = load_or_compute(None, db_dir, method, params, desc_dir)
+    if masks is not None:
+        q_ids, images, query_mask_list = masks
+        q_ids = np.asarray(q_ids)
+        if (q_ids.ndim != 1 or not np.issubdtype(q_ids.dtype, np.integer) or
+                len(q_ids) != len(images) or q_ids.tolist() != list_images(query_dir)[1]):
+            raise ValueError("Masked query IDs must match images in sorted query-file order")
+        q_desc = compute_masked_queries(config, images, query_mask_list, trim)
+    elif query_preprocess is not None:
+        q_ids, q_desc = compute_folder(query_dir, method, preprocess=query_preprocess, **params)
+    else:
+        q_ids, q_desc = load_or_compute(None, query_dir, method, params, desc_dir)
     return db_ids, db_desc, q_ids, q_desc
 
 
@@ -184,23 +222,26 @@ def query_masks(folder, mask_source="pred"):
 def compute_masked_queries(config, images, masks, trim="block"):
     """Foreground-only query descriptors. Not cached: the cache tag ignores masks."""
     config = resolve_descriptor_config(config)
+    if not len(images) or len(images) != len(masks):
+        raise ValueError("Provide one foreground mask per query image")
     desc = [compute_descriptor(image, config["descriptor"], mask=mask, trim=trim, **config["params"])
             for image, mask in zip(images, masks)]
     return np.stack(desc).astype(np.float32)
 
 
 def retrieve_config(config, measure, db_dir=BBDD_DIR, query_dir=DATA_DIR / "qsd1_w1",
-                    desc_dir=DESC_DIR, k=10, *, allow_truncate=False, masks=None, trim="block"):
-    """masks=(query ids, images, masks) computes foreground-only query descriptors."""
+                    desc_dir=DESC_DIR, k=10, *, allow_truncate=False, masks=None, trim="block",
+                    query_preprocess=None):
+    """Rank original, preprocessed or masked queries using the shared loader.
+
+    masks=(query ids, images, masks) computes foreground-only query descriptors.
+    query_preprocess accepts the same image callable as compute_descriptor.
+    """
     config = resolve_descriptor_config(config)
     channels = measure_channels(config["descriptor"], config["params"], measure)
     k = positive_int(k, "k")
-    if masks is None:
-        db_ids, db_desc, q_ids, q_desc = load_configured_data(config, db_dir, query_dir, desc_dir)
-    else:
-        db_ids, db_desc = load_or_compute("bbdd", db_dir, config["descriptor"], config["params"], desc_dir)
-        q_ids, images, query_masks_ = masks
-        q_desc = compute_masked_queries(config, images, query_masks_, trim)
+    db_ids, db_desc, q_ids, q_desc = load_configured_data(
+        config, db_dir, query_dir, desc_dir, query_preprocess=query_preprocess, masks=masks, trim=trim)
     return q_ids, retrieve(q_desc, db_desc, db_ids, measure, k, channels, allow_truncate=allow_truncate)
 
 

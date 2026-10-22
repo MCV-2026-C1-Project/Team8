@@ -273,6 +273,12 @@ METHODS = {"ycbcr": ycbcr_hist, "hsv": hsv_hist, "hsv_baseline": hsv_baseline_hi
            "lab_ab2d": lab_ab2d, "hsv_3d": hsv_3d, "lab_3d": lab_3d}
 METHODS.update(lbp=lbp_descriptor, multiscale_lbp=multiscale_lbp_descriptor,
                dct=dct_descriptor, wavelet=wavelet_descriptor)
+# Numerical properties shared by cache validation and distance compatibility.
+# Wavelet statistics are nonnegative, but are not histogram masses.
+DESCRIPTOR_PROPERTIES = {
+    method: dict(nonnegative=method != "dct", histogram=method not in {"dct", "wavelet"})
+    for method in METHODS
+}
 # Methods whose histograms can be restricted to foreground pixels.
 MASKABLE_METHODS = {"rgb", "lab", "ycbcr", "lab_ab2d", "lab_3d"}
 DEFAULTS = {"ycbcr": YCBCR_DEFAULTS, "hsv": HSV_DEFAULTS, "hsv_baseline": HSV_BASELINE_DEFAULTS,
@@ -316,7 +322,7 @@ def method_tag(method, **params):
     return tag
 
 
-def compute_descriptor(img_bgr, method, mask=None, trim="block", **params):
+def compute_descriptor(img_bgr, method, mask=None, trim="block", *, preprocess=None, **params):
     """Descriptor of an image; with a mask, only foreground (nonzero) pixels are counted.
 
     For spatial layouts with a mask, the background around the painting is removed
@@ -324,7 +330,16 @@ def compute_descriptor(img_bgr, method, mask=None, trim="block", **params):
     (trim_background_blocks), trim="bbox" crops to the foreground's bounding box
     (crop_to_foreground), and trim=None keeps the whole image.
     Photometric preparation uses the complete foreground before any trimming.
+    preprocess is an optional BGR image -> BGR image callable, also usable on an
+    individual painting crop. It runs before descriptor preparation. Combining
+    preprocessing with masks is unsupported until their alignment is defined.
     """
+    if preprocess is not None:
+        if not callable(preprocess):
+            raise ValueError("preprocess must be callable or None")
+        if mask is not None:
+            raise ValueError("Query preprocessing cannot be combined with foreground masks")
+        img_bgr = preprocess(img_bgr)
     if (not isinstance(img_bgr, np.ndarray) or img_bgr.dtype != np.uint8 or
             img_bgr.ndim != 3 or img_bgr.shape[2] != 3 or not img_bgr.size):
         raise ValueError("Expected a nonempty H x W x 3 uint8 BGR image")
@@ -379,13 +394,7 @@ def compute_folder(folder, method, *, preprocess=None, **params):
     paths, ids = list_images(folder)
     if not paths:
         raise ValueError(f"No JPEG images (.jpg/.jpeg) found in {folder}")
-    def extract(path):
-        image = load_image(path)
-        if preprocess is not None:
-            image = preprocess(image)
-        return compute_descriptor(image, method, **params)
-
-    desc = [extract(p)
+    desc = [compute_descriptor(load_image(p), method, preprocess=preprocess, **params)
             for p in tqdm(paths, desc=f"{Path(folder).name}/{method}")]
     return np.asarray(ids, dtype=np.int64), np.stack(desc).astype(np.float32)
 
