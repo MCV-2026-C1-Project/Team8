@@ -182,10 +182,10 @@ def resolve_filter_config(config=None):
     return result
 
 
-def query_preprocessor(config=None):
+def query_preprocessor(config=None, *, diagnostics=None):
     """Return None for the cacheable original-image path, else an image callable."""
     config = resolve_filter_config(config)
-    return None if config["name"] == "none" else make_filter(**config)
+    return None if config["name"] == "none" else make_filter(**config, diagnostics=diagnostics)
 
 
 def _make_unconditional_filter(
@@ -229,21 +229,38 @@ def _make_unconditional_filter(
         f"Unknown filter {name!r}. Choose from {FILTER_NAMES}."
     )
 
-def make_filter(name="none", **params):
-    """Filter all images, or only those whose noise score exceeds a threshold."""
+def make_filter(name="none", *, diagnostics=None, **params):
+    """Filter images; optionally append one decision per call to diagnostics.
+
+    Selective decisions expose the score already computed for filtering. No
+    scores are computed for unconditional filters. Too-small crops cannot be
+    scored and follow the existing unreliable-estimate policy: leave unchanged.
+    """
     config = resolve_filter_config(dict(name=name, **params))
     noise_threshold = config.pop("noise_threshold", None)
     base_filter = _make_unconditional_filter(**config)
 
     # JSON null means apply filtering to every image.
     if noise_threshold is None or name == "none":
-        return base_filter
+        if diagnostics is None:
+            return base_filter
+        def unconditional(image):
+            result = base_filter(image)
+            diagnostics.append(dict(filtered=name != "none", score=None, reliable=None,
+                                    threshold=None, reason="unconditional"))
+            return result
+        return unconditional
 
     # Lazy import avoids a circular import with noise_detection.py.
     from noise_detection import needs_filtering
 
     def selective_filter(image):
-        result = needs_filtering(image, threshold=noise_threshold)
+        _image(image)
+        result = (needs_filtering(image, threshold=noise_threshold) if min(image.shape[:2]) >= 7 else
+                  dict(score=None, reliable=False, needs_filtering=None, threshold=noise_threshold,
+                       reason="crop_too_small"))
+        if diagnostics is not None:
+            diagnostics.append(dict(result, filtered=result["needs_filtering"] is True))
 
         if result["needs_filtering"] is True:
             return base_filter(image)

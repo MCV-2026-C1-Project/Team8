@@ -14,8 +14,10 @@ from descriptors import (DESCRIPTOR_PROPERTIES, compute_descriptor, compute_fold
                          full_params, method_tag, list_images, load_image)
 from descriptor_config import descriptor_dim, canonical_json, measure_channels, resolve_descriptor_config, positive_int
 from distances import MEASURES, rank
-from metrics import normalize_gt
+from metrics import normalize_gt, validate_predictions
 from remove_background import foreground_mask
+from painting_detection import detect_paintings, resolve_detection_config
+from filter_noise import query_preprocessor, resolve_filter_config
 
 ROOT = Path(__file__).resolve().parent.parent
 DESC_DIR = ROOT / "descriptors"
@@ -250,8 +252,85 @@ def validate_gt_order(q_ids, gt):
         raise ValueError("Query IDs must follow ground-truth order (0, 1, ...) with one GT entry per image")
 
 
-def save_results(path, results):
+def retrieve_multi_config(config, measure, segmentation_config, db_dir=BBDD_DIR,
+                          query_dir=DATA_DIR / "qsd1_w1", desc_dir=DESC_DIR, k=10, *,
+                          allow_truncate=False, query_filter=None, diagnostics=None, on_segmented=None):
+    """Detect once, describe original rectangular crops, rank once, regroup.
+
+    Returns (query IDs, photo -> painting -> Top-K IDs). Empty detections retain
+    an empty photo entry. diagnostics receives per-photo boxes, failures, noise
+    decisions and rankings. on_segmented(path, union_mask, paintings) observes
+    the already-computed segmentation for saving/evaluation; its return is unused.
+    No GT enters this function. Crop descriptors are never cached.
+    """
+    config = resolve_descriptor_config(config)
+    segmentation_config = resolve_detection_config(segmentation_config)
+    policy = resolve_filter_config(query_filter)
+    method, params = config["descriptor"], config["params"]
+    channels = measure_channels(method, params, measure)
+    k = positive_int(k, "k")
+    paths, ids = list_images(query_dir)
+    if not paths:
+        raise ValueError(f"No JPEG images found in {query_dir}")
+    db_ids, db_desc = load_or_compute(None, db_dir, method, params, desc_dir)
+    noise_records = [] if diagnostics is not None else None
+    preprocess = query_preprocessor(policy, diagnostics=noise_records)
+    descriptors, counts, records = [], [], []
+    for path, query_id in tqdm(list(zip(paths, ids)), desc="Painting crops"):
+        image = load_image(path)
+        mask, paintings = detect_paintings(image, segmentation_config)
+        record = dict(image=path.name, query_id=int(query_id), shape=list(image.shape[:2]),
+                      detected=len(paintings), failure=None if paintings else "no_paintings_detected", paintings=[])
+        counts.append(len(paintings))
+        for index, painting in enumerate(paintings):
+            x, y, right, bottom = painting.bbox
+            if painting.order != index or not (0 <= x < right <= image.shape[1] and 0 <= y < bottom <= image.shape[0]):
+                raise ValueError(f"Invalid painting order or bounding box for {path.name}")
+            crop = image[y:bottom, x:right]  # Original pixels, without black mask boundaries.
+            descriptors.append(compute_descriptor(crop, method, preprocess=preprocess, **params))
+            item = dict(order=index, bbox=[int(v) for v in painting.bbox])
+            if diagnostics is not None:
+                item["noise"] = (noise_records[-1] if preprocess is not None else
+                                 dict(filtered=False, score=None, reliable=None, threshold=None, reason="disabled"))
+            record["paintings"].append(item)
+        if on_segmented is not None:
+            on_segmented(path, mask, paintings)
+        records.append(record)
+    matrix = (np.stack(descriptors).astype(np.float32) if descriptors else
+              np.empty((0, descriptor_dim(method, **params)), np.float32))
+    flat = retrieve(matrix, db_desc, db_ids, measure, k, channels, allow_truncate=allow_truncate)
+    results, offset = [], 0
+    for record, count in zip(records, counts):
+        rankings = flat[offset:offset + count]
+        offset += count
+        results.append(rankings)
+        for item, ranking in zip(record["paintings"], rankings):
+            item["ranking"] = ranking
+    results = validate_predictions(results, nested=True, k=min(k, len(db_ids)),
+                                   query_count=len(ids), painting_counts=counts, db_ids=db_ids)
+    if diagnostics is not None:
+        diagnostics.extend(records)
+    return np.asarray(ids, np.int64), results
+
+
+def save_results(path, results, *, nested=False, k=None, query_count=None, painting_counts=None, db_ids=None):
+    """Save flat legacy or nested Week 3 results, refusing existing files."""
+    results = validate_predictions(results, nested=nested, k=k, query_count=query_count,
+                                   painting_counts=painting_counts, db_ids=db_ids)
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("wb") as stream:
-        pickle.dump([[int(value) for value in row] for row in results], stream)
+    with path.open("xb") as stream:
+        pickle.dump(results, stream)
+
+
+def save_query_mask(path, mask):
+    """Write an original-resolution binary PNG without replacing an artifact."""
+    if mask.dtype != np.uint8 or mask.ndim != 2 or not np.isin(mask, [0, 255]).all():
+        raise ValueError("Query masks must be single-channel uint8 with values 0 and 255")
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    ok, encoded = cv2.imencode(".png", mask)
+    if not ok:
+        raise OSError(f"Could not encode mask {path}")
+    with path.open("xb") as stream:
+        stream.write(encoded.tobytes())

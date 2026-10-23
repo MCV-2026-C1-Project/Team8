@@ -134,14 +134,14 @@ def polygon_masks(polygons, shape):
     return masks
 
 
-def instance_diagnostics(predictions, truth, threshold=0.5):
+def instance_diagnostics(predictions, truth, threshold=0.5, *, return_matches=False):
     """Exact one-to-one maximum-total-IoU matching, with unmatched GT scored 0.
 
     Bitmask dynamic programming is small for the one/two-painting task and does
     not assume any annotation ordering. Frame polygons are approximate masks.
     """
     states = {0: (0.0, [])}
-    for pred in predictions:
+    for predicted_index, pred in enumerate(predictions):
         overlaps = []
         for gt in truth:
             union = np.count_nonzero((pred > 0) | (gt > 0))
@@ -151,14 +151,21 @@ def instance_diagnostics(predictions, truth, threshold=0.5):
             for index, iou in enumerate(overlaps):
                 bit = 1 << index
                 if not used & bit and score + iou > updated.get(used | bit, (-1, []))[0]:
-                    updated[used | bit] = (score + iou, values + [iou])
+                    updated[used | bit] = (score + iou, values + [(index, predicted_index, iou)])
         states = updated
     score, values = max(states.values(), key=lambda item: item[0])
-    tp = int(sum(iou >= threshold for iou in values))
-    return dict(gt_count=len(truth), count_correct=int(len(predictions) == len(truth)),
+    tp = int(sum(iou >= threshold for _, _, iou in values))
+    result = dict(gt_count=len(truth), count_correct=int(len(predictions) == len(truth)),
                 mean_instance_iou=score / len(truth) if truth else 0.0,
                 instance_tp=tp, instance_precision=tp / len(predictions) if predictions else 0.0,
                 instance_recall=tp / len(truth) if truth else 0.0)
+    if return_matches:
+        result.update(matches=[None] * len(truth), ious=[0.0] * len(truth))
+        for gt_index, predicted_index, iou in values:
+            result["ious"][gt_index] = iou
+            if iou >= threshold:
+                result["matches"][gt_index] = predicted_index
+    return result
 
 
 def _legacy_instances(mask):
