@@ -1,0 +1,41 @@
+{
+  "mode": "instances",
+  "segmentation": {
+    "border_ratio": 0.04,
+    "threshold": 20.0,
+    "mad_multiplier": 3.0,
+    "sample_step": 4,
+    "l_weight": 0.5,
+    "fill_interior": false,
+    "fill_rows": true,
+    "closing_size": 5,
+    "fill_columns": true,
+    "min_component_ratio": 0.001,
+    "method": "color_distribution",
+    "color_sigma": 3.0,
+    "min_row_foreground": 0.0,
+    "min_col_foreground": 0.0,
+    "dark_mode": "robust",
+    "dark_percentile": 2.0,
+    "dark_margin": 40.0,
+    "dark_mad_multiplier": 3.0,
+    "dark_mad_floor": 10.0
+  },
+  "instances": {
+    "max_paintings": 2,
+    "min_fragment_area": 0.0002,
+    "min_area": 0.003,
+    "min_side": 0.03,
+    "min_aspect": 0.1,
+    "max_aspect": 10.0,
+    "min_fill": 0.1,
+    "group_gap": 0.05,
+    "group_overlap": 0.6,
+    "group_area_ratio": 0.8,
+    "group_solid_fill": 0.85,
+    "group_slenderness": 0.25,
+    "refinement": "hull",
+    "closing_ratio": 0.0,
+    "vertical_overlap": 0.5
+  }
+}
