@@ -1,0 +1,287 @@
+{
+  "config": {
+    "descriptor": "dct",
+    "params": {
+      "n_coeffs": 64,
+      "resize": 256,
+      "spatial": {
+        "mode": "grid",
+        "grids": [
+          4
+        ],
+        "level_weights": [
+          1.0
+        ]
+      }
+    }
+  },
+  "measure": "euclidean",
+  "segmentation": null,
+  "query_filter": {
+    "name": "none"
+  },
+  "crop_inset": 0.0,
+  "fusion": null,
+  "crop_strategy": "whole_image",
+  "format": "nested",
+  "requested_k": 10,
+  "effective_k": 10,
+  "db_dir": "C:\\Users\\bielb\\Documents\\MCV\\C1\\project\\Team8\\data\\BBDD",
+  "query_dir": "data\\qst1_w3",
+  "gt": null,
+  "gt_frames": null,
+  "match_iou": null,
+  "queries": [
+    {
+      "image": "00000.jpg",
+      "query_id": 0,
+      "paintings": 1
+    },
+    {
+      "image": "00001.jpg",
+      "query_id": 1,
+      "paintings": 1
+    },
+    {
+      "image": "00002.jpg",
+      "query_id": 2,
+      "paintings": 1
+    },
+    {
+      "image": "00003.jpg",
+      "query_id": 3,
+      "paintings": 1
+    },
+    {
+      "image": "00004.jpg",
+      "query_id": 4,
+      "paintings": 1
+    },
+    {
+      "image": "00005.jpg",
+      "query_id": 5,
+      "paintings": 1
+    },
+    {
+      "image": "00006.jpg",
+      "query_id": 6,
+      "paintings": 1
+    },
+    {
+      "image": "00007.jpg",
+      "query_id": 7,
+      "paintings": 1
+    },
+    {
+      "image": "00008.jpg",
+      "query_id": 8,
+      "paintings": 1
+    },
+    {
+      "image": "00009.jpg",
+      "query_id": 9,
+      "paintings": 1
+    },
+    {
+      "image": "00010.jpg",
+      "query_id": 10,
+      "paintings": 1
+    },
+    {
+      "image": "00011.jpg",
+      "query_id": 11,
+      "paintings": 1
+    },
+    {
+      "image": "00012.jpg",
+      "query_id": 12,
+      "paintings": 1
+    },
+    {
+      "image": "00013.jpg",
+      "query_id": 13,
+      "paintings": 1
+    },
+    {
+      "image": "00014.jpg",
+      "query_id": 14,
+      "paintings": 1
+    },
+    {
+      "image": "00015.jpg",
+      "query_id": 15,
+      "paintings": 1
+    },
+    {
+      "image": "00016.jpg",
+      "query_id": 16,
+      "paintings": 1
+    },
+    {
+      "image": "00017.jpg",
+      "query_id": 17,
+      "paintings": 1
+    },
+    {
+      "image": "00018.jpg",
+      "query_id": 18,
+      "paintings": 1
+    },
+    {
+      "image": "00019.jpg",
+      "query_id": 19,
+      "paintings": 1
+    },
+    {
+      "image": "00020.jpg",
+      "query_id": 20,
+      "paintings": 1
+    },
+    {
+      "image": "00021.jpg",
+      "query_id": 21,
+      "paintings": 1
+    },
+    {
+      "image": "00022.jpg",
+      "query_id": 22,
+      "paintings": 1
+    },
+    {
+      "image": "00023.jpg",
+      "query_id": 23,
+      "paintings": 1
+    },
+    {
+      "image": "00024.jpg",
+      "query_id": 24,
+      "paintings": 1
+    },
+    {
+      "image": "00025.jpg",
+      "query_id": 25,
+      "paintings": 1
+    },
+    {
+      "image": "00026.jpg",
+      "query_id": 26,
+      "paintings": 1
+    },
+    {
+      "image": "00027.jpg",
+      "query_id": 27,
+      "paintings": 1
+    },
+    {
+      "image": "00028.jpg",
+      "query_id": 28,
+      "paintings": 1
+    },
+    {
+      "image": "00029.jpg",
+      "query_id": 29,
+      "paintings": 1
+    },
+    {
+      "image": "00030.jpg",
+      "query_id": 30,
+      "paintings": 1
+    },
+    {
+      "image": "00031.jpg",
+      "query_id": 31,
+      "paintings": 1
+    },
+    {
+      "image": "00032.jpg",
+      "query_id": 32,
+      "paintings": 1
+    },
+    {
+      "image": "00033.jpg",
+      "query_id": 33,
+      "paintings": 1
+    },
+    {
+      "image": "00034.jpg",
+      "query_id": 34,
+      "paintings": 1
+    },
+    {
+      "image": "00035.jpg",
+      "query_id": 35,
+      "paintings": 1
+    },
+    {
+      "image": "00036.jpg",
+      "query_id": 36,
+      "paintings": 1
+    },
+    {
+      "image": "00037.jpg",
+      "query_id": 37,
+      "paintings": 1
+    },
+    {
+      "image": "00038.jpg",
+      "query_id": 38,
+      "paintings": 1
+    },
+    {
+      "image": "00039.jpg",
+      "query_id": 39,
+      "paintings": 1
+    },
+    {
+      "image": "00040.jpg",
+      "query_id": 40,
+      "paintings": 1
+    },
+    {
+      "image": "00041.jpg",
+      "query_id": 41,
+      "paintings": 1
+    },
+    {
+      "image": "00042.jpg",
+      "query_id": 42,
+      "paintings": 1
+    },
+    {
+      "image": "00043.jpg",
+      "query_id": 43,
+      "paintings": 1
+    },
+    {
+      "image": "00044.jpg",
+      "query_id": 44,
+      "paintings": 1
+    },
+    {
+      "image": "00045.jpg",
+      "query_id": 45,
+      "paintings": 1
+    },
+    {
+      "image": "00046.jpg",
+      "query_id": 46,
+      "paintings": 1
+    },
+    {
+      "image": "00047.jpg",
+      "query_id": 47,
+      "paintings": 1
+    },
+    {
+      "image": "00048.jpg",
+      "query_id": 48,
+      "paintings": 1
+    },
+    {
+      "image": "00049.jpg",
+      "query_id": 49,
+      "paintings": 1
+    }
+  ],
+  "failures": []
+}

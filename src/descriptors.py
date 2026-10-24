@@ -4,6 +4,7 @@ from pathlib import Path
 
 import cv2
 import numpy as np
+from functools import lru_cache
 from tqdm import tqdm
 
 from descriptor_config import JOINT_METHODS, descriptor_dim, hashed_tag, resolve_params
@@ -183,12 +184,37 @@ def _texture_gray(image, resize):
     return cv2.resize(gray, (resize, resize), interpolation=cv2.INTER_AREA)
 
 
-def lbp_descriptor(img_bgr, radius=1, points=8, resize=256):
-    """Rotation-invariant uniform circular LBP (P+2 bins), L1 normalised.
+LBP_MAPPINGS = ("riu2", "u2", "none")
 
-    Bilinear circular samples compare >= the centre. Uniform patterns have at
-    most two circular bit transitions; their bin is the number of set bits.
-    Other patterns share bin P+1. Exclude a radius-wide image boundary.
+
+def lbp_bins(points, mapping="riu2"):
+    """riu2: P+2 bins; u2: P(P-1)+3 bins; none: 2**P bins."""
+    return {"riu2": points + 2, "u2": points * (points - 1) + 3, "none": 2 ** points}[mapping]
+
+
+@lru_cache(maxsize=None)
+def _u2_lookup(points):
+    """Code -> bin: each uniform pattern (<= 2 circular transitions) its own bin, the rest one bin."""
+    lookup = np.full(2 ** points, points * (points - 1) + 2, dtype=np.int64)
+    index = 0
+    for code in range(2 ** points):
+        bits = [(code >> p) & 1 for p in range(points)]
+        if sum(bits[p] != bits[(p + 1) % points] for p in range(points)) <= 2:
+            lookup[code] = index
+            index += 1
+    return lookup
+
+
+def lbp_descriptor(img_bgr, radius=1, points=8, resize=256, mapping="riu2"):
+    """Circular LBP histogram, L1 normalised.
+
+    Bilinear circular samples compare >= the centre; a radius-wide image
+    boundary is excluded. mapping chooses the bins:
+    riu2 (default): rotation-invariant uniform, P+2 bins (bin = number of set
+        bits for uniform patterns, one shared bin otherwise). Discards the
+        orientation of edges.
+    u2: uniform, P(P-1)+3 bins (59 for P=8); keeps orientation.
+    none: every one of the 2**P codes (P <= 16).
     """
     gray = _texture_gray(img_bgr, resize).astype(np.float32)
     margin = int(np.ceil(radius))
@@ -203,16 +229,23 @@ def lbp_descriptor(img_bgr, radius=1, points=8, resize=256):
                            (yy - radius * np.sin(angle)).astype(np.float32), cv2.INTER_LINEAR)
         bits.append(sample >= centre)
     bits = np.stack(bits)
-    transitions = np.sum(bits != np.roll(bits, 1, axis=0), axis=0)
-    codes = np.where(transitions <= 2, bits.sum(axis=0), points + 1)
-    return _norm(np.bincount(codes.ravel(), minlength=points + 2))
+    if mapping == "riu2":
+        transitions = np.sum(bits != np.roll(bits, 1, axis=0), axis=0)
+        codes = np.where(transitions <= 2, bits.sum(axis=0), points + 1)
+    else:
+        codes = np.zeros(bits.shape[1:], dtype=np.int64)
+        for p in range(points):
+            codes |= bits[p].astype(np.int64) << p
+        if mapping == "u2":
+            codes = _u2_lookup(points)[codes]
+    return _norm(np.bincount(codes.ravel(), minlength=lbp_bins(points, mapping)))
 
 
-def multiscale_lbp_descriptor(img_bgr, radii=(1, 2, 3), points=(8, 16, 24), resize=256):
+def multiscale_lbp_descriptor(img_bgr, radii=(1, 2, 3), points=(8, 16, 24), resize=256, mapping="riu2"):
     """Concatenate equally weighted LBP histograms at paired radii/point counts."""
     if len(radii) != len(points) or not len(radii):
         raise ValueError("radii and points must have matching nonzero lengths")
-    return np.concatenate([lbp_descriptor(img_bgr, radius, count, resize)
+    return np.concatenate([lbp_descriptor(img_bgr, radius, count, resize, mapping)
                            for radius, count in zip(radii, points)]) / len(radii)
 
 
@@ -289,8 +322,8 @@ DEFAULTS = {"ycbcr": YCBCR_DEFAULTS, "hsv": HSV_DEFAULTS, "hsv_baseline": HSV_BA
             "lab_ab2d": dict(bins=(16, 16), include_l=True, l_bins=8, chroma_weight=0.7),
             "hsv_3d": dict(bins=(8, 8, 4)), "lab_3d": dict(bins=(4, 8, 8))}
 
-DEFAULTS.update(lbp=dict(radius=1, points=8, resize=256),
-                multiscale_lbp=dict(radii=(1, 2, 3), points=(8, 16, 24), resize=256),
+DEFAULTS.update(lbp=dict(radius=1, points=8, resize=256, mapping="riu2"),
+                multiscale_lbp=dict(radii=(1, 2, 3), points=(8, 16, 24), resize=256, mapping="riu2"),
                 dct=dict(n_coeffs=64, resize=256), wavelet=dict(levels=3, resize=256))
 
 

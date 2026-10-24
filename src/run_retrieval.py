@@ -74,6 +74,8 @@ def main(argv=None):
     ap.add_argument("--no-trim", action="store_true",
                     help="Keep the whole image instead of removing the background around the painting")
     ap.add_argument("--save-masks", type=Path, help="Write the query masks as <stem>.png")
+    ap.add_argument("--crop-inset", type=float, default=None,
+                    help="Shrink each detected box by this fraction per side (overrides the exported value)")
     ap.add_argument("--noise-filter", choices=FILTER_NAMES, default=None)
     ap.add_argument("--filter-ksize", type=int, default=argparse.SUPPRESS)
     ap.add_argument("--filter-sigma", type=float, default=argparse.SUPPRESS)
@@ -113,13 +115,20 @@ def main(argv=None):
         if measure is None:
             raise ValueError("Specify --measure or use an exported configuration with a measure")
         folder = args.query_dir if args.query_dir is not None else query_folder(args.query_set)
-        saved_filter = None
+        saved_filter, crop_inset, fusion = None, 0.0, None
         if args.config:
             with args.config.open(encoding="utf-8") as stream:
                 provenance = json.load(stream).get("provenance", {})
             if not isinstance(provenance, dict):
                 raise ValueError("Exported provenance must be a dictionary")
             saved_filter = provenance.get("query_filter")
+            # Written by search_multi.py: replay crop inset and colour/texture fusion.
+            crop_inset = float(provenance.get("crop_inset") or 0.0)
+            fusion = provenance.get("fusion")
+        if args.crop_inset is not None:
+            crop_inset = args.crop_inset
+        if (crop_inset or fusion) and not args.multi_painting:
+            raise ValueError("Crop inset and fusion apply only to --multi-painting retrieval")
         filter_config = query_filter_from_args(args, saved_filter)
         query_preprocess = query_preprocessor(filter_config)
         if query_preprocess is not None and args.remove_background:
@@ -167,7 +176,8 @@ def main(argv=None):
             q_ids, results = retrieve_multi_config(
                 config, measure, segmentation, args.db_dir, folder, args.cache_dir, args.k,
                 allow_truncate=args.allow_truncate, query_filter=filter_config,
-                diagnostics=records, on_segmented=observe_segmentation)
+                diagnostics=records, on_segmented=observe_segmentation,
+                crop_inset=crop_inset, fusion=fusion)
             print("Detected paintings: " + ", ".join(f"{r['image']}={r['detected']}" for r in records))
             for record in records:
                 if record["failure"]:
@@ -219,6 +229,7 @@ def main(argv=None):
         print(f"Query noise filter: {filter_config['name']}")
         print(f"First 3 results: {results[:3]}")
         manifest = dict(config=config, measure=measure, segmentation=segmentation, query_filter=filter_config,
+                        crop_inset=crop_inset, fusion=fusion,
                         crop_strategy="original_rectangular_bbox" if args.multi_painting else
                                       "legacy_foreground_mask" if args.remove_background else "whole_image",
                         format="nested" if nested else "flat", requested_k=args.k, effective_k=effective_k,

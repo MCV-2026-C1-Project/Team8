@@ -35,6 +35,9 @@ def retrieve(query_desc, db_desc, db_ids, measure_name, k, channel_sizes=None, *
     K must be a positive integer no larger than N. Explicit allow_truncate=True
     permits K > N and returns all N IDs; it never permits an empty database.
     Returns a list of Q lists of k plain Python ints (BBDD IDs), most similar first.
+    All-zero database descriptors (e.g. DCT/wavelet of the flat BBDD image 1)
+    carry no information but sit at distance 1 from every unit-norm block, so
+    they are ranked last instead of matching every query.
     """
     k = positive_int(k, "k")
     if not isinstance(allow_truncate, bool):
@@ -55,11 +58,61 @@ def retrieve(query_desc, db_desc, db_ids, measure_name, k, channel_sizes=None, *
     if measure_name not in MEASURES:
         raise ValueError(f"Unknown measure {measure_name!r}")
     k = min(k, len(db_desc))
+    degenerate = ~np.any(db_desc != 0, axis=1)
     results = []
     for q in query_desc:
-        rows = rank(q, db_desc, measure_name, channel_sizes)[:k]  # row indices, best first
+        rows = rank(q, db_desc, measure_name, channel_sizes)  # row indices, best first
+        if degenerate.any():
+            rows = np.concatenate([rows[~degenerate[rows]], rows[degenerate[rows]]])
+        rows = rows[:k]
         results.append([int(i) for i in db_ids[rows]])   # rows -> image IDs, np.int64 -> int
     return results
+
+
+def distance_matrix(query_desc, db_desc, measure_name, channel_sizes=None):
+    """(Q, N) scores where lower = more similar (similarity measures are negated)."""
+    func, higher_is_better = MEASURES[measure_name]
+    rows = [func(q, db_desc, channel_sizes) if measure_name == "wasserstein" else func(q, db_desc)
+            for q in np.asarray(query_desc)]
+    rows = np.asarray(rows, dtype=np.float64).reshape(len(query_desc), len(db_desc))
+    return -rows if higher_is_better else rows
+
+
+def fuse_distances(parts):
+    """Late fusion: weighted sum of per-query z-normalised distance rows.
+
+    parts: [(distance matrix, weight), ...]; z-normalising each row puts
+    descriptors with different scales and measures on a comparable footing.
+    """
+    fused = 0.0
+    for distance, weight in parts:
+        mean = distance.mean(axis=1, keepdims=True)
+        std = np.maximum(distance.std(axis=1, keepdims=True), 1e-12)
+        fused = fused + weight * (distance - mean) / std
+    return fused
+
+
+def rank_distances(distance, db_ids, k, degenerate=None):
+    """Top-k IDs per row of a (Q, N) distance matrix, ranked as retrieve() does:
+    stable ascending order, with degenerate (all-zero) database rows last."""
+    db_ids = np.asarray(db_ids)
+    degenerate = np.zeros(len(db_ids), bool) if degenerate is None else np.asarray(degenerate, bool)
+    results = []
+    for row in distance:
+        order = np.argsort(row, kind="stable")
+        order = np.concatenate([order[~degenerate[order]], order[degenerate[order]]])[:k]
+        results.append([int(i) for i in db_ids[order]])
+    return results
+
+
+def inset_box(bbox, inset):
+    """Shrink (x, y, right, bottom) by `inset` of its width/height on every side,
+    dropping the frame and wall that a rectangular detection box includes."""
+    if not 0 <= inset < 0.5:
+        raise ValueError("crop inset must lie in [0, 0.5)")
+    x, y, right, bottom = bbox
+    dx, dy = int(round(inset * (right - x))), int(round(inset * (bottom - y)))
+    return x + dx, y + dy, right - dx, bottom - dy
 
 
 def _cache_metadata(method, params):
@@ -254,7 +307,8 @@ def validate_gt_order(q_ids, gt):
 
 def retrieve_multi_config(config, measure, segmentation_config, db_dir=BBDD_DIR,
                           query_dir=DATA_DIR / "qsd1_w1", desc_dir=DESC_DIR, k=10, *,
-                          allow_truncate=False, query_filter=None, diagnostics=None, on_segmented=None):
+                          allow_truncate=False, query_filter=None, diagnostics=None, on_segmented=None,
+                          crop_inset=0.0, fusion=None):
     """Detect once, describe original rectangular crops, rank once, regroup.
 
     Returns (query IDs, photo -> painting -> Top-K IDs). Empty detections retain
@@ -262,6 +316,9 @@ def retrieve_multi_config(config, measure, segmentation_config, db_dir=BBDD_DIR,
     decisions and rankings. on_segmented(path, union_mask, paintings) observes
     the already-computed segmentation for saving/evaluation; its return is unused.
     No GT enters this function. Crop descriptors are never cached.
+    crop_inset shrinks each box (see inset_box) before description.
+    fusion=dict(config, measure, weight) adds a second descriptor: rankings use
+    weight * z(main distances) + (1 - weight) * z(fusion distances).
     """
     config = resolve_descriptor_config(config)
     segmentation_config = resolve_detection_config(segmentation_config)
@@ -273,6 +330,18 @@ def retrieve_multi_config(config, measure, segmentation_config, db_dir=BBDD_DIR,
     if not paths:
         raise ValueError(f"No JPEG images found in {query_dir}")
     db_ids, db_desc = load_or_compute(None, db_dir, method, params, desc_dir)
+    second = None
+    if fusion is not None:
+        weight = float(fusion["weight"])
+        if not 0 <= weight <= 1:
+            raise ValueError("fusion weight must lie in [0, 1]")
+        second_config = resolve_descriptor_config(fusion["config"])
+        second_method, second_params = second_config["descriptor"], second_config["params"]
+        second_channels = measure_channels(second_method, second_params, fusion["measure"])
+        second_ids, second_db = load_or_compute(None, db_dir, second_method, second_params, desc_dir)
+        if np.asarray(second_ids).tolist() != np.asarray(db_ids).tolist():
+            raise ValueError("Fused descriptors must cover the same database images")
+        second = dict(method=second_method, params=second_params, db=second_db, descriptors=[])
     noise_records = [] if diagnostics is not None else None
     preprocess = query_preprocessor(policy, diagnostics=noise_records)
     descriptors, counts, records = [], [], []
@@ -286,8 +355,13 @@ def retrieve_multi_config(config, measure, segmentation_config, db_dir=BBDD_DIR,
             x, y, right, bottom = painting.bbox
             if painting.order != index or not (0 <= x < right <= image.shape[1] and 0 <= y < bottom <= image.shape[0]):
                 raise ValueError(f"Invalid painting order or bounding box for {path.name}")
+            x, y, right, bottom = inset_box(painting.bbox, crop_inset)
             crop = image[y:bottom, x:right]  # Original pixels, without black mask boundaries.
-            descriptors.append(compute_descriptor(crop, method, preprocess=preprocess, **params))
+            # Filter once, so fused descriptors see the same image and noise records stay aligned.
+            crop = crop if preprocess is None else preprocess(crop)
+            descriptors.append(compute_descriptor(crop, method, **params))
+            if second is not None:
+                second["descriptors"].append(compute_descriptor(crop, second["method"], **second["params"]))
             item = dict(order=index, bbox=[int(v) for v in painting.bbox])
             if diagnostics is not None:
                 item["noise"] = (noise_records[-1] if preprocess is not None else
@@ -298,7 +372,20 @@ def retrieve_multi_config(config, measure, segmentation_config, db_dir=BBDD_DIR,
         records.append(record)
     matrix = (np.stack(descriptors).astype(np.float32) if descriptors else
               np.empty((0, descriptor_dim(method, **params)), np.float32))
-    flat = retrieve(matrix, db_desc, db_ids, measure, k, channels, allow_truncate=allow_truncate)
+    if second is None:
+        flat = retrieve(matrix, db_desc, db_ids, measure, k, channels, allow_truncate=allow_truncate)
+    else:
+        if k > len(db_ids) and not allow_truncate:
+            raise ValueError(f"k={k} exceeds database size {len(db_ids)}")
+        degenerate = ~np.any(db_desc != 0, axis=1) | ~np.any(second["db"] != 0, axis=1)
+        if len(matrix):
+            second_matrix = np.stack(second["descriptors"]).astype(np.float32)
+            fused = fuse_distances([(distance_matrix(matrix, db_desc, measure, channels), weight),
+                                    (distance_matrix(second_matrix, second["db"], fusion["measure"],
+                                                     second_channels), 1 - weight)])
+            flat = rank_distances(fused, db_ids, min(k, len(db_ids)), degenerate)
+        else:
+            flat = []
     results, offset = [], 0
     for record, count in zip(records, counts):
         rankings = flat[offset:offset + count]

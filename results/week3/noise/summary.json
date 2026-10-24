@@ -1,0 +1,23 @@
+{
+  "detection": {
+    "qsd1_w3": {
+      "noisy": 7,
+      "detected": 7,
+      "false_alarms": 0,
+      "clean": 23,
+      "max_clean": 4.055104732513428,
+      "min_noisy": 7.5488481521606445
+    },
+    "qsd2_w3": {
+      "noisy": 9,
+      "detected": 9,
+      "false_alarms": 0,
+      "clean": 21,
+      "max_clean": 1.7876570224761963,
+      "min_noisy": 7.605828285217285
+    }
+  },
+  "example_query": "00005",
+  "mean_changed_pixels": 0.05567620603569077,
+  "zoom_query": "00016"
+}

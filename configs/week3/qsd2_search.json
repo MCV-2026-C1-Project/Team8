@@ -1,0 +1,29 @@
+{
+  "id": "qsd2_w3_multi_painting_search",
+  "query_dir": "data/qsd2_w3",
+  "gt_frames": "data/qsd2_w3/frames.pkl",
+  "segmentation": "configs/week3/task3_selected.json",
+  "sanity_dir": "data/qsd1_w3",
+  "insets": [0.0, 0.03, 0.06],
+  "query_filters": [
+    {"name": "none"},
+    {"name": "median", "ksize": 3, "noise_threshold": 5.0}
+  ],
+  "fusion": {"top_texture": 3, "top_colour": 1, "weights": [0.25, 0.5, 0.75]},
+  "experiments": [
+    {"id": "dct", "descriptor": "dct", "grid": {"n_coeffs": [16, 32, 64, 128]},
+     "spatial": [{"mode": "grid", "grids": [2]}, {"mode": "grid", "grids": [4]},
+                 {"mode": "grid", "grids": [6]}, {"mode": "grid", "grids": [8]}],
+     "measures": ["euclidean", "l1"]},
+    {"id": "wavelet", "descriptor": "wavelet", "params": {"levels": 3},
+     "spatial": [{"mode": "grid", "grids": [4]}], "measures": ["euclidean", "l1"]},
+    {"id": "lbp", "descriptor": "lbp", "grid": {"radius": [1, 2], "points": [8, 16]},
+     "spatial": [{"mode": "grid", "grids": [4]}], "measures": ["l1", "euclidean"]},
+    {"id": "multiscale_lbp", "descriptor": "multiscale_lbp",
+     "spatial": [{"mode": "grid", "grids": [4]}], "measures": ["l1", "euclidean"]},
+    {"id": "week2_lab", "descriptor": "lab", "params": {"bins": [8, 64, 64]},
+     "spatial": [{"mode": "grid", "grids": [5]}], "measures": ["l1"]},
+    {"id": "lab_3d", "descriptor": "lab_3d", "params": {"bins": [4, 8, 8]},
+     "spatial": [{"mode": "grid", "grids": [4]}], "measures": ["l1", "hellinger"]}
+  ]
+}

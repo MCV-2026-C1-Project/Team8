@@ -55,6 +55,14 @@ def resolve_params(method, supplied):
                 positive_int(count, "points")
             if method == "multiscale_lbp":
                 params["radii"], params["points"] = list(radii), list(points)
+            from descriptors import LBP_MAPPINGS
+            if params.get("mapping", "riu2") not in LBP_MAPPINGS:
+                raise ValueError(f"LBP mapping must be one of {LBP_MAPPINGS}")
+            if params.get("mapping") == "none" and max(points) > 16:
+                raise ValueError("LBP mapping none supports at most 16 points")
+            if params.get("mapping", "riu2") == "riu2":
+                # Omit the default so earlier LBP tags and caches stay valid.
+                params.pop("mapping", None)
         elif method == "dct":
             params["n_coeffs"] = positive_int(params["n_coeffs"], "n_coeffs")
             if size % 2 or params["n_coeffs"] >= size**2:
@@ -129,9 +137,11 @@ def resolve_descriptor_config(config):
 def descriptor_dim(method, **params):
     p = resolve_params(method, params)
     if method == "lbp":
-        size = p["points"] + 2
+        from descriptors import lbp_bins
+        size = lbp_bins(p["points"], p.get("mapping", "riu2"))
     elif method == "multiscale_lbp":
-        size = sum(count + 2 for count in p["points"])
+        from descriptors import lbp_bins
+        size = sum(lbp_bins(count, p.get("mapping", "riu2")) for count in p["points"])
     elif method == "dct":
         size = p["n_coeffs"]
     elif method == "wavelet":
