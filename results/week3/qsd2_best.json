@@ -1,0 +1,59 @@
+{
+  "config": {
+    "descriptor": "dct",
+    "params": {
+      "n_coeffs": 32,
+      "resize": 256,
+      "spatial": {
+        "grids": [
+          2
+        ],
+        "level_weights": [
+          1.0
+        ],
+        "mode": "grid"
+      }
+    }
+  },
+  "measure": "l1",
+  "select_by": "qsd2_map1",
+  "development_metrics": {
+    "qsd2_map1": 0.9487179487179487,
+    "qsd2_map5": 0.9487179487179487,
+    "qsd1_map1": 0.9666666666666667,
+    "qsd1_map5": 0.9666666666666667
+  },
+  "provenance": {
+    "source": "C:\\Users\\bielb\\Documents\\MCV\\C1\\project\\Team8\\configs\\week3\\qsd2_search.json",
+    "query_filter": {
+      "name": "median",
+      "ksize": 3,
+      "noise_threshold": 6.0
+    },
+    "crop_inset": 0.03,
+    "fusion": {
+      "config": {
+        "descriptor": "lab",
+        "params": {
+          "bins": [
+            8,
+            64,
+            64
+          ],
+          "spatial": {
+            "grids": [
+              5
+            ],
+            "level_weights": [
+              1.0
+            ],
+            "mode": "grid"
+          }
+        }
+      },
+      "measure": "l1",
+      "weight": 0.5
+    },
+    "query_filter_note": "Task 1 selective median; ties the unfiltered model on QSD2-W3/QSD1-W3, kept for a single Task 1-4 pipeline"
+  }
+}

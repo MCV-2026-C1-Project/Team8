@@ -1,5 +1,35 @@
 import cv2
 import numpy as np
+from numbers import Real
+
+
+def dark_foreground_cutoff(lightness, mode="legacy", percentile=2.0, margin=30.0,
+                           mad_multiplier=3.0, mad_floor=10.0):
+    """Lower wall-lightness bound in OpenCV Lab units (0..255).
+
+    legacy reproduces percentile 2 minus 30 exactly. percentile uses the full
+    border sample. robust first excludes extreme low outliers relative to the
+    median/MAD, then takes the requested percentile. This assumes the wall
+    dominates border samples; it cannot distinguish all wall shadows from art.
+    The margin tolerates ordinary shadows; off disables the extra criterion.
+    """
+    if mode not in {"legacy", "percentile", "robust", "off"}:
+        raise ValueError("dark_mode must be legacy, percentile, robust or off")
+    for name, value, upper in (("dark_percentile", percentile, 100),
+                               ("dark_margin", margin, 255),
+                               ("dark_mad_multiplier", mad_multiplier, np.inf),
+                               ("dark_mad_floor", mad_floor, 255)):
+        if isinstance(value, bool) or not isinstance(value, Real) or not np.isfinite(value) or not 0 <= value <= upper:
+            raise ValueError(f"{name} must be finite and in [0, {upper}]")
+    if mode == "off":
+        return 0.0
+    if mode == "legacy":
+        return max(0.0, np.percentile(lightness, 2) - 30.0)
+    if mode == "robust":
+        median = np.median(lightness)
+        scale = 1.4826 * np.median(np.abs(lightness - median))
+        lightness = lightness[lightness >= median - max(mad_floor, mad_multiplier * scale)]
+    return max(0.0, np.percentile(lightness, percentile) - margin)
 
 
 def suppress_sparse_lines(mask, min_row_foreground=0.5, min_col_foreground=0.5):
@@ -94,6 +124,11 @@ def foreground_mask(
     color_sigma=5.5,
     min_row_foreground=0.5,
     min_col_foreground=0.5,
+    dark_mode="legacy",
+    dark_percentile=2.0,
+    dark_margin=30.0,
+    dark_mad_multiplier=3.0,
+    dark_mad_floor=10.0,
 ):
     """
     Estimate a smoothly varying wall color from image borders.
@@ -117,7 +152,12 @@ def foreground_mask(
         color_distribution uses brightness-conditioned wall colours;
         quadratic retains the spatial baseline.
     color_sigma : float
-        Mahalanobis tolerance for color_distribution (default 3).
+        Mahalanobis tolerance for color_distribution (default 5.5).
+    dark_mode : str
+        legacy keeps the original darkness safeguard; robust and percentile
+        enable configurable dark_percentile/dark_margin (Lab 0..255 units).
+        robust uses dark_mad_multiplier/dark_mad_floor to reject low border
+        outliers before estimating wall lightness. off disables the safeguard.
     fill_columns : bool
         Also fill vertical spans within each connected foreground component.
     min_component_ratio : float
@@ -145,7 +185,10 @@ def foreground_mask(
     if method not in {"quadratic", "color_distribution"}:
         raise ValueError("Unknown method.")
     if method == "color_distribution":
-        mask = _color_distribution_mask(image, border_ratio, sample_step, color_sigma)
+        mask = _color_distribution_mask(
+            image, border_ratio, sample_step, color_sigma, dark_mode=dark_mode,
+            dark_percentile=dark_percentile, dark_margin=dark_margin,
+            dark_mad_multiplier=dark_mad_multiplier, dark_mad_floor=dark_mad_floor)
         if fill_interior:
             mask = fill_painting_interior(mask, closing_size, fill_rows,
                                          fill_columns, min_component_ratio)
@@ -287,6 +330,11 @@ def _distribution_model(
     fill_holes=False,
     color_sigma=3.0,
     closing_size=5,
+    dark_mode="legacy",
+    dark_percentile=2.0,
+    dark_margin=30.0,
+    dark_mad_multiplier=3.0,
+    dark_mad_floor=10.0,
 ):
     """
     Segment using only a background colour model and colour-mask connectivity.
@@ -422,7 +470,8 @@ def _distribution_model(
             adaptive_threshold = color_sigma
             # Ignoring brightness entirely confuses dark neutral paintings
             # with pale neutral walls. Allow shadows, but reject extreme darks.
-            lower = max(0.0, np.percentile(colors[:, 0], 2) - 30.0)
+            lower = dark_foreground_cutoff(colors[:, 0], dark_mode, dark_percentile,
+                                            dark_margin, dark_mad_multiplier, dark_mad_floor)
             distance[lab[:, :, 0] < lower] = np.inf
     else:
         # Only the legacy quadratic model needs a spatial design matrix.
@@ -541,9 +590,9 @@ def _distribution_model(
     return mask
 
 
-def _color_distribution_mask(image, border_ratio, sample_step, color_sigma):
+def _color_distribution_mask(image, border_ratio, sample_step, color_sigma, **dark_options):
     return _distribution_model(
         image, method="color_distribution", border_ratio=border_ratio,
         sample_step=sample_step, color_sigma=color_sigma, opening_size=0,
-        closing_size=0, min_foreground_ratio=0, fill_holes=False
+        closing_size=0, min_foreground_ratio=0, fill_holes=False, **dark_options
     )

@@ -14,3 +14,12 @@ results/background_masks_sweep/**/masks/
 results/week2/background
 results/week2/background_search
 results/week2/QSD2
+results/week3/visual_gaussian
+results/week3/visual_median
+results/week3/task3*/
+results/week3/task4*/
+pdfs/
+tests/
+results/week3/QST2
+results/week3/qsd2_evaluation
+results/week3/QST1

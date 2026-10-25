@@ -10,11 +10,14 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 
-from descriptors import compute_descriptor, compute_folder, full_params, method_tag, list_images, load_image
+from descriptors import (DESCRIPTOR_PROPERTIES, compute_descriptor, compute_folder,
+                         full_params, method_tag, list_images, load_image)
 from descriptor_config import descriptor_dim, canonical_json, measure_channels, resolve_descriptor_config, positive_int
 from distances import MEASURES, rank
-from metrics import normalize_gt
+from metrics import normalize_gt, validate_predictions
 from remove_background import foreground_mask
+from painting_detection import detect_paintings, resolve_detection_config
+from filter_noise import query_preprocessor, resolve_filter_config
 
 ROOT = Path(__file__).resolve().parent.parent
 DESC_DIR = ROOT / "descriptors"
@@ -32,6 +35,9 @@ def retrieve(query_desc, db_desc, db_ids, measure_name, k, channel_sizes=None, *
     K must be a positive integer no larger than N. Explicit allow_truncate=True
     permits K > N and returns all N IDs; it never permits an empty database.
     Returns a list of Q lists of k plain Python ints (BBDD IDs), most similar first.
+    All-zero database descriptors (e.g. DCT/wavelet of the flat BBDD image 1)
+    carry no information but sit at distance 1 from every unit-norm block, so
+    they are ranked last instead of matching every query.
     """
     k = positive_int(k, "k")
     if not isinstance(allow_truncate, bool):
@@ -52,11 +58,61 @@ def retrieve(query_desc, db_desc, db_ids, measure_name, k, channel_sizes=None, *
     if measure_name not in MEASURES:
         raise ValueError(f"Unknown measure {measure_name!r}")
     k = min(k, len(db_desc))
+    degenerate = ~np.any(db_desc != 0, axis=1)
     results = []
     for q in query_desc:
-        rows = rank(q, db_desc, measure_name, channel_sizes)[:k]  # row indices, best first
+        rows = rank(q, db_desc, measure_name, channel_sizes)  # row indices, best first
+        if degenerate.any():
+            rows = np.concatenate([rows[~degenerate[rows]], rows[degenerate[rows]]])
+        rows = rows[:k]
         results.append([int(i) for i in db_ids[rows]])   # rows -> image IDs, np.int64 -> int
     return results
+
+
+def distance_matrix(query_desc, db_desc, measure_name, channel_sizes=None):
+    """(Q, N) scores where lower = more similar (similarity measures are negated)."""
+    func, higher_is_better = MEASURES[measure_name]
+    rows = [func(q, db_desc, channel_sizes) if measure_name == "wasserstein" else func(q, db_desc)
+            for q in np.asarray(query_desc)]
+    rows = np.asarray(rows, dtype=np.float64).reshape(len(query_desc), len(db_desc))
+    return -rows if higher_is_better else rows
+
+
+def fuse_distances(parts):
+    """Late fusion: weighted sum of per-query z-normalised distance rows.
+
+    parts: [(distance matrix, weight), ...]; z-normalising each row puts
+    descriptors with different scales and measures on a comparable footing.
+    """
+    fused = 0.0
+    for distance, weight in parts:
+        mean = distance.mean(axis=1, keepdims=True)
+        std = np.maximum(distance.std(axis=1, keepdims=True), 1e-12)
+        fused = fused + weight * (distance - mean) / std
+    return fused
+
+
+def rank_distances(distance, db_ids, k, degenerate=None):
+    """Top-k IDs per row of a (Q, N) distance matrix, ranked as retrieve() does:
+    stable ascending order, with degenerate (all-zero) database rows last."""
+    db_ids = np.asarray(db_ids)
+    degenerate = np.zeros(len(db_ids), bool) if degenerate is None else np.asarray(degenerate, bool)
+    results = []
+    for row in distance:
+        order = np.argsort(row, kind="stable")
+        order = np.concatenate([order[~degenerate[order]], order[degenerate[order]]])[:k]
+        results.append([int(i) for i in db_ids[order]])
+    return results
+
+
+def inset_box(bbox, inset):
+    """Shrink (x, y, right, bottom) by `inset` of its width/height on every side,
+    dropping the frame and wall that a rectangular detection box includes."""
+    if not 0 <= inset < 0.5:
+        raise ValueError("crop inset must lie in [0, 0.5)")
+    x, y, right, bottom = bbox
+    dx, dy = int(round(inset * (right - x))), int(round(inset * (bottom - y)))
+    return x + dx, y + dy, right - dx, bottom - dy
 
 
 def _cache_metadata(method, params):
@@ -85,6 +141,20 @@ def save_descriptor_cache(path, ids, desc, method, params, folder=None):
              **_cache_metadata(method, params))
 
 
+def descriptor_cache_path(name, folder, method, params, desc_dir=DESC_DIR):
+    """Shared source-aware filename; None selects the full folder name as prefix.
+
+    Resolve relative paths and symlinks before hashing. The namespace depends on
+    location, not file timestamps: changed images invalidate the same cache via
+    source_identity rather than leaving a new cache behind on every edit.
+    Explicit names remain supported, but never replace the source namespace.
+    """
+    folder = Path(folder).resolve()
+    digest = hashlib.sha256(str(folder).encode()).hexdigest()[:24]
+    name = name or folder.name.lower() or "images"
+    return Path(desc_dir) / f"{name}_{digest}_{method_tag(method, **params)}.npz"
+
+
 def load_or_compute(name, folder, method, params, desc_dir=DESC_DIR):
     """Reuse only canonical caches with matching metadata and valid array shapes.
 
@@ -94,7 +164,7 @@ def load_or_compute(name, folder, method, params, desc_dir=DESC_DIR):
     params = full_params(method, **params)
     expected = _cache_metadata(method, params)
     source = source_identity(folder)
-    path = Path(desc_dir) / f"{name}_{expected['tag']}.npz"
+    path = descriptor_cache_path(name, folder, method, params, desc_dir)
     if path.exists():
         try:
             with np.load(path, allow_pickle=False) as d:
@@ -108,7 +178,9 @@ def load_or_compute(name, folder, method, params, desc_dir=DESC_DIR):
                         desc.shape != (len(ids), descriptor_dim(method, **params)) or
                         not np.issubdtype(ids.dtype, np.integer) or
                         ids.tolist() != list_images(folder)[1] or
-                        np.any(desc < 0) or
+                        not np.issubdtype(desc.dtype, np.number) or
+                        np.issubdtype(desc.dtype, np.complexfloating) or
+                        (DESCRIPTOR_PROPERTIES[method]["nonnegative"] and np.any(desc < 0)) or
                         not np.isfinite(desc).all()):
                     raise ValueError("invalid descriptor arrays")
                 return ids, desc
@@ -143,13 +215,34 @@ def query_folder(query_set):
     return p
 
 
-def load_configured_data(config, db_dir=BBDD_DIR, query_dir=DATA_DIR / "qsd1_w1", desc_dir=DESC_DIR):
-    """Shared extraction/cache path for experiments and final retrieval."""
+def load_configured_data(config, db_dir=BBDD_DIR, query_dir=DATA_DIR / "qsd1_w1", desc_dir=DESC_DIR,
+                         *, query_preprocess=None, masks=None, trim="block"):
+    """Shared extraction/cache path for experiments and final retrieval.
+
+    query_preprocess maps one BGR image to one BGR image before extraction.
+    Only original, unmasked images have persistent descriptor caches: arbitrary
+    callables and masks have no stable cache identity. Database caches are always
+    retained, and query IDs follow the original sorted filenames.
+    """
     config = resolve_descriptor_config(config)
+    if query_preprocess is not None:
+        if not callable(query_preprocess):
+            raise ValueError("query_preprocess must be callable or None")
+        if masks is not None:
+            raise ValueError("Query preprocessing cannot be combined with foreground masks")
     method, params = config["descriptor"], config["params"]
-    db_ids, db_desc = load_or_compute("bbdd", db_dir, method, params, desc_dir)
-    q_ids, q_desc = load_or_compute(Path(query_dir).name.split("_")[0].lower(),
-                                   query_dir, method, params, desc_dir)
+    db_ids, db_desc = load_or_compute(None, db_dir, method, params, desc_dir)
+    if masks is not None:
+        q_ids, images, query_mask_list = masks
+        q_ids = np.asarray(q_ids)
+        if (q_ids.ndim != 1 or not np.issubdtype(q_ids.dtype, np.integer) or
+                len(q_ids) != len(images) or q_ids.tolist() != list_images(query_dir)[1]):
+            raise ValueError("Masked query IDs must match images in sorted query-file order")
+        q_desc = compute_masked_queries(config, images, query_mask_list, trim)
+    elif query_preprocess is not None:
+        q_ids, q_desc = compute_folder(query_dir, method, preprocess=query_preprocess, **params)
+    else:
+        q_ids, q_desc = load_or_compute(None, query_dir, method, params, desc_dir)
     return db_ids, db_desc, q_ids, q_desc
 
 
@@ -184,23 +277,26 @@ def query_masks(folder, mask_source="pred"):
 def compute_masked_queries(config, images, masks, trim="block"):
     """Foreground-only query descriptors. Not cached: the cache tag ignores masks."""
     config = resolve_descriptor_config(config)
+    if not len(images) or len(images) != len(masks):
+        raise ValueError("Provide one foreground mask per query image")
     desc = [compute_descriptor(image, config["descriptor"], mask=mask, trim=trim, **config["params"])
             for image, mask in zip(images, masks)]
     return np.stack(desc).astype(np.float32)
 
 
 def retrieve_config(config, measure, db_dir=BBDD_DIR, query_dir=DATA_DIR / "qsd1_w1",
-                    desc_dir=DESC_DIR, k=10, *, allow_truncate=False, masks=None, trim="block"):
-    """masks=(query ids, images, masks) computes foreground-only query descriptors."""
+                    desc_dir=DESC_DIR, k=10, *, allow_truncate=False, masks=None, trim="block",
+                    query_preprocess=None):
+    """Rank original, preprocessed or masked queries using the shared loader.
+
+    masks=(query ids, images, masks) computes foreground-only query descriptors.
+    query_preprocess accepts the same image callable as compute_descriptor.
+    """
     config = resolve_descriptor_config(config)
     channels = measure_channels(config["descriptor"], config["params"], measure)
     k = positive_int(k, "k")
-    if masks is None:
-        db_ids, db_desc, q_ids, q_desc = load_configured_data(config, db_dir, query_dir, desc_dir)
-    else:
-        db_ids, db_desc = load_or_compute("bbdd", db_dir, config["descriptor"], config["params"], desc_dir)
-        q_ids, images, query_masks_ = masks
-        q_desc = compute_masked_queries(config, images, query_masks_, trim)
+    db_ids, db_desc, q_ids, q_desc = load_configured_data(
+        config, db_dir, query_dir, desc_dir, query_preprocess=query_preprocess, masks=masks, trim=trim)
     return q_ids, retrieve(q_desc, db_desc, db_ids, measure, k, channels, allow_truncate=allow_truncate)
 
 
@@ -209,8 +305,119 @@ def validate_gt_order(q_ids, gt):
         raise ValueError("Query IDs must follow ground-truth order (0, 1, ...) with one GT entry per image")
 
 
-def save_results(path, results):
+def retrieve_multi_config(config, measure, segmentation_config, db_dir=BBDD_DIR,
+                          query_dir=DATA_DIR / "qsd1_w1", desc_dir=DESC_DIR, k=10, *,
+                          allow_truncate=False, query_filter=None, diagnostics=None, on_segmented=None,
+                          crop_inset=0.0, fusion=None):
+    """Detect once, describe original rectangular crops, rank once, regroup.
+
+    Returns (query IDs, photo -> painting -> Top-K IDs). Empty detections retain
+    an empty photo entry. diagnostics receives per-photo boxes, failures, noise
+    decisions and rankings. on_segmented(path, union_mask, paintings) observes
+    the already-computed segmentation for saving/evaluation; its return is unused.
+    No GT enters this function. Crop descriptors are never cached.
+    crop_inset shrinks each box (see inset_box) before description.
+    fusion=dict(config, measure, weight) adds a second descriptor: rankings use
+    weight * z(main distances) + (1 - weight) * z(fusion distances).
+    """
+    config = resolve_descriptor_config(config)
+    segmentation_config = resolve_detection_config(segmentation_config)
+    policy = resolve_filter_config(query_filter)
+    method, params = config["descriptor"], config["params"]
+    channels = measure_channels(method, params, measure)
+    k = positive_int(k, "k")
+    paths, ids = list_images(query_dir)
+    if not paths:
+        raise ValueError(f"No JPEG images found in {query_dir}")
+    db_ids, db_desc = load_or_compute(None, db_dir, method, params, desc_dir)
+    second = None
+    if fusion is not None:
+        weight = float(fusion["weight"])
+        if not 0 <= weight <= 1:
+            raise ValueError("fusion weight must lie in [0, 1]")
+        second_config = resolve_descriptor_config(fusion["config"])
+        second_method, second_params = second_config["descriptor"], second_config["params"]
+        second_channels = measure_channels(second_method, second_params, fusion["measure"])
+        second_ids, second_db = load_or_compute(None, db_dir, second_method, second_params, desc_dir)
+        if np.asarray(second_ids).tolist() != np.asarray(db_ids).tolist():
+            raise ValueError("Fused descriptors must cover the same database images")
+        second = dict(method=second_method, params=second_params, db=second_db, descriptors=[])
+    noise_records = [] if diagnostics is not None else None
+    preprocess = query_preprocessor(policy, diagnostics=noise_records)
+    descriptors, counts, records = [], [], []
+    for path, query_id in tqdm(list(zip(paths, ids)), desc="Painting crops"):
+        image = load_image(path)
+        mask, paintings = detect_paintings(image, segmentation_config)
+        record = dict(image=path.name, query_id=int(query_id), shape=list(image.shape[:2]),
+                      detected=len(paintings), failure=None if paintings else "no_paintings_detected", paintings=[])
+        counts.append(len(paintings))
+        for index, painting in enumerate(paintings):
+            x, y, right, bottom = painting.bbox
+            if painting.order != index or not (0 <= x < right <= image.shape[1] and 0 <= y < bottom <= image.shape[0]):
+                raise ValueError(f"Invalid painting order or bounding box for {path.name}")
+            x, y, right, bottom = inset_box(painting.bbox, crop_inset)
+            crop = image[y:bottom, x:right]  # Original pixels, without black mask boundaries.
+            # Filter once, so fused descriptors see the same image and noise records stay aligned.
+            crop = crop if preprocess is None else preprocess(crop)
+            descriptors.append(compute_descriptor(crop, method, **params))
+            if second is not None:
+                second["descriptors"].append(compute_descriptor(crop, second["method"], **second["params"]))
+            item = dict(order=index, bbox=[int(v) for v in painting.bbox])
+            if diagnostics is not None:
+                item["noise"] = (noise_records[-1] if preprocess is not None else
+                                 dict(filtered=False, score=None, reliable=None, threshold=None, reason="disabled"))
+            record["paintings"].append(item)
+        if on_segmented is not None:
+            on_segmented(path, mask, paintings)
+        records.append(record)
+    matrix = (np.stack(descriptors).astype(np.float32) if descriptors else
+              np.empty((0, descriptor_dim(method, **params)), np.float32))
+    if second is None:
+        flat = retrieve(matrix, db_desc, db_ids, measure, k, channels, allow_truncate=allow_truncate)
+    else:
+        if k > len(db_ids) and not allow_truncate:
+            raise ValueError(f"k={k} exceeds database size {len(db_ids)}")
+        degenerate = ~np.any(db_desc != 0, axis=1) | ~np.any(second["db"] != 0, axis=1)
+        if len(matrix):
+            second_matrix = np.stack(second["descriptors"]).astype(np.float32)
+            fused = fuse_distances([(distance_matrix(matrix, db_desc, measure, channels), weight),
+                                    (distance_matrix(second_matrix, second["db"], fusion["measure"],
+                                                     second_channels), 1 - weight)])
+            flat = rank_distances(fused, db_ids, min(k, len(db_ids)), degenerate)
+        else:
+            flat = []
+    results, offset = [], 0
+    for record, count in zip(records, counts):
+        rankings = flat[offset:offset + count]
+        offset += count
+        results.append(rankings)
+        for item, ranking in zip(record["paintings"], rankings):
+            item["ranking"] = ranking
+    results = validate_predictions(results, nested=True, k=min(k, len(db_ids)),
+                                   query_count=len(ids), painting_counts=counts, db_ids=db_ids)
+    if diagnostics is not None:
+        diagnostics.extend(records)
+    return np.asarray(ids, np.int64), results
+
+
+def save_results(path, results, *, nested=False, k=None, query_count=None, painting_counts=None, db_ids=None):
+    """Save flat legacy or nested Week 3 results, refusing existing files."""
+    results = validate_predictions(results, nested=nested, k=k, query_count=query_count,
+                                   painting_counts=painting_counts, db_ids=db_ids)
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("wb") as stream:
-        pickle.dump([[int(value) for value in row] for row in results], stream)
+    with path.open("xb") as stream:
+        pickle.dump(results, stream)
+
+
+def save_query_mask(path, mask):
+    """Write an original-resolution binary PNG without replacing an artifact."""
+    if mask.dtype != np.uint8 or mask.ndim != 2 or not np.isin(mask, [0, 255]).all():
+        raise ValueError("Query masks must be single-channel uint8 with values 0 and 255")
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    ok, encoded = cv2.imencode(".png", mask)
+    if not ok:
+        raise OSError(f"Could not encode mask {path}")
+    with path.open("xb") as stream:
+        stream.write(encoded.tobytes())

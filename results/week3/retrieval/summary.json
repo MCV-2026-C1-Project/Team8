@@ -1,0 +1,52 @@
+{
+  "ablation": {
+    "QSD1 best: DCT 64 coef, 4\u00d74, L2": [
+      0.6410256410256411,
+      0.6965811965811967
+    ],
+    "coarser DCT: 32 coef, 2\u00d72, L1": [
+      0.717948717948718,
+      0.7794871794871795
+    ],
+    "+ trim 3 % of each box side": [
+      0.8461538461538461,
+      0.8803418803418802
+    ],
+    "colour only: Lab 8-64-64, 5\u00d75, L1": [
+      0.7435897435897436,
+      0.7628205128205128
+    ],
+    "DCT + Lab fused 50/50 (final)": [
+      0.9487179487179487,
+      0.9487179487179487
+    ]
+  },
+  "final": {
+    "map1": 0.9487179487179487,
+    "map5": 0.9487179487179487,
+    "count_accuracy": 1.0,
+    "success": "00002",
+    "misses": [
+      {
+        "query": "00019",
+        "gt": 128,
+        "painting": 1,
+        "top": [
+          279
+        ],
+        "rank": null,
+        "label": "UnnamedImpulseNoise"
+      },
+      {
+        "query": "00025",
+        "gt": 270,
+        "painting": 0,
+        "top": [
+          252
+        ],
+        "rank": null,
+        "label": "UnnamedImpulseNoise"
+      }
+    ]
+  }
+}

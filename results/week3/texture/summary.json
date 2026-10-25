@@ -1,0 +1,85 @@
+{
+  "best": {
+    "DCT": {
+      "label": "DCT 2\u00d72, 128 coef",
+      "measure": "l1",
+      "map1": 1.0,
+      "map5": 1.0,
+      "map1_noise": 1.0,
+      "map1_hue": 1.0,
+      "map1_clean": 1.0
+    },
+    "Wavelet": {
+      "label": "Haar wavelet L4 4\u00d74",
+      "measure": "euclidean",
+      "map1": 0.6666666666666666,
+      "map5": 0.7088888888888889,
+      "map1_noise": 0.42857142857142855,
+      "map1_hue": 0.7142857142857143,
+      "map1_clean": 0.7777777777777778
+    },
+    "LBP": {
+      "label": "LBP none R2 4\u00d74",
+      "measure": "l1",
+      "map1": 0.9666666666666667,
+      "map5": 0.9833333333333333,
+      "map1_noise": 0.8571428571428571,
+      "map1_hue": 1.0,
+      "map1_clean": 1.0
+    },
+    "Multiscale LBP": {
+      "label": "MS-LBP u2 R1-3 4\u00d74",
+      "measure": "chi2",
+      "map1": 0.9333333333333333,
+      "map5": 0.9555555555555556,
+      "map1_noise": 0.7142857142857143,
+      "map1_hue": 1.0,
+      "map1_clean": 1.0
+    }
+  },
+  "best_no_denoise": {
+    "DCT": 1.0,
+    "Wavelet": 0.6666666666666666,
+    "LBP": 0.9,
+    "Multiscale LBP": 0.8666666666666667
+  },
+  "colour": {
+    "raw": {
+      "map1": 0.9666666666666667,
+      "map5": 0.9833333333333333,
+      "map1_noise": 1.0,
+      "map1_hue": 0.9285714285714286,
+      "map1_clean": 1.0
+    },
+    "denoise": {
+      "map1": 0.9666666666666667,
+      "map5": 0.9833333333333333,
+      "map1_noise": 1.0,
+      "map1_hue": 0.9285714285714286,
+      "map1_clean": 1.0
+    }
+  },
+  "dct_perfect": [
+    "DCT 2\u00d72, 128 coef l1",
+    "DCT 2\u00d72, 128 coef euclidean",
+    "DCT 4\u00d74, 16 coef l1",
+    "DCT 4\u00d74, 16 coef euclidean",
+    "DCT 4\u00d74, 32 coef l1",
+    "DCT 4\u00d74, 32 coef euclidean",
+    "DCT 4\u00d74, 64 coef l1",
+    "DCT 4\u00d74, 64 coef euclidean",
+    "DCT 4\u00d74, 128 coef l1",
+    "DCT 4\u00d74, 128 coef euclidean",
+    "DCT 8\u00d78, 8 coef l1",
+    "DCT 8\u00d78, 8 coef euclidean",
+    "DCT 8\u00d78, 16 coef l1",
+    "DCT 8\u00d78, 16 coef euclidean",
+    "DCT 8\u00d78, 32 coef l1",
+    "DCT 8\u00d78, 32 coef euclidean",
+    "DCT 8\u00d78, 64 coef l1",
+    "DCT 8\u00d78, 64 coef euclidean",
+    "DCT 8\u00d78, 128 coef l1",
+    "DCT 8\u00d78, 128 coef euclidean"
+  ],
+  "qualitative_query": "00002"
+}

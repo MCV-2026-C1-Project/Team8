@@ -4,13 +4,14 @@ from pathlib import Path
 
 import cv2
 import numpy as np
+from functools import lru_cache
 from tqdm import tqdm
 
 from descriptor_config import JOINT_METHODS, descriptor_dim, hashed_tag, resolve_params
 from joint_histograms import (hsv_hs2d, lab_ab2d, hsv_3d, lab_3d,
                               lab_ab2d_from_color, lab_3d_from_color)
 from photometric import color_image
-from spatial import crop_to_foreground, resolve_spatial, spatial_descriptor, trim_background_blocks
+from spatial import block_slices, crop_to_foreground, resolve_spatial, spatial_descriptor, trim_background_blocks
 
 YCBCR_DEFAULTS = dict(bins=(8, 32, 32), y_range=(0, 256), chroma_range=(0, 256),
                       chroma_overflow=False)
@@ -173,9 +174,144 @@ def lab_hist(img_bgr, bins=LAB_DEFAULTS["bins"], mask=None, normalization="none"
     return _three_channel_hist(color_image(img_bgr, "lab", normalization, mask), bins, mask)
 
 
+
+# ----------------------------------------------------------------------------
+# Texture descriptors (BGR input, grayscale intensity structure)
+# ----------------------------------------------------------------------------
+def _texture_gray(image, resize):
+    """Square canonical resolution; direct functions follow the repo BGR convention."""
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) if image.ndim == 3 else image
+    return cv2.resize(gray, (resize, resize), interpolation=cv2.INTER_AREA)
+
+
+LBP_MAPPINGS = ("riu2", "u2", "none")
+
+
+def lbp_bins(points, mapping="riu2"):
+    """riu2: P+2 bins; u2: P(P-1)+3 bins; none: 2**P bins."""
+    return {"riu2": points + 2, "u2": points * (points - 1) + 3, "none": 2 ** points}[mapping]
+
+
+@lru_cache(maxsize=None)
+def _u2_lookup(points):
+    """Code -> bin: each uniform pattern (<= 2 circular transitions) its own bin, the rest one bin."""
+    lookup = np.full(2 ** points, points * (points - 1) + 2, dtype=np.int64)
+    index = 0
+    for code in range(2 ** points):
+        bits = [(code >> p) & 1 for p in range(points)]
+        if sum(bits[p] != bits[(p + 1) % points] for p in range(points)) <= 2:
+            lookup[code] = index
+            index += 1
+    return lookup
+
+
+def lbp_descriptor(img_bgr, radius=1, points=8, resize=256, mapping="riu2"):
+    """Circular LBP histogram, L1 normalised.
+
+    Bilinear circular samples compare >= the centre; a radius-wide image
+    boundary is excluded. mapping chooses the bins:
+    riu2 (default): rotation-invariant uniform, P+2 bins (bin = number of set
+        bits for uniform patterns, one shared bin otherwise). Discards the
+        orientation of edges.
+    u2: uniform, P(P-1)+3 bins (59 for P=8); keeps orientation.
+    none: every one of the 2**P codes (P <= 16).
+    """
+    gray = _texture_gray(img_bgr, resize).astype(np.float32)
+    margin = int(np.ceil(radius))
+    if 2 * margin >= resize:
+        raise ValueError("LBP radius leaves no valid pixels")
+    yy, xx = np.mgrid[margin:resize-margin, margin:resize-margin].astype(np.float32)
+    centre = gray[margin:resize-margin, margin:resize-margin]
+    bits = []
+    for p in range(points):
+        angle = 2 * np.pi * p / points
+        sample = cv2.remap(gray, (xx + radius * np.cos(angle)).astype(np.float32),
+                           (yy - radius * np.sin(angle)).astype(np.float32), cv2.INTER_LINEAR)
+        bits.append(sample >= centre)
+    bits = np.stack(bits)
+    if mapping == "riu2":
+        transitions = np.sum(bits != np.roll(bits, 1, axis=0), axis=0)
+        codes = np.where(transitions <= 2, bits.sum(axis=0), points + 1)
+    else:
+        codes = np.zeros(bits.shape[1:], dtype=np.int64)
+        for p in range(points):
+            codes |= bits[p].astype(np.int64) << p
+        if mapping == "u2":
+            codes = _u2_lookup(points)[codes]
+    return _norm(np.bincount(codes.ravel(), minlength=lbp_bins(points, mapping)))
+
+
+def multiscale_lbp_descriptor(img_bgr, radii=(1, 2, 3), points=(8, 16, 24), resize=256, mapping="riu2"):
+    """Concatenate equally weighted LBP histograms at paired radii/point counts."""
+    if len(radii) != len(points) or not len(radii):
+        raise ValueError("radii and points must have matching nonzero lengths")
+    return np.concatenate([lbp_descriptor(img_bgr, radius, count, resize, mapping)
+                           for radius, count in zip(radii, points)]) / len(radii)
+
+
+def dct_descriptor(img_bgr, n_coeffs=64, resize=256):
+    """Signed low-frequency DCT AC coefficients in zigzag order, L2 normalised.
+
+    Remove mean brightness and standardise contrast before the orthonormal DCT.
+    DC is omitted. Use L1/Euclidean distance, not histogram distances.
+    Combine with the existing spatial grid for block DCT.
+    """
+    gray = _texture_gray(img_bgr, resize).astype(np.float32)
+    gray -= gray.mean()
+    gray /= max(float(gray.std()), 1e-6)
+    coeff = cv2.dct(gray)
+    values = []
+    for diagonal in range(1, 2 * resize - 1):
+        pairs = [(y, diagonal-y) for y in range(max(0, diagonal-resize+1),
+                                               min(resize-1, diagonal)+1)]
+        if diagonal % 2 == 0:
+            pairs.reverse()
+        for y, x in pairs:
+            values.append(coeff[y, x])
+            if len(values) == n_coeffs:
+                vector = np.asarray(values, dtype=np.float32)
+                return vector / max(float(np.linalg.norm(vector)), 1e-6)
+    raise ValueError("n_coeffs exceeds available AC coefficients")
+
+
+def wavelet_descriptor(img_bgr, levels=3, resize=256):
+    """Haar detail statistics: mean absolute value and std of LH/HL/HH per level.
+
+    Standardise brightness/contrast first. Approximation band is decomposed
+    recursively; no approximation/DC statistics are included. L2 normalised.
+    This uses an orthonormal separable Haar transform, requiring no dependency.
+    """
+    gray = _texture_gray(img_bgr, resize).astype(np.float32)
+    gray -= gray.mean()
+    gray /= max(float(gray.std()), 1e-6)
+    features = []
+    for _ in range(levels):
+        low = (gray[:, 0::2] + gray[:, 1::2]) / np.sqrt(2)
+        high = (gray[:, 0::2] - gray[:, 1::2]) / np.sqrt(2)
+        approximation = (low[0::2] + low[1::2]) / np.sqrt(2)
+        details = [(low[0::2] - low[1::2]) / np.sqrt(2),
+                   (high[0::2] + high[1::2]) / np.sqrt(2),
+                   (high[0::2] - high[1::2]) / np.sqrt(2)]
+        for band in details:
+            features.extend([np.abs(band).mean(), band.std()])
+        gray = approximation
+    vector = np.asarray(features, dtype=np.float32)
+    return vector / max(float(np.linalg.norm(vector)), 1e-6)
+
+
+TEXTURE_METHODS = {"lbp", "multiscale_lbp", "dct", "wavelet"}
+
 METHODS = {"ycbcr": ycbcr_hist, "hsv": hsv_hist, "hsv_baseline": hsv_baseline_hist,
            "rgb": rgb_hist, "lab": lab_hist, "hsv_hs2d": hsv_hs2d,
            "lab_ab2d": lab_ab2d, "hsv_3d": hsv_3d, "lab_3d": lab_3d}
+METHODS.update(lbp=lbp_descriptor, multiscale_lbp=multiscale_lbp_descriptor,
+               dct=dct_descriptor, wavelet=wavelet_descriptor)
+# Numerical properties shared by cache validation and distance compatibility.
+# Wavelet statistics are nonnegative, but are not histogram masses.
+DESCRIPTOR_PROPERTIES = {
+    method: dict(nonnegative=method != "dct", histogram=method not in {"dct", "wavelet"})
+    for method in METHODS
+}
 # Methods whose histograms can be restricted to foreground pixels.
 MASKABLE_METHODS = {"rgb", "lab", "ycbcr", "lab_ab2d", "lab_3d"}
 DEFAULTS = {"ycbcr": YCBCR_DEFAULTS, "hsv": HSV_DEFAULTS, "hsv_baseline": HSV_BASELINE_DEFAULTS,
@@ -186,6 +322,10 @@ DEFAULTS = {"ycbcr": YCBCR_DEFAULTS, "hsv": HSV_DEFAULTS, "hsv_baseline": HSV_BA
             "lab_ab2d": dict(bins=(16, 16), include_l=True, l_bins=8, chroma_weight=0.7),
             "hsv_3d": dict(bins=(8, 8, 4)), "lab_3d": dict(bins=(4, 8, 8))}
 
+DEFAULTS.update(lbp=dict(radius=1, points=8, resize=256, mapping="riu2"),
+                multiscale_lbp=dict(radii=(1, 2, 3), points=(8, 16, 24), resize=256, mapping="riu2"),
+                dct=dict(n_coeffs=64, resize=256), wavelet=dict(levels=3, resize=256))
+
 
 def full_params(method, **params):
     """Default parameters of `method` updated with the given ones."""
@@ -195,7 +335,7 @@ def full_params(method, **params):
 def method_tag(method, **params):
     """Canonical tag encoding every effective parameter, independent of defaults."""
     p = full_params(method, **params)
-    if method in JOINT_METHODS or "spatial" in p:
+    if method in JOINT_METHODS or method in TEXTURE_METHODS or "spatial" in p:
         return hashed_tag(method, p)
     def number(value):
         return str(int(value)) if value == int(value) else str(float(value))
@@ -215,7 +355,7 @@ def method_tag(method, **params):
     return tag
 
 
-def compute_descriptor(img_bgr, method, mask=None, trim="block", **params):
+def compute_descriptor(img_bgr, method, mask=None, trim="block", *, preprocess=None, **params):
     """Descriptor of an image; with a mask, only foreground (nonzero) pixels are counted.
 
     For spatial layouts with a mask, the background around the painting is removed
@@ -223,7 +363,16 @@ def compute_descriptor(img_bgr, method, mask=None, trim="block", **params):
     (trim_background_blocks), trim="bbox" crops to the foreground's bounding box
     (crop_to_foreground), and trim=None keeps the whole image.
     Photometric preparation uses the complete foreground before any trimming.
+    preprocess is an optional BGR image -> BGR image callable, also usable on an
+    individual painting crop. It runs before descriptor preparation. Combining
+    preprocessing with masks is unsupported until their alignment is defined.
     """
+    if preprocess is not None:
+        if not callable(preprocess):
+            raise ValueError("preprocess must be callable or None")
+        if mask is not None:
+            raise ValueError("Query preprocessing cannot be combined with foreground masks")
+        img_bgr = preprocess(img_bgr)
     if (not isinstance(img_bgr, np.ndarray) or img_bgr.dtype != np.uint8 or
             img_bgr.ndim != 3 or img_bgr.shape[2] != 3 or not img_bgr.size):
         raise ValueError("Expected a nonempty H x W x 3 uint8 BGR image")
@@ -244,6 +393,14 @@ def compute_descriptor(img_bgr, method, mask=None, trim="block", **params):
         img_bgr = color_image(img_bgr, "ycbcr" if method == "ycbcr" else "lab", "photometric", mask)
         extract_color = {"lab": _three_channel_hist, "ycbcr": ycbcr_hist_from_color,
                          "lab_ab2d": lab_ab2d_from_color, "lab_3d": lab_3d_from_color}[method]
+    if method in TEXTURE_METHODS and spatial is not None:
+        # Coefficients are signed and/or L2 normalised, so do not use the
+        # histogram mass normalisation in spatial_descriptor.
+        spatial = resolve_spatial(spatial)
+        return np.concatenate([
+            extract_color(img_bgr[ys, xs], **params) * (weight / grid**2)
+            for grid, weight in zip(spatial["grids"], spatial["level_weights"])
+            for ys, xs in block_slices(img_bgr.shape, grid)]).astype(np.float32)
     if mask is None:
         if spatial is None:
             return extract_color(img_bgr, **params)
@@ -261,15 +418,16 @@ def compute_descriptor(img_bgr, method, mask=None, trim="block", **params):
                               spatial, mask)
 
 
-def compute_folder(folder, method, **params):
+def compute_folder(folder, method, *, preprocess=None, **params):
     """Compute descriptors for all JPEG images (.jpg/.jpeg, any case) in `folder`.
 
+    preprocess optionally filters each loaded BGR image in memory before extraction.
     Returns (ids: int64 [N], desc: float32 [N x D]); row i corresponds to ids[i].
     """
     paths, ids = list_images(folder)
     if not paths:
         raise ValueError(f"No JPEG images (.jpg/.jpeg) found in {folder}")
-    desc = [compute_descriptor(load_image(p), method, **params)
+    desc = [compute_descriptor(load_image(p), method, preprocess=preprocess, **params)
             for p in tqdm(paths, desc=f"{Path(folder).name}/{method}")]
     return np.asarray(ids, dtype=np.int64), np.stack(desc).astype(np.float32)
 
@@ -277,7 +435,7 @@ def compute_folder(folder, method, **params):
 def channel_sizes(method, **params):
     """Number of bins of each channel's slice in the descriptor."""
     p = full_params(method, **params)
-    if method in JOINT_METHODS or "spatial" in p:
+    if method in JOINT_METHODS or method in TEXTURE_METHODS or "spatial" in p:
         raise ValueError("channel_sizes applies only to global independent 1D histograms")
     sizes = [int(b) for b in p["bins"]]
     if method == "ycbcr" and p["chroma_overflow"]:

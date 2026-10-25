@@ -1,0 +1,129 @@
+{
+  "id": "qsd1_w3_100_selective_noise",
+  "query_dir": "data/qsd1_w3",
+  "spatial": [
+    {
+      "mode": "grid",
+      "grids": [
+        4
+      ]
+    }
+  ],
+  "query_filters": [
+    {
+      "name": "none"
+    },
+    {
+      "name": "median",
+      "grid": {
+        "ksize": [
+          3,
+          5
+        ],
+        "noise_threshold": [
+          null,
+          3.0,
+          6.0,
+          10.0
+        ]
+      }
+    },
+    {
+      "name": "gaussian",
+      "grid": {
+        "ksize": [
+          5
+        ],
+        "sigma": [
+          0.5,
+          1.0
+        ],
+        "noise_threshold": [
+          null,
+          3.0,
+          6.0,
+          10.0
+        ]
+      }
+    },
+    {
+      "name": "average",
+      "grid": {
+        "ksize": [
+          3
+        ],
+        "noise_threshold": [
+          null,
+          3.0,
+          6.0,
+          10.0
+        ]
+      }
+    },
+    {
+      "name": "ideal",
+      "grid": {
+        "cutoff": [
+          40.0,
+          80.0
+        ],
+        "noise_threshold": [
+          null,
+          6.0
+        ]
+      }
+    }
+  ],
+  "experiments": [
+    {
+      "descriptor": "lbp",
+      "params": {
+        "radius": 2,
+        "points": 16,
+        "resize": 256
+      },
+      "measures": [
+        "chi2"
+      ]
+    },
+    {
+      "descriptor": "multiscale_lbp",
+      "params": {
+        "radii": [
+          1,
+          2,
+          3
+        ],
+        "points": [
+          8,
+          16,
+          24
+        ],
+        "resize": 256
+      },
+      "measures": [
+        "chi2"
+      ]
+    },
+    {
+      "descriptor": "dct",
+      "params": {
+        "n_coeffs": 64,
+        "resize": 256
+      },
+      "measures": [
+        "euclidean"
+      ]
+    },
+    {
+      "descriptor": "wavelet",
+      "params": {
+        "levels": 3,
+        "resize": 256
+      },
+      "measures": [
+        "euclidean"
+      ]
+    }
+  ]
+}

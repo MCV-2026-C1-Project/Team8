@@ -1,0 +1,34 @@
+{
+  "config": {
+    "descriptor": "dct",
+    "params": {
+      "n_coeffs": 64,
+      "resize": 256,
+      "spatial": {
+        "grids": [
+          4
+        ],
+        "level_weights": [
+          1.0
+        ],
+        "mode": "grid"
+      }
+    }
+  },
+  "measure": "euclidean",
+  "tag": "dct__40a5f5fa95a9ba2b5ef057e7",
+  "select_by": "map1",
+  "development_metrics": {
+    "map1": 1.0,
+    "map5": 1.0
+  },
+  "provenance": {
+    "source": "configs\\week3\\noise_texture_compact.json",
+    "db_dir": "C:\\Users\\Usuario\\Desktop\\MCV\\C1\\Project\\Team8\\data\\BBDD",
+    "query_dir": "C:\\Users\\Usuario\\Desktop\\MCV\\C1\\Project\\Team8\\data\\qsd1_w3",
+    "gt": "C:\\Users\\Usuario\\Desktop\\MCV\\C1\\Project\\Team8\\data\\qsd1_w3\\gt_corresps.pkl",
+    "query_filter": {
+      "name": "none"
+    }
+  }
+}

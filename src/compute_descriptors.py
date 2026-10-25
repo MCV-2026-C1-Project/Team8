@@ -3,8 +3,8 @@ import argparse
 from pathlib import Path
 
 from descriptor_cli import add_descriptor_arguments, config_from_args, load_descriptor_document
-from descriptors import compute_folder, method_tag
-from retrieval import DESC_DIR, save_descriptor_cache
+from descriptors import compute_folder
+from retrieval import DESC_DIR, descriptor_cache_path, save_descriptor_cache
 
 # Preserve --method all as the original Week 1 set, rather than silently
 # precomputing every new joint descriptor too.
@@ -15,7 +15,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     add_descriptor_arguments(ap, "--method", allow_all=True)
     ap.add_argument("--data", required=True, type=Path)
-    ap.add_argument("--name", help="Cache prefix; default: folder name before underscore")
+    ap.add_argument("--name", help="Cache prefix; default: full folder name (source hash is always included)")
     ap.add_argument("--out", "--cache-dir", dest="out", type=Path, default=DESC_DIR)
     args = ap.parse_args(argv)
     try:
@@ -34,11 +34,10 @@ def main(argv=None):
                     if hasattr(selected, key):
                         setattr(selected, key, None)
             configs.append(config_from_args(selected, base, method))
-        name = args.name or args.data.name.split("_")[0].lower()
         for config in configs:
             method, params = config["descriptor"], config["params"]
             ids, desc = compute_folder(args.data, method, **params)
-            path = args.out / f"{name}_{method_tag(method, **params)}.npz"
+            path = descriptor_cache_path(args.name, args.data, method, params, args.out)
             save_descriptor_cache(path, ids, desc, method, params, args.data)
             print(f"Saved {path} ids={ids.shape} desc={desc.shape} {desc.dtype}")
     except (ValueError, TypeError, OSError, KeyError) as error:

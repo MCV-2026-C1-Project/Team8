@@ -1,0 +1,7 @@
+system,policy,map1,map5,map1_noisy,map1_clean,map1_hue
+"Texture: DCT 64 coef, 4×4, L2",no filter,1.0,1.0,1.0,1.0,1.0
+"Texture: DCT 64 coef, 4×4, L2",median 3×3 on all,1.0,1.0,1.0,1.0,1.0
+"Texture: DCT 64 coef, 4×4, L2",median 3×3 if score > 6,1.0,1.0,1.0,1.0,1.0
+"Colour (W2 best): YCbCr 64³ norm, 4×4, L1",no filter,0.9666666666666667,0.9833333333333333,1.0,1.0,0.9285714285714286
+"Colour (W2 best): YCbCr 64³ norm, 4×4, L1",median 3×3 on all,0.9666666666666667,0.9777777777777777,1.0,1.0,0.9285714285714286
+"Colour (W2 best): YCbCr 64³ norm, 4×4, L1",median 3×3 if score > 6,0.9666666666666667,0.9833333333333333,1.0,1.0,0.9285714285714286
