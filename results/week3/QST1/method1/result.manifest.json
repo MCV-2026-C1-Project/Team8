@@ -26,7 +26,7 @@
   "format": "nested",
   "requested_k": 10,
   "effective_k": 10,
-  "db_dir": "C:\\Users\\bielb\\Documents\\MCV\\C1\\project\\Team8\\data\\BBDD",
+  "db_dir": "data\\BBDD",
   "query_dir": "data\\qst1_w3",
   "gt": null,
   "gt_frames": null,

@@ -1,232 +1,146 @@
 # Team 8 — Museum Painting Retrieval (C1)
 
-Colour and texture image retrieval for the UAB museum painting project (Weeks 1–3).
+Colour and texture retrieval for the UAB museum painting project. This branch focuses on **Week 3: noise filtering, texture descriptors, multiple-painting detection and retrieval**.
 
 ## Setup
 
 ```sh
 python -m venv .venv
-.venv\Scripts\activate        # Linux/macOS: source .venv/bin/activate
+.venv\Scripts\activate
+# Linux/macOS: source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Extract the course datasets into `data/` (git-ignored): `data/BBDD/`, `data/qsd1_w1/` and `data/qsd2_w2/` (each with `gt_corresps.pkl`; QSD2 also has the ground-truth masks `<id>.png`), and the test sets `data/qst1_w2/` and `data/qst2_w2/` (from `qst_w2.zip`). **QSD1-W2 uses the same cropped images as QSD1-W1.** Run commands from the repository root.
+Run commands from the repository root. Extract datasets into `data/` (git-ignored):
 
-## Best results
-
-| Query set | Descriptor (exported configuration) | mAP@1 | mAP@5 |
-|---|---|---|---|
-| QSD1, Week 1 best | HSV 16-16-16, global, intersection (`results/week1/1d_none_best.json`) | 0.600 | 0.672 |
-| QSD1, Week 2 best | YCbCr 64-64-64, photometric, 4×4 grid, L1 (`results/week2/qsd1_best_with_norm.json`) | 0.967 | 0.978 |
-| QSD2, whole photo | QSD2 best descriptor without background removal | 0.167 | 0.217 |
-| QSD2, Week 2 best | Lab 3D 16-16-8, photometric, 2×2 grid, L1, predicted masks (`results/week2/qsd2_best.json`) | 0.900 | 0.928 |
-
-QSD2 background masks (default `foreground_mask`): mean precision 0.969, recall 0.985, F1 0.976 per image. Ground-truth masks give the same QSD2 retrieval scores as the predicted ones.
-
-### Retrieval results
-
-<p align="center">
-  <img src="plots/week1_vs_week2_qsd1.png" width="500" alt="Week 1 versus Week 2 retrieval performance">
-  <br>
-  <sub>Figure 1. Week 1 versus Week 2 retrieval performance on QSD1.</sub>
-</p>
-
-<p align="center">
-  <img src="plots/qsd2_retrieval.png" width="500" alt="Effect of background removal on QSD2 retrieval">
-  <br>
-  <sub>Figure 2. Effect of background removal on QSD2 retrieval.</sub>
-</p>
-
-
-## Retrieval
-
-```sh
-# Run a descriptor and distance directly
-python src/run_retrieval.py --descriptor hsv --measure l1
-
-# Run a configuration selected during experiments
-python src/run_retrieval.py --config results/week2/qsd1_best_with_norm.json --query-set qsd1
-
-# QSD2: remove the wall and describe only the painting's pixels
-python src/run_retrieval.py --config results/week2/qsd2_best.json --query-set qsd2_w2 --remove-background
-```
-
-- `--descriptor`: select a colour descriptor (listed below).
-- `--measure`: `euclidean`, `l1`, `chi2`, `intersection`, `hellinger`, `wasserstein` (global 1D only).
-- `--config`: load a configuration exported by `run_experiments.py`.
-- `--query-set`, `--db-dir`, `--k`, `--output`: select the data and retrieval output.
-
-Retrieval ranks database paintings by their similarity to each query. The output `.pkl` contains one ordered list of painting IDs per query.
-
-## Colour descriptors
-
-| Type | Descriptors | Description |
-|---|---|---|
-| **1D (Week 1)** | `hsv`, `hsv_baseline`, `rgb`, `lab`, `ycbcr` | Independent histograms for each colour channel |
-| **2D (Week 2)** | `hsv_hs2d`, `lab_ab2d` | Joint H–S or a–b histograms, optionally including brightness |
-| **3D (Week 2)** | `hsv_3d`, `lab_3d` | Joint histograms across three colour channels |
-
-Histogram bins and other parameters are configurable through Python, JSON or CLI options.
-
-### Photometric normalisation
-
-Optional photometric normalisation supports `lab`, `ycbcr`, `lab_ab2d` and `lab_3d` in global, grid and pyramid layouts.
-It centres each channel around 128 and scales all channels using the luminance standard deviation (target 50), then clips.
-The transformation runs once per complete image, before spatial partitioning; histograms use the prepared float32 pixels.
-The default `--normalization none` preserves existing values and caches; exported configurations retain the selected mode.
-RGB/HSV remain unnormalised baselines.
-
-```bash
-python src/run_retrieval.py --descriptor lab_ab2d --normalization photometric --spatial-mode pyramid --grids 1 2 --measure l1
-```
-
-With `--remove-background`, Lab/YCbCr statistics and histogram counts use only foreground pixels; preparation runs once before trimming or partitioning. All four Lab/YCbCr families support masks with `none` or `photometric`; RGB keeps its existing mask support and HSV masks remain unsupported. Empty foreground masks raise an error.
-Experiments also accept `--mask-source pred|gt`, `--trim-mode block|bbox` or `--no-trim`. GT masks are development diagnostics only. Database caches are reused; masked queries are never cached.
-Masked CSVs and exported provenance record the mask source/trim policy and `replay_flags`; replay those flags explicitly with `run_retrieval.py --config` (loading the descriptor alone does not enable masking).
-
-```sh
-python src/run_experiments.py --config configs/week2/week2_qsd2_background_photometric.json --remove-background --mask-source pred --trim-mode block --cache-dir descriptors --output results/week2/qsd2_pred.csv --export-best results/week2/qsd2_pred_best.json
-```
-
-### Spatial histograms (Week 2)
-
-- **`global`**: one descriptor for the entire image.
-- **`grid`**: histograms from non-overlapping image blocks.
-- **`pyramid`**: combine histograms at multiple spatial resolutions, with configurable level weights.
-
-Select a representation using `--spatial-mode`, `--grids` and `--level-weights`. Background removal is handled separately from the cropped-image retrieval experiments.
-
-## Background removal (Week 2)
-
-`src/remove_background.py` estimates the wall colour from image borders and returns an original-resolution binary mask: **255 = painting, 0 = background**. It uses colour, connectivity and mask postprocessing without edge detection, contours or object detectors.
-
-### Method
-
-The default `color_distribution` method learns the wall’s Lab colour distribution from border pixels, accounting for brightness changes. Only wall-like regions connected to the image boundary are removed, preserving enclosed painting regions with similar colours.
-
-Postprocessing closes gaps, removes small components, fills painting interiors and suppresses rows or columns with little foreground. The alternative `quadratic` method models spatial variations in wall colour using a quadratic surface.
-
-### Segmentation examples
-
-![Predicted masks and errors against ground truth](plots/mask_examples.png)
-
-### Evaluate segmentation
-
-Place development JPEG images and matching ground-truth PNG masks in `data/qsd2_w2/` (for example, `00001.jpg` and `00001.png`). Use `--gt` to select a separate mask directory if needed.
-
-```sh
-# Evaluate the colour-distribution model with the selected sigma
-python src/evaluate_background.py --images data/qsd2_w2 --gt data/qsd2_w2 --method color_distribution --color-sigma 4.0 --output results/background_masks
-
-# Search for the sigma with the highest mean F1
-python src/evaluate_background.py --images data/qsd2_w2 --gt data/qsd2_w2 --method color_distribution --grid-search --output results/background_masks_sweep
-
-# Evaluate the spatial quadratic baseline
-python src/evaluate_background.py --images data/qsd2_w2 --gt data/qsd2_w2 --method quadratic --threshold 20 --output results/background_masks_quadratic
-```
-
-A single run saves masks in `<output>/masks/` and per-image precision, recall, F1 and pixel counts in `<output>/metrics.csv`. Printed scores are macro averages over images.
-
-Grid search tests sigma values from 2 to 6 in steps of 0.5 for `color_distribution`, or thresholds 10, 15, 20 and 25 for `quadratic`. It saves masks under `<output>/threshold_<value>/masks/` and ranks configurations by mean F1 in `threshold_comparison.csv`.
-
-The selected colour tolerance is `color_sigma=4.0`, which achieved the highest mean F1 on the development set. To use it consistently, set this default in both `foreground_mask()` and the evaluation CLI; grid search does not update retrieval automatically.
-
-| Option | Purpose |
+| Folder | Contents |
 |---|---|
-| `--color-sigma` | Colour-distribution tolerance; larger values classify more colours as wall |
-| `--threshold`, `--mad-multiplier`, `--l-weight` | Quadratic model threshold, adaptive scale and lightness weight |
-| `--border-ratio`, `--sample-step` | Border width fraction and sampling spacing |
-| `--closing-size`, `--min-component-ratio` | Closing kernel size and minimum component area fraction |
-| `--enclosed-only` | Disable horizontal and vertical span filling |
-| `--no-fill-columns` | Disable vertical span filling only |
-| `--no-fill-interior` | Disable interior refinement; row/column filtering still runs |
-| `--min-row-foreground`, `--min-col-foreground` | Final foreground-fraction cutoffs; 0 disables an axis |
+| `data/BBDD/` | Database painting images |
+| `data/qsd1_w3/` | Cropped development queries and `gt_corresps.pkl` |
+| `data/qsd2_w3/` | Multi-painting development queries, `gt_corresps.pkl` and `frames.pkl` |
+| `data/qst1_w3/`, `data/qst2_w3/` | Blind-test query images |
 
-### Retrieval with foreground masks
+Only JPEGs are read as query images. QSD2 development frame annotations must follow the correspondence order. Database descriptors are cached in `descriptors/`; the first run computes missing caches.
 
-Enable background removal explicitly, including when loading an exported configuration. Query descriptors then use only foreground pixels.
+## Previous work: Weeks 1–2
+
+Week 1 introduced global colour histograms and distance comparisons. Week 2 added joint colour histograms, photometric normalisation, spatial grids/pyramids and colour-based background removal. The wall model estimates Lab colour statistics from border pixels and removes wall-like regions connected to the boundary, followed by morphological cleanup and hole filling.
+
+| Selected development result | Method | mAP@1 | mAP@5 |
+|---|---|---|---|
+| Week 1, QSD1 | Global HSV, intersection | 0.600 | 0.672 |
+| Week 2, QSD1 | YCbCr, photometric normalisation, 4×4 grid, L1 | 0.967 | 0.978 |
+| Week 2, QSD2 | Lab 3D, photometric normalisation, 2×2 grid, L1, predicted masks | 0.900 | 0.928 |
+
+Week 2 QSD2 segmentation reached mean F1 **0.9759**. Earlier configurations and results remain in `configs/week1/`, `configs/week2/`, `results/week1/` and `results/week2/`. Different weeks use different query sets, so these scores are not a controlled comparison across weeks.
+
+## Week 3: noise, texture and multiple paintings
+
+### Noise filtering and texture descriptors
+
+`src/filter_noise.py` provides query filtering, including a selective median policy that filters only crops whose noise score exceeds a threshold. Filtering is applied to queries; database paintings retain their original pixels. The selected QSD2 export uses a 3×3 median filter with `noise_threshold=6.0`. Its provenance notes that this policy ties the unfiltered model on the development sets; it was retained for a consistent pipeline. The selected QSD1 export uses no filtering.
+
+The Week 3 texture descriptors are `dct`, `wavelet`, `lbp` and `multiscale_lbp`. DCT represents spatial frequency content, wavelets describe information at several scales, and LBP variants encode local intensity patterns. Spatial grids preserve their approximate locations within the painting.
+
+The saved texture comparison (`results/week3/texture/summary.json`) reports:
+
+| Best configuration per family on QSD1-W3 | Distance | mAP@1 | mAP@5 |
+|---|---|---|---|
+| DCT, 128 coefficients, 2×2 grid | L1 | 1.0000 | 1.0000 |
+| LBP, radius 2, 4×4 grid | L1 | 0.9667 | 0.9833 |
+| Multiscale LBP, uniform mapping, radii 1–3, 4×4 grid | Chi-square | 0.9333 | 0.9556 |
+| Haar wavelet, level 4, 4×4 grid | Euclidean | 0.6667 | 0.7089 |
+
+Several DCT configurations reach perfect development retrieval. The separately exported QST1 configuration is **DCT with 64 coefficients, resize 256, 4×4 grid and Euclidean distance**, which also reaches 1.0000 mAP@1 and mAP@5. These are development results, not blind-test accuracy.
+
+### Detecting multiple paintings
+
+`src/painting_detection.py` separates up to two painting instances using the configuration in `configs/week3/task3_selected.json`. It builds on the border-conditioned Lab wall model, uses `color_sigma=3.0` and a robust dark-wall cutoff, disables the final row/column foreground cleanup, groups fragments and refines instance masks with convex hulls. Instances are returned in reading order.
+
+Retrieval describes rectangular crops from the **original image pixels**, rather than black-masked images. The selected retrieval configuration then trims 3% from each crop side to reduce frame/background contamination. Submitted masks remain at the original query resolution.
+
+On QSD2-W3, the saved segmentation comparison gives:
+
+| Segmentation method on QSD2-W3 | Mean precision | Mean recall | Mean F1 | Correct painting count |
+|---|---|---|---|---|
+| Week 2 method | 0.9888 | 0.6317 | 0.6777 | 22/30 |
+| Week 3 method | 0.9434 | 0.9832 | 0.9608 | 30/30 |
+
+The Week 3 method recovers substantially more painting pixels, with some reduction in precision. It correctly counts all 21 single-painting and 9 two-painting development images. This configuration is specialised for Week 3: on QSD2-W2 its mean F1 is 0.9444, compared with 0.9759 for the Week 2 method.
+
+<p align="center">
+  <img src="plots/masks_w2_vs_w3.png" width="650" alt="Week 2 and Week 3 segmentation comparison">
+  <br>
+  <sub>Week 2 and Week 3 segmentation on the development sets.</sub>
+</p>
+
+### QSD2 retrieval and descriptor fusion
+
+The selected pipeline combines **DCT with 32 coefficients, resize 256, 2×2 grid, L1** and **Lab histograms with bins [8, 64, 64], 5×5 grid, L1**. Distances are standardised per query before a 50/50 weighted sum, so the two descriptor scales are comparable. Both descriptors see the same filtered painting crop.
+
+The saved QSD2-W3 ablation (`results/week3/retrieval/summary.json`) shows:
+
+| Configuration | Painting mAP@1 | Painting mAP@5 |
+|---|---|---|
+| QSD1-selected DCT: 64 coefficients, 4×4 grid, Euclidean | 0.6410 | 0.6966 |
+| Coarser DCT: 32 coefficients, 2×2 grid, L1 | 0.7179 | 0.7795 |
+| Coarser DCT + 3% crop inset | 0.8462 | 0.8803 |
+| Colour-only Lab: bins [8, 64, 64], 5×5 grid, L1 | 0.7436 | 0.7628 |
+| Final DCT + Lab fusion | **0.9487** | **0.9487** |
+
+Crop trimming improves retrieval by reducing border contamination; fusion improves the observed scores further by combining colour and texture evidence. The final result corresponds to 37 of 39 paintings retrieved correctly at rank 1. The two remaining correct matches are also absent from the top 5, explaining the identical mAP values. Perfect painting counts therefore do not imply perfect identification.
+
+<p align="center">
+  <img src="plots/retrieval_ablation.png" width="650" alt="Week 3 QSD2 retrieval ablation">
+  <br>
+  <sub>Effect of descriptor selection, crop trimming and fusion on QSD2-W3 retrieval.</sub>
+</p>
+
+### Evaluate the selected configurations
+
+Run from the repository root:
 
 ```sh
-python src/run_retrieval.py --config results/week2/qsd2_best.json --query-set data/qsd2_w2 --remove-background --mask-source pred --trim-mode block
+# QSD1-W3: selected single-painting descriptor
+python src/run_retrieval.py --config results/week3/week3_100_best.json --query-dir data/qsd1_w3 --db-dir data/BBDD
+
+# QSD2-W3: complete multi-painting pipeline and geometric GT matching
+python src/run_retrieval.py --config results/week3/qsd2_best.json --query-dir data/qsd2_w3 --db-dir data/BBDD --multi-painting --segmentation-config configs/week3/task3_selected.json --gt data/qsd2_w3/gt_corresps.pkl --gt-frames data/qsd2_w3/frames.pkl --k 10 --output results/week3/qsd2_evaluation/result.pkl --diagnostics results/week3/qsd2_evaluation/diagnostics.json
 ```
 
-`--trim-mode block` removes background block rows and columns before spatial partitioning; `--trim-mode bbox` crops to the foreground bounding box, and `--no-trim` preserves the full image layout. `--save-masks DIR` saves original-resolution masks before trimming.
+`run_retrieval.py` loads the descriptor, distance and saved filtering policy. For the QSD2 export, it also restores the crop inset and fusion settings. `--multi-painting` and `--segmentation-config` must be supplied together; do not combine them with legacy `--remove-background`. Ground-truth frames are used only to match predictions geometrically for evaluation, not to detect paintings or rank database images.
 
-Ground-truth masks (`--mask-source gt`) are for development diagnostics only. QSD1/QST1 images are already cropped and do not require background removal.
-
-## Week 2 delivery
+**Exported best configurations and experiment suites are different formats.** Evaluate `results/week3/qsd2_best.json` with `run_retrieval.py`; passing it to `run_experiments.py` produces an unknown-suite-settings error. To repeat the multi-painting search instead:
 
 ```sh
-# QST1: retrieve using the already cropped paintings
-python src/run_retrieval.py --config results/week2/qsd1_best_with_norm.json --query-set data/qst1_w2 --no-gt --k 10 --output results/week2/QST1/method1/result.pkl
-
-# QST2: retrieve using predicted foreground masks and export them
-python src/run_retrieval.py --config results/week2/qsd2_best.json --query-set data/qst2_w2 --remove-background --mask-source pred --trim-mode block --no-gt --k 10 --output results/week2/QST2/method1/result.pkl --save-masks results/week2/QST2/method1
+python src/search_multi.py --config configs/week3/qsd2_search.json --output results/week3/qsd2_search_rerun.csv --export-best results/week3/qsd2_best_rerun.json
 ```
 
-Each `result.pkl` contains one ranked list of 10 integer BBDD IDs per query, in query order. QST2 also includes one PNG mask per query, saved alongside `result.pkl` with the same basename (for example, `00001.jpg` → `00001.png`).
+The search suite uses median threshold 5.0; the selected export uses 6.0. Evaluate the export to replay the reported pipeline.
 
-The output produces the following files:
+## Week 3 delivery (Task 5)
 
-- `Team8/week2/QST1/method1/result.pkl`
-- `Team8/week2/QST2/method1/result.pkl`
-- `Team8/week2/QST2/method1/*.png`
-
-
-## Experiments
-
-Use `src/run_experiments.py` to compare descriptors, distances and spatial representations. Experiments can be configured in three ways:
-
-**Python / original grids** — edit `EXPERIMENTS` in `src/run_experiments.py`, or use the existing grids:
+Place blind-test JPEGs in `data/qst1_w3/` and `data/qst2_w3/`. No test ground truth is required:
 
 ```sh
-python src/run_experiments.py --grid default --output config_results/default.csv
-python src/run_experiments.py --grid lab --output config_results/lab.csv
-python src/run_experiments.py --grid ycbcr --output config_results/ycbcr.csv
-python src/sweep_hsv.py --output config_results/hsv_sweep.csv
+# QST1: already cropped paintings, with the required extra list level
+python src/run_retrieval.py --config results/week3/week3_100_best.json --query-dir data/qst1_w3 --db-dir data/BBDD --nested-output --no-gt --k 10 --output results/week3/QST1/method1/result.pkl
+
+# QST2: detect each painting, retrieve, and save one union mask per query
+python src/run_retrieval.py --config results/week3/qsd2_best.json --query-dir data/qst2_w3 --db-dir data/BBDD --multi-painting --segmentation-config configs/week3/task3_selected.json --no-gt --k 10 --output results/week3/QST2/method1/result.pkl --save-masks results/week3/QST2/method1
 ```
 
-**JSON** — edit the experiment suites in `configs/week1/` and `configs/week2/`:
+Both pickle files use **query image → painting → 10 ranked integer database IDs**. The first ID is the best match, not a confidence score. QST1 uses `--nested-output`; QST2 obtains the extra list level automatically through `--multi-painting`.
 
-```sh
-python src/run_experiments.py --config configs/week1/week1_1d_none.json --cache-dir descriptors --output results/week1/1d_none.csv --export-best results/week1/1d_none_best.json
-python src/run_experiments.py --config configs/week1/week1_1d_photometric.json --cache-dir descriptors --output results/week1/1d_photometric.csv --export-best results/week1/1d_photometric_best.json
-python src/run_experiments.py --config configs/week2/week2_joint_spatial_normalization.json --cache-dir descriptors --output results/week2/qsd1_pred_with_norm.csv --export-best results/week2/qsd1_best_with_norm.json
-```
+Query order follows sorted image IDs; painting order follows the detector's reading order. Masks are original-resolution binary PNGs: **255 = painting, 0 = background**, named like their queries (`00001.jpg` → `00001.png`).
 
-The example suites compare colour histograms, spatial layouts and pyramid weights. Their settings can be modified freely.
+The generated submission files are placed in the course GDrive folder as:
 
-**CLI** — run an experiment directly without editing a configuration file:
+- `Team8/week3/QST1/method1/result.pkl`
+- `Team8/week3/QST2/method1/result.pkl`
+- `Team8/week3/QST2/method1/*.png`
 
-```sh
-python src/run_experiments.py --descriptor hsv_hs2d --spatial-mode grid --grids 2 --measures l1 chi2 hellinger --output results/week2/quick.csv
-```
+The QST1 results contain 50 images, each with one painting. The QST2 results contain 30 images with 40 detected paintings in total: 20 images have one painting and 10 have two. Each painting has a ranked list of 10 database image IDs, with no duplicates. QST2 also requires one segmentation mask per image (30 PNG files).
 
-Use `--dry-run` to preview experiments, `--overwrite` to replace existing outputs and `-h` for more options. `--export-best` saves a configuration that can be reused with `run_retrieval.py`.
+A `.manifest.json` is generated alongside each Week 3 pickle for reproducibility; it is additional metadata. Existing result, mask or report files are not overwritten: move previous outputs or choose a new destination before rerunning.
 
-## Generating plots
-
-Each script in `src/visualizations/` produces one figure in `plots/` (`--output` to change it; `-h` for options):
-
-**Week 1**
-- `plot_best_comparison.py`: all measures for the best configuration of each descriptor.
-- `plot_hsv_histograms.py <id>` / `plot_hue_mask.py <id>`: per-image HSV histograms and Hue mask.
-- `plot_results.py`, `plot_example_descriptors.py`: report figures.
-
-**Week 2: descriptors (QSD1)**
-- `plot_descriptor_types.py`: best global mAP@5 of each descriptor type, with and without photometric normalisation.
-- `plot_block_grid_example.py`: a query split into a 4×4 grid and its concatenated descriptor.
-- `plot_grid_size_sweep.py`: mAP@5 against the number of blocks per side.
-- `plot_pyramid_vs_grid.py`: spatial pyramids against the grid of their finest level.
-- `plot_week1_vs_week2.py`: Week 1 best, Week 1 with normalisation and Week 2 best.
-- `plot_week1_vs_week2_example.py`: a query Week 1 misses and Week 2 finds, top 3 of each.
-
-**Week 2: background removal and QSD2**
-- `plot_mask_pipeline.py`: the background-removal steps on one query.
-- `plot_wall_model.py`: the fitted wall colour against lightness.
-- `plot_mask_examples.py`: predicted masks on harder queries, with errors against the ground truth.
-- `plot_block_foreground.py`: foreground percentage per block of the grid.
-- `plot_trim_limit.py`: retrieval and lost painting for each trim mode and limit.
-- `plot_foreground_descriptor.py`: how a query descriptor uses the mask.
-- `plot_qsd2_retrieval.py`: QSD2 mAP without removal, with predicted masks and with GT masks.
-- `plot_qsd2_failures.py`: the QSD2 queries wrong at rank 1.
