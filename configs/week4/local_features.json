@@ -1,0 +1,5 @@
+{
+  "sift": {"nfeatures": 1000, "nOctaveLayers": 3, "contrastThreshold": 0.04, "edgeThreshold": 10.0, "sigma": 1.6},
+  "orb": {"nfeatures": 1000, "scaleFactor": 1.2, "nlevels": 8, "edgeThreshold": 31, "patchSize": 31, "fastThreshold": 20},
+  "akaze": {"threshold": 0.001, "nOctaves": 4, "nOctaveLayers": 4}
+}
