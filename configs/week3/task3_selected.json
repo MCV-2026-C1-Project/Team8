@@ -1,7 +1,7 @@
 {
   "mode": "instances",
   "segmentation": {
-    "border_ratio": 0.04,
+    "border_ratio": 0.01,
     "threshold": 20.0,
     "mad_multiplier": 3.0,
     "sample_step": 4,
@@ -12,10 +12,10 @@
     "fill_columns": true,
     "min_component_ratio": 0.001,
     "method": "color_distribution",
-    "color_sigma": 3.0,
+    "color_sigma": 3.5,
     "min_row_foreground": 0.0,
     "min_col_foreground": 0.0,
-    "dark_mode": "robust",
+    "dark_mode": "robust", 
     "dark_percentile": 2.0,
     "dark_margin": 40.0,
     "dark_mad_multiplier": 3.0,
