@@ -378,6 +378,33 @@ def _recover_frames(image, evidence, paintings, options):
     return chosen[:options['max_paintings']]
 
 
+def _merge_overlapping_fragments(paintings):
+    """Merge two broad fragments with substantial bounding-box overlap.
+
+    Thresholds are development heuristics. Genuinely overlapping artworks can
+    also satisfy them, so validate painting counts on the complete query set.
+    """
+    if len(paintings) != 2:
+        return paintings
+
+    first, second = paintings
+    ax, ay, ar, ab = first.bbox
+    bx, by, br, bb = second.bbox
+    width_a, height_a = ar - ax, ab - ay
+    width_b, height_b = br - bx, bb - by
+    overlap_x = max(0, min(ar, br) - max(ax, bx))
+    overlap_y = max(0, min(ab, bb) - max(ay, by))
+    horizontal_overlap = overlap_x / min(width_a, width_b)
+    vertical_overlap = overlap_y / min(height_a, height_b)
+    width_similarity = min(width_a, width_b) / max(width_a, width_b)
+
+    if (horizontal_overlap >= 0.9 and vertical_overlap >= 0.3
+            and width_similarity >= 0.85):
+        merged = cv2.bitwise_or(first.mask, second.mask)
+        return [Painting(_bbox(merged), merged, 0)]
+    return paintings
+
+
 def detect_paintings(image, config=None):
     """Return (union mask, ordered Painting instances), at original resolution.
 
@@ -391,5 +418,6 @@ def detect_paintings(image, config=None):
     config = resolve_detection_config(config)
     evidence = foreground_mask(image, **config['segmentation'])
     _, paintings = _split_retry(evidence, config)
+    paintings = _merge_overlapping_fragments(paintings)
     paintings = _recover_frames(image, evidence, paintings, config['instances'])
     return _ordered_result(paintings, evidence.shape, config['instances'])
