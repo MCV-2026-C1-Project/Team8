@@ -7,6 +7,8 @@ import cv2
 import numpy as np
 
 from local_features import resolve_local_config
+from filter_noise import resolve_filter_config
+from painting_detection import resolve_detection_config
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -61,7 +63,7 @@ def resolve_scoring(config=None):
 
 def resolve_run_config(config=None, feature_defaults=None):
     result = section(config, dict(feature_method="sift", feature_params={}, matching=None, geometry=None,
-                                  scoring=None, retrieval=None, crop=None, rejection=None), "run")
+                                  scoring=None, retrieval=None, crop=None, rejection=None, query_filter=None, segmentation=None), "run")
     if feature_defaults is None:
         feature_defaults = json.loads((ROOT / "configs/week4/local_features.json").read_text(encoding="utf-8"))
     method = result["feature_method"]
@@ -70,6 +72,9 @@ def resolve_run_config(config=None, feature_defaults=None):
         raise ValueError("feature_params must be a dictionary")
     params = dict(feature_defaults.get(method, {}), **result["feature_params"])
     result["feature_params"] = resolve_local_config(method, params)["params"]
+    result["query_filter"] = resolve_filter_config(result["query_filter"])
+    if result["segmentation"] is not None:
+        result["segmentation"] = resolve_detection_config(result["segmentation"])
     result["rejection"] = resolve_rejection(result["rejection"])
     result["matching"] = resolve_matching(result["matching"])
     result["geometry"] = resolve_geometry(result["geometry"])

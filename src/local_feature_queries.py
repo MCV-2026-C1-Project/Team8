@@ -7,8 +7,6 @@ import numpy as np
 from local_features import LocalFeatures, extract_local_features, validate_image
 from painting_detection import detect_paintings, resolve_detection_config
 from retrieval import inset_box
-from pathlib import Path
-import cv2
 
 
 @dataclass
@@ -41,7 +39,7 @@ class PaintingCrop:
                                 extract_local_features(self.image, method, **params))
 
 
-def prepare_painting_crops(image_bgr, query_id, segmentation_config=None, *, crop_inset=0.03, preprocess=None):
+def prepare_painting_crops(image_bgr, query_id, segmentation_config=None, *, crop_inset=0.03, preprocess=None, detections=None):
     """Detect once; original rectangular pixels, in detector order; no GT or cache.
 
     preprocess can be the existing query_preprocessor(config) callable. It runs
@@ -56,28 +54,10 @@ def prepare_painting_crops(image_bgr, query_id, segmentation_config=None, *, cro
         raise ValueError("crop_inset must lie in [0, 0.5)")
     if preprocess is not None and not callable(preprocess):
         raise ValueError("preprocess must be callable or None")
-    _, paintings = detect_paintings(image_bgr, resolve_detection_config(segmentation_config))
-
-    # ### debug 
-    # mask, paintings = detect_paintings(
-    # image_bgr, resolve_detection_config(segmentation_config))
-
-    # # Save the detector's final mask, even when no paintings are detected.
-    # debug_dir = Path("results/week4/debug_masks")
-    # debug_dir.mkdir(parents=True, exist_ok=True)
-
-    # cv2.imwrite(str(debug_dir / f"{query_id:05d}_mask.png"), mask)
-
-    # # Highlight foreground in green over the original image.
-    # overlay = image_bgr.copy()
-    # overlay[mask > 0] = (0, 255, 0)
-    # overlay = cv2.addWeighted(image_bgr, 0.6, overlay, 0.4, 0)
-
-    # cv2.imwrite(str(debug_dir / f"{query_id:05d}_overlay.png"), overlay)
-
-    # print(f"Query {query_id:05d}: {len(paintings)} paintings detected")
-    # ### debug
-    
+    # Optional previously detected paintings let experiments share segmentation.
+    paintings = detections
+    if paintings is None:
+        _, paintings = detect_paintings(image_bgr, resolve_detection_config(segmentation_config))
     crops = []
     h, w = image_bgr.shape[:2]
     for index, painting in enumerate(paintings):

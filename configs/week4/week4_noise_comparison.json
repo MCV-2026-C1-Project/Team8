@@ -1,0 +1,41 @@
+{
+  "base_config": "local_matching_baseline.json",
+  "shared": {
+    "matching": {
+      "filter": "ratio",
+      "ratio_threshold": 0.75
+    },
+    "geometry": {
+      "estimator": "ransac",
+      "reprojection_threshold": 3.0
+    }
+  },
+  "search": {
+    "feature_method": [
+      "sift",
+      "orb",
+      "akaze"
+    ],
+    "query_filter": [
+      {
+        "name": "none"
+      },
+      {
+        "name": "median",
+        "ksize": 3,
+        "noise_threshold": 6.0
+      }
+    ],
+    "scoring.mode": [
+      "inlier_count",
+      "coverage_weighted"
+    ]
+  },
+  "evaluation": {
+    "k_values": [
+      1,
+      5
+    ],
+    "select_rejection_threshold": true
+  }
+}

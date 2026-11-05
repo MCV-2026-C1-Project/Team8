@@ -14,6 +14,7 @@ from local_matching_config import ROOT, resolve_run_config
 from local_retrieval import retrieve_local, rank_candidates, candidate_report
 from painting_detection import resolve_detection_config
 from retrieval import BBDD_DIR
+from filter_noise import query_preprocessor
 from local_rejection import painting_evidence, predict, apply_threshold, evaluate_unknown, select_threshold
 from local_development import load_development, align_boxes
 
@@ -66,7 +67,7 @@ def main(argv=None):
     parser.add_argument("--query-dir", type=Path, default=ROOT / "data/qsd1_w4")
     parser.add_argument("--db-dir", type=Path, default=BBDD_DIR)
     parser.add_argument("--cache-dir", type=Path, default=DEFAULT_CACHE_DIR)
-    parser.add_argument("--segmentation-config", type=Path, default=ROOT / "configs/week3/task3_selected.json")
+    parser.add_argument("--segmentation-config", type=Path, default=None)
     parser.add_argument("--query-limit", type=int)
     parser.add_argument("--db-limit", type=int, help="Explicit partial-database diagnostic; full caches remain intact")
     parser.add_argument("--k", type=int)
@@ -78,11 +79,13 @@ def main(argv=None):
     parser.add_argument("--output", type=Path, required=True, help="New diagnostics directory")
     parser.add_argument("--visualize-top", type=int, default=2, help="PNG candidates per painting, 0 disables")
     parser.add_argument("--show-rejected", action="store_true")
-    parser.add_argument("--detail", choices=("summary", "visualized", "all"), default="visualized")
+    parser.add_argument("--detail", choices=("compact", "summary", "visualized", "all", "full"), default=None)
     parser.add_argument("--min-inliers", type=int)
     parser.add_argument("--evaluate-dev", action="store_true", help="Explicitly load trusted QSD1-W4 labels and frames")
     parser.add_argument("--select-threshold", action="store_true", help="Select development F1 threshold; requires --evaluate-dev")
     args = parser.parse_args(argv)
+    # --show-rejected explicitly requests the legacy visual diagnostics.
+    args.detail = args.detail or ("visualized" if args.show_rejected else "compact")
     try:
         start = perf_counter()
         raw = json.loads(args.config.read_text(encoding="utf-8"))
@@ -119,7 +122,10 @@ def main(argv=None):
             raise ValueError("Top-K exceeds inspected candidate count; reduce --k or increase --db-limit")
         labels, frames = load_development(args.query_dir, paths, ids) if args.evaluate_dev else (None, None)
         development_evidence, development_labels, all_evidence, all_paintings, alignment = [], [], [], [], []
-        segmentation = resolve_detection_config(json.loads(args.segmentation_config.read_text(encoding="utf-8")))
+        segmentation = resolve_detection_config(json.loads(args.segmentation_config.read_text(encoding="utf-8"))
+            if args.segmentation_config else config["segmentation"] or json.loads((ROOT / "configs/week3/task3_selected.json").read_text(encoding="utf-8")))
+        noise_decisions = []
+        preprocess = query_preprocessor(config["query_filter"], diagnostics=noise_decisions)
         args.output.mkdir(parents=True, exist_ok=False)
         before = perf_counter()
         database = load_or_compute_database_features(args.db_dir, config["feature_method"], args.cache_dir, **config["feature_params"])
@@ -136,7 +142,7 @@ def main(argv=None):
         print(json.dumps(config, sort_keys=True), flush=True)
         for path, query_id in zip(paths[:args.query_limit], ids[:args.query_limit]):
             before = perf_counter()
-            crops = prepare_painting_crops(load_image(path), query_id, segmentation, crop_inset=config["crop"]["inset"])
+            crops = prepare_painting_crops(load_image(path), query_id, segmentation, crop_inset=config["crop"]["inset"], preprocess=preprocess)
             query = dict(image=path.name, query_id=int(query_id), segmentation_seconds=perf_counter()-before, paintings=[])
             if not crops:
                 report["warnings"].append(f"No paintings detected in {path.name}")
@@ -157,8 +163,13 @@ def main(argv=None):
                                 crop_bbox=list(crop.crop_bbox), keypoints=len(features.features.keypoints),
                                 query_feature_extraction_seconds=extraction_time, timings=timings,
                                 top_ids=[c.database_id for c in top],
-                                candidates=[candidate_report(c, i+1, mode, detail=(args.detail == "all" or
-                                            (args.detail == "visualized" and i < args.visualize_top))) for i, c in enumerate(ranked)])
+                                candidates=[candidate_report(c, i+1, mode, detail=(args.detail in ("all", "full") or
+                                            (args.detail == "visualized" and i < args.visualize_top))) for i, c in enumerate(top if args.detail == "compact" else ranked)])
+                if args.detail == "compact":
+                    painting["candidates"] = [dict(database_id=c.database_id, rank=i+1,
+                        selected_score=float(c.scores[mode]), inlier_count=c.verification.inlier_count,
+                        filtered_count=c.verification.matches.count, verified=c.verification.success)
+                        for i,c in enumerate(top)]
                 decision = painting_evidence(ranked, config["retrieval"]["k"])
                 query_evidence.append(decision)
                 all_evidence.append(decision)
@@ -170,7 +181,8 @@ def main(argv=None):
                 for i, c in enumerate(ranked[:args.visualize_top]):
                     name = f"{path.stem}_painting_{crop.painting_index}_rank_{i+1}_db_{c.database_id}.png"
                     draw_candidate(args.output / name, crop.image, load_image(args.db_dir / c.filename), c, mode, args.show_rejected)
-                    painting["candidates"][i]["visualization"] = name
+                    if i < len(painting["candidates"]):
+                        painting["candidates"][i]["visualization"] = name
                 query["paintings"].append(painting)
                 print(f"{path.name}/{crop.painting_index}: {painting['top_ids']}; inliers {[c.verification.inlier_count for c in top]}", flush=True)
             if labels is not None:
@@ -205,6 +217,7 @@ def main(argv=None):
                 report["warnings"].append("Unknown F1 excludes unmatched paintings; inspect missing/extra detection counts")
             print(f"Development unknown F1={evaluation['metrics']['f1']:.6f}; threshold={threshold}; "
                   f"missing={evaluation['missing']}, extra={evaluation['extra']}; {evaluation['scope']}", flush=True)
+        report["noise_decisions"] = noise_decisions
         report["timings"]["total_run"] = perf_counter()-start
         for warning in report["warnings"]:
             print(f"Warning: {warning}")
