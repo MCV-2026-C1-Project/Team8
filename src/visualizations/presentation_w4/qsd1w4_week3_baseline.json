@@ -1,0 +1,1022 @@
+{
+ "status": "ok",
+ "configuration": {
+  "config": {
+   "descriptor": "dct",
+   "params": {
+    "n_coeffs": 32,
+    "resize": 256,
+    "spatial": {
+     "grids": [
+      2
+     ],
+     "level_weights": [
+      1.0
+     ],
+     "mode": "grid"
+    }
+   }
+  },
+  "measure": "l1",
+  "select_by": "qsd2_map1",
+  "development_metrics": {
+   "qsd2_map1": 0.9487179487179487,
+   "qsd2_map5": 0.9487179487179487,
+   "qsd1_map1": 0.9666666666666667,
+   "qsd1_map5": 0.9666666666666667
+  },
+  "provenance": {
+   "source": "C:\\Users\\bielb\\Documents\\MCV\\C1\\project\\Team8\\configs\\week3\\qsd2_search.json",
+   "query_filter": {
+    "name": "median",
+    "ksize": 3,
+    "noise_threshold": 6.0
+   },
+   "crop_inset": 0.03,
+   "fusion": {
+    "config": {
+     "descriptor": "lab",
+     "params": {
+      "bins": [
+       8,
+       64,
+       64
+      ],
+      "spatial": {
+       "grids": [
+        5
+       ],
+       "level_weights": [
+        1.0
+       ],
+       "mode": "grid"
+      }
+     }
+    },
+    "measure": "l1",
+    "weight": 0.5
+   },
+   "query_filter_note": "Task 1 selective median; ties the unfiltered model on QSD2-W3/QSD1-W3, kept for a single Task 1-4 pipeline"
+  }
+ },
+ "segmentation": {
+  "mode": "instances",
+  "segmentation": {
+   "border_ratio": 0.01,
+   "threshold": 20.0,
+   "mad_multiplier": 3.0,
+   "sample_step": 4,
+   "l_weight": 0.5,
+   "fill_interior": false,
+   "fill_rows": true,
+   "closing_size": 5,
+   "fill_columns": true,
+   "min_component_ratio": 0.001,
+   "method": "color_distribution",
+   "color_sigma": 3.5,
+   "min_row_foreground": 0.0,
+   "min_col_foreground": 0.0,
+   "dark_mode": "robust",
+   "dark_percentile": 2.0,
+   "dark_margin": 40.0,
+   "dark_mad_multiplier": 3.0,
+   "dark_mad_floor": 10.0
+  },
+  "instances": {
+   "max_paintings": 2,
+   "min_fragment_area": 0.0002,
+   "min_area": 0.003,
+   "min_side": 0.03,
+   "min_aspect": 0.1,
+   "max_aspect": 10.0,
+   "min_fill": 0.1,
+   "group_gap": 0.05,
+   "group_overlap": 0.6,
+   "group_area_ratio": 0.8,
+   "group_solid_fill": 0.85,
+   "group_slenderness": 0.25,
+   "refinement": "hull",
+   "closing_ratio": 0.0,
+   "vertical_overlap": 0.5
+  }
+ },
+ "metrics": {
+  "known_ranking_map": {
+   "1": 0.8620689655172413,
+   "5": 0.8908045977011494
+  },
+  "known_after_rejection_map": {
+   "1": 0.8620689655172413,
+   "5": 0.8908045977011494
+  },
+  "overall_map": {
+   "1": 0.6410256410256411,
+   "5": 0.6623931623931624
+  },
+  "detection_aware_map": {
+   "1": 0.6410256410256411,
+   "5": 0.6623931623931624
+  },
+  "paintings": 39,
+  "known": 29,
+  "unknown": 10,
+  "missing": 0,
+  "extra": 0,
+  "unknown_detection": {
+   "tp": 0,
+   "fp": 0,
+   "fn": 10,
+   "tn": 29,
+   "precision": 0.0,
+   "recall": 0.0,
+   "f1": 0.0,
+   "precision_defined": false,
+   "recall_defined": true,
+   "f1_defined": true,
+   "paintings": 39,
+   "known": 29,
+   "unknown": 10,
+   "accepted": 39,
+   "rejected": 0,
+   "positive_class": "unknown",
+   "zero_division": 0
+  },
+  "unknown_metric_scope": "aligned paintings only",
+  "retrieval_scope": "all annotated paintings; missing AP=0",
+  "provenance": "QSD1-W4 development; not independent generalization performance"
+ },
+ "runtime": 39.9267018999999,
+ "predictions": [
+  [
+   [
+    26,
+    53,
+    78,
+    11,
+    128
+   ]
+  ],
+  [
+   [
+    150,
+    176,
+    95,
+    137,
+    130
+   ]
+  ],
+  [
+   [
+    48,
+    111,
+    92,
+    74,
+    149
+   ],
+   [
+    251,
+    105,
+    172,
+    29,
+    177
+   ]
+  ],
+  [
+   [
+    32,
+    210,
+    109,
+    46,
+    61
+   ]
+  ],
+  [
+   [
+    161,
+    3,
+    82,
+    61,
+    193
+   ]
+  ],
+  [
+   [
+    81,
+    105,
+    93,
+    205,
+    82
+   ]
+  ],
+  [
+   [
+    62,
+    199,
+    173,
+    218,
+    3
+   ],
+   [
+    38,
+    229,
+    2,
+    141,
+    73
+   ]
+  ],
+  [
+   [
+    238,
+    240,
+    11,
+    247,
+    128
+   ]
+  ],
+  [
+   [
+    279,
+    180,
+    248,
+    259,
+    273
+   ]
+  ],
+  [
+   [
+    155,
+    3,
+    81,
+    104,
+    265
+   ],
+   [
+    258,
+    75,
+    127,
+    73,
+    176
+   ]
+  ],
+  [
+   [
+    136,
+    140,
+    193,
+    163,
+    29
+   ],
+   [
+    76,
+    249,
+    43,
+    103,
+    88
+   ]
+  ],
+  [
+   [
+    205,
+    14,
+    149,
+    93,
+    3
+   ]
+  ],
+  [
+   [
+    82,
+    163,
+    161,
+    137,
+    76
+   ]
+  ],
+  [
+   [
+    53,
+    55,
+    74,
+    155,
+    128
+   ]
+  ],
+  [
+   [
+    226,
+    146,
+    59,
+    148,
+    68
+   ]
+  ],
+  [
+   [
+    12,
+    50,
+    93,
+    137,
+    200
+   ]
+  ],
+  [
+   [
+    238,
+    11,
+    247,
+    128,
+    125
+   ],
+   [
+    205,
+    93,
+    252,
+    220,
+    194
+   ]
+  ],
+  [
+   [
+    108,
+    226,
+    68,
+    125,
+    35
+   ]
+  ],
+  [
+   [
+    182,
+    186,
+    252,
+    93,
+    97
+   ],
+   [
+    252,
+    205,
+    125,
+    244,
+    245
+   ]
+  ],
+  [
+   [
+    279,
+    244,
+    34,
+    260,
+    248
+   ]
+  ],
+  [
+   [
+    272,
+    222,
+    271,
+    125,
+    279
+   ],
+   [
+    117,
+    73,
+    191,
+    85,
+    268
+   ]
+  ],
+  [
+   [
+    73,
+    170,
+    180,
+    10,
+    208
+   ]
+  ],
+  [
+   [
+    242,
+    57,
+    31,
+    210,
+    259
+   ]
+  ],
+  [
+   [
+    260,
+    279,
+    248,
+    81,
+    61
+   ]
+  ],
+  [
+   [
+    94,
+    88,
+    103,
+    130,
+    23
+   ],
+   [
+    132,
+    130,
+    103,
+    63,
+    57
+   ]
+  ],
+  [
+   [
+    223,
+    57,
+    171,
+    103,
+    88
+   ]
+  ],
+  [
+   [
+    108,
+    11,
+    106,
+    173,
+    238
+   ]
+  ],
+  [
+   [
+    127,
+    73,
+    75,
+    2,
+    170
+   ]
+  ],
+  [
+   [
+    36,
+    189,
+    47,
+    77,
+    52
+   ],
+   [
+    13,
+    245,
+    122,
+    11,
+    3
+   ]
+  ],
+  [
+   [
+    176,
+    82,
+    109,
+    107,
+    137
+   ]
+  ]
+ ],
+ "alignment": [
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9288691524037752
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.8956454948932886
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0,
+    1
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.8119514472455649,
+     0.0
+    ],
+    [
+     0.0,
+     0.8461752169558192
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.947128104321825
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9724144969066215
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9634558544903372
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0,
+    1
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.7671611173639945,
+     0.0
+    ],
+    [
+     0.00016121366937261225,
+     0.9355732304241074
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9556568592722064
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9682803983924867
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0,
+    1
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9674940008783811,
+     0.0
+    ],
+    [
+     0.0,
+     0.8464421768707483
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0,
+    1
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9183917039558371,
+     0.0
+    ],
+    [
+     0.0,
+     0.9338097283181369
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9807125960446361
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9328571674180237
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9816378784799837
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9482532004349847
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9403525106949354
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0,
+    1
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.833194009056078,
+     0.0
+    ],
+    [
+     0.0,
+     0.8035956006768189
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9555024286464148
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0,
+    1
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.772895747691893,
+     0.0
+    ],
+    [
+     0.0,
+     0.763722435282838
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9534014813532355
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0,
+    1
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.5834684074758596,
+     0.0
+    ],
+    [
+     0.0,
+     0.9208280742890067
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9618177773917113
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9524038461538461
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9554279355364347
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0,
+    1
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.924006908462867,
+     0.0
+    ],
+    [
+     0.0,
+     0.9457054156605726
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.8567647695028693
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9782115157167627
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9136410940193177
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0,
+    1
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9246807795698925,
+     0.0
+    ],
+    [
+     0.0,
+     0.9164820253452832
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  },
+  {
+   "matches": [
+    0
+   ],
+   "missing": 0,
+   "extra": 0,
+   "missing_gt_indices": [],
+   "extra_detection_indices": [],
+   "iou_threshold": 0.5,
+   "ious": [
+    [
+     0.9383529394715581
+    ]
+   ],
+   "policy": "unique geometry-only IoU; F1 on matched paintings only"
+  }
+ ],
+ "scope": "full_development_set",
+ "note": "Exact Week 3 retrieval; no unknown rejection; full inference even for evaluation subsets"
+}
