@@ -1,0 +1,1102 @@
+{
+ "metrics": {
+  "known_ranking_map": {
+   "1": 0.9310344827586207,
+   "5": 0.9310344827586207
+  },
+  "known_after_rejection_map": {
+   "1": 0.9310344827586207,
+   "5": 0.9310344827586207
+  },
+  "overall_map": {
+   "1": 0.9487179487179487,
+   "5": 0.9487179487179487
+  },
+  "detection_aware_map": {
+   "1": 0.9487179487179487,
+   "5": 0.9487179487179487
+  },
+  "paintings": 39,
+  "known": 29,
+  "unknown": 10,
+  "missing": 0,
+  "extra": 0,
+  "unknown_detection": {
+   "tp": 10,
+   "fp": 2,
+   "fn": 0,
+   "tn": 27,
+   "precision": 0.8333333333333334,
+   "recall": 1.0,
+   "f1": 0.9090909090909091,
+   "precision_defined": true,
+   "recall_defined": true,
+   "f1_defined": true,
+   "paintings": 39,
+   "known": 29,
+   "unknown": 10,
+   "accepted": 27,
+   "rejected": 12,
+   "positive_class": "unknown",
+   "zero_division": 0
+  },
+  "unknown_metric_scope": "aligned paintings only",
+  "retrieval_scope": "all annotated paintings; missing AP=0",
+  "provenance": "QSD1-W4 development; not independent generalization performance"
+ },
+ "paintings": [
+  {
+   "query_id": 0,
+   "gt_index": 0,
+   "truth": -1,
+   "index": 0,
+   "top5": [
+    9,
+    13,
+    27,
+    29,
+    31
+   ],
+   "inliers": [
+    4,
+    4,
+    4,
+    4,
+    4
+   ],
+   "rejected": true,
+   "bbox": [
+    110,
+    125,
+    2016,
+    3554
+   ]
+  },
+  {
+   "query_id": 1,
+   "gt_index": 0,
+   "truth": 150,
+   "index": 0,
+   "top5": [
+    150,
+    5,
+    17,
+    33,
+    36
+   ],
+   "inliers": [
+    64,
+    4,
+    4,
+    4,
+    4
+   ],
+   "rejected": false,
+   "bbox": [
+    20,
+    59,
+    474,
+    678
+   ]
+  },
+  {
+   "query_id": 2,
+   "gt_index": 0,
+   "truth": 48,
+   "index": 0,
+   "top5": [
+    48,
+    0,
+    1,
+    2,
+    3
+   ],
+   "inliers": [
+    124,
+    0,
+    0,
+    0,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    23,
+    44,
+    404,
+    492
+   ]
+  },
+  {
+   "query_id": 2,
+   "gt_index": 1,
+   "truth": 251,
+   "index": 1,
+   "top5": [
+    251,
+    9,
+    97,
+    0,
+    1
+   ],
+   "inliers": [
+    34,
+    4,
+    4,
+    0,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    445,
+    36,
+    842,
+    491
+   ]
+  },
+  {
+   "query_id": 3,
+   "gt_index": 0,
+   "truth": 32,
+   "index": 0,
+   "top5": [
+    32,
+    0,
+    1,
+    2,
+    3
+   ],
+   "inliers": [
+    20,
+    0,
+    0,
+    0,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    45,
+    45,
+    442,
+    344
+   ]
+  },
+  {
+   "query_id": 4,
+   "gt_index": 0,
+   "truth": 161,
+   "index": 0,
+   "top5": [
+    161,
+    0,
+    1,
+    2,
+    3
+   ],
+   "inliers": [
+    358,
+    0,
+    0,
+    0,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    91,
+    127,
+    1453,
+    2283
+   ]
+  },
+  {
+   "query_id": 5,
+   "gt_index": 0,
+   "truth": 81,
+   "index": 0,
+   "top5": [
+    81,
+    17,
+    24,
+    51,
+    115
+   ],
+   "inliers": [
+    200,
+    4,
+    4,
+    4,
+    4
+   ],
+   "rejected": false,
+   "bbox": [
+    75,
+    87,
+    1602,
+    1995
+   ]
+  },
+  {
+   "query_id": 6,
+   "gt_index": 0,
+   "truth": 62,
+   "index": 0,
+   "top5": [
+    62,
+    0,
+    1,
+    2,
+    3
+   ],
+   "inliers": [
+    148,
+    0,
+    0,
+    0,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    183,
+    42,
+    467,
+    389
+   ]
+  },
+  {
+   "query_id": 6,
+   "gt_index": 1,
+   "truth": 38,
+   "index": 1,
+   "top5": [
+    38,
+    275,
+    0,
+    1,
+    2
+   ],
+   "inliers": [
+    16,
+    4,
+    0,
+    0,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    61,
+    409,
+    464,
+    778
+   ]
+  },
+  {
+   "query_id": 7,
+   "gt_index": 0,
+   "truth": -1,
+   "index": 0,
+   "top5": [
+    6,
+    8,
+    13,
+    15,
+    17
+   ],
+   "inliers": [
+    4,
+    4,
+    4,
+    4,
+    4
+   ],
+   "rejected": true,
+   "bbox": [
+    66,
+    105,
+    1336,
+    2428
+   ]
+  },
+  {
+   "query_id": 8,
+   "gt_index": 0,
+   "truth": 128,
+   "index": 0,
+   "top5": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "inliers": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "rejected": true,
+   "bbox": [
+    76,
+    74,
+    465,
+    624
+   ]
+  },
+  {
+   "query_id": 9,
+   "gt_index": 0,
+   "truth": 155,
+   "index": 0,
+   "top5": [
+    155,
+    66,
+    86,
+    87,
+    142
+   ],
+   "inliers": [
+    145,
+    4,
+    4,
+    4,
+    4
+   ],
+   "rejected": false,
+   "bbox": [
+    63,
+    54,
+    612,
+    601
+   ]
+  },
+  {
+   "query_id": 9,
+   "gt_index": 1,
+   "truth": 258,
+   "index": 1,
+   "top5": [
+    258,
+    242,
+    0,
+    1,
+    2
+   ],
+   "inliers": [
+    47,
+    4,
+    0,
+    0,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    816,
+    167,
+    1050,
+    443
+   ]
+  },
+  {
+   "query_id": 10,
+   "gt_index": 0,
+   "truth": 136,
+   "index": 0,
+   "top5": [
+    136,
+    13,
+    61,
+    165,
+    172
+   ],
+   "inliers": [
+    76,
+    4,
+    4,
+    4,
+    4
+   ],
+   "rejected": false,
+   "bbox": [
+    31,
+    86,
+    466,
+    649
+   ]
+  },
+  {
+   "query_id": 10,
+   "gt_index": 1,
+   "truth": 76,
+   "index": 1,
+   "top5": [
+    76,
+    17,
+    34,
+    36,
+    44
+   ],
+   "inliers": [
+    299,
+    4,
+    4,
+    4,
+    4
+   ],
+   "rejected": false,
+   "bbox": [
+    684,
+    57,
+    1297,
+    646
+   ]
+  },
+  {
+   "query_id": 11,
+   "gt_index": 0,
+   "truth": -1,
+   "index": 0,
+   "top5": [
+    175,
+    208,
+    243,
+    267,
+    0
+   ],
+   "inliers": [
+    4,
+    4,
+    4,
+    4,
+    0
+   ],
+   "rejected": true,
+   "bbox": [
+    117,
+    75,
+    3046,
+    1842
+   ]
+  },
+  {
+   "query_id": 12,
+   "gt_index": 0,
+   "truth": -1,
+   "index": 0,
+   "top5": [
+    9,
+    17,
+    29,
+    66,
+    70
+   ],
+   "inliers": [
+    4,
+    4,
+    4,
+    4,
+    4
+   ],
+   "rejected": true,
+   "bbox": [
+    86,
+    62,
+    1574,
+    1556
+   ]
+  },
+  {
+   "query_id": 13,
+   "gt_index": 0,
+   "truth": 53,
+   "index": 0,
+   "top5": [
+    53,
+    0,
+    1,
+    2,
+    3
+   ],
+   "inliers": [
+    40,
+    0,
+    0,
+    0,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    73,
+    70,
+    698,
+    591
+   ]
+  },
+  {
+   "query_id": 14,
+   "gt_index": 0,
+   "truth": -1,
+   "index": 0,
+   "top5": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "inliers": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "rejected": true,
+   "bbox": [
+    140,
+    71,
+    3502,
+    2306
+   ]
+  },
+  {
+   "query_id": 15,
+   "gt_index": 0,
+   "truth": 12,
+   "index": 0,
+   "top5": [
+    12,
+    0,
+    1,
+    2,
+    3
+   ],
+   "inliers": [
+    174,
+    0,
+    0,
+    0,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    36,
+    51,
+    523,
+    662
+   ]
+  },
+  {
+   "query_id": 16,
+   "gt_index": 0,
+   "truth": 11,
+   "index": 0,
+   "top5": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "inliers": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "rejected": true,
+   "bbox": [
+    19,
+    66,
+    347,
+    531
+   ]
+  },
+  {
+   "query_id": 16,
+   "gt_index": 1,
+   "truth": 280,
+   "index": 1,
+   "top5": [
+    280,
+    0,
+    1,
+    2,
+    3
+   ],
+   "inliers": [
+    51,
+    0,
+    0,
+    0,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    631,
+    197,
+    857,
+    382
+   ]
+  },
+  {
+   "query_id": 17,
+   "gt_index": 0,
+   "truth": -1,
+   "index": 0,
+   "top5": [
+    0,
+    9,
+    18,
+    22,
+    27
+   ],
+   "inliers": [
+    4,
+    4,
+    4,
+    4,
+    4
+   ],
+   "rejected": true,
+   "bbox": [
+    165,
+    95,
+    3217,
+    1305
+   ]
+  },
+  {
+   "query_id": 18,
+   "gt_index": 0,
+   "truth": 182,
+   "index": 0,
+   "top5": [
+    182,
+    0,
+    1,
+    2,
+    3
+   ],
+   "inliers": [
+    35,
+    0,
+    0,
+    0,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    60,
+    41,
+    460,
+    238
+   ]
+  },
+  {
+   "query_id": 18,
+   "gt_index": 1,
+   "truth": 252,
+   "index": 1,
+   "top5": [
+    252,
+    3,
+    189,
+    0,
+    1
+   ],
+   "inliers": [
+    46,
+    4,
+    4,
+    0,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    635,
+    13,
+    951,
+    293
+   ]
+  },
+  {
+   "query_id": 19,
+   "gt_index": 0,
+   "truth": -1,
+   "index": 0,
+   "top5": [
+    143,
+    273,
+    0,
+    1,
+    2
+   ],
+   "inliers": [
+    4,
+    4,
+    0,
+    0,
+    0
+   ],
+   "rejected": true,
+   "bbox": [
+    111,
+    59,
+    2614,
+    1703
+   ]
+  },
+  {
+   "query_id": 20,
+   "gt_index": 0,
+   "truth": 272,
+   "index": 0,
+   "top5": [
+    272,
+    109,
+    0,
+    1,
+    2
+   ],
+   "inliers": [
+    58,
+    4,
+    0,
+    0,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    177,
+    41,
+    702,
+    381
+   ]
+  },
+  {
+   "query_id": 20,
+   "gt_index": 1,
+   "truth": 117,
+   "index": 1,
+   "top5": [
+    117,
+    49,
+    61,
+    165,
+    181
+   ],
+   "inliers": [
+    196,
+    4,
+    4,
+    4,
+    4
+   ],
+   "rejected": false,
+   "bbox": [
+    56,
+    411,
+    672,
+    779
+   ]
+  },
+  {
+   "query_id": 21,
+   "gt_index": 0,
+   "truth": -1,
+   "index": 0,
+   "top5": [
+    6,
+    47,
+    112,
+    141,
+    150
+   ],
+   "inliers": [
+    4,
+    4,
+    4,
+    4,
+    4
+   ],
+   "rejected": true,
+   "bbox": [
+    143,
+    112,
+    2141,
+    1209
+   ]
+  },
+  {
+   "query_id": 22,
+   "gt_index": 0,
+   "truth": 242,
+   "index": 0,
+   "top5": [
+    242,
+    0,
+    1,
+    2,
+    3
+   ],
+   "inliers": [
+    131,
+    0,
+    0,
+    0,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    28,
+    70,
+    272,
+    612
+   ]
+  },
+  {
+   "query_id": 23,
+   "gt_index": 0,
+   "truth": 260,
+   "index": 0,
+   "top5": [
+    260,
+    4,
+    7,
+    13,
+    17
+   ],
+   "inliers": [
+    159,
+    4,
+    4,
+    4,
+    4
+   ],
+   "rejected": false,
+   "bbox": [
+    78,
+    104,
+    1460,
+    2034
+   ]
+  },
+  {
+   "query_id": 24,
+   "gt_index": 0,
+   "truth": 94,
+   "index": 0,
+   "top5": [
+    94,
+    183,
+    9,
+    61,
+    89
+   ],
+   "inliers": [
+    18,
+    5,
+    4,
+    4,
+    4
+   ],
+   "rejected": false,
+   "bbox": [
+    51,
+    75,
+    777,
+    651
+   ]
+  },
+  {
+   "query_id": 24,
+   "gt_index": 1,
+   "truth": 132,
+   "index": 1,
+   "top5": [
+    132,
+    63,
+    271,
+    277,
+    0
+   ],
+   "inliers": [
+    34,
+    4,
+    4,
+    4,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    1081,
+    56,
+    1937,
+    685
+   ]
+  },
+  {
+   "query_id": 25,
+   "gt_index": 0,
+   "truth": 223,
+   "index": 0,
+   "top5": [
+    223,
+    0,
+    1,
+    2,
+    3
+   ],
+   "inliers": [
+    8,
+    0,
+    0,
+    0,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    17,
+    29,
+    384,
+    407
+   ]
+  },
+  {
+   "query_id": 26,
+   "gt_index": 0,
+   "truth": -1,
+   "index": 0,
+   "top5": [
+    61,
+    0,
+    1,
+    2,
+    3
+   ],
+   "inliers": [
+    4,
+    0,
+    0,
+    0,
+    0
+   ],
+   "rejected": true,
+   "bbox": [
+    157,
+    142,
+    3168,
+    2438
+   ]
+  },
+  {
+   "query_id": 27,
+   "gt_index": 0,
+   "truth": 127,
+   "index": 0,
+   "top5": [
+    127,
+    0,
+    1,
+    2,
+    3
+   ],
+   "inliers": [
+    399,
+    0,
+    0,
+    0,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    67,
+    39,
+    663,
+    494
+   ]
+  },
+  {
+   "query_id": 28,
+   "gt_index": 0,
+   "truth": 47,
+   "index": 0,
+   "top5": [
+    47,
+    231,
+    280,
+    0,
+    1
+   ],
+   "inliers": [
+    9,
+    4,
+    4,
+    0,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    54,
+    33,
+    491,
+    393
+   ]
+  },
+  {
+   "query_id": 28,
+   "gt_index": 1,
+   "truth": 13,
+   "index": 1,
+   "top5": [
+    13,
+    52,
+    0,
+    1,
+    2
+   ],
+   "inliers": [
+    59,
+    10,
+    0,
+    0,
+    0
+   ],
+   "rejected": false,
+   "bbox": [
+    31,
+    442,
+    522,
+    821
+   ]
+  },
+  {
+   "query_id": 29,
+   "gt_index": 0,
+   "truth": -1,
+   "index": 0,
+   "top5": [
+    261,
+    0,
+    1,
+    2,
+    3
+   ],
+   "inliers": [
+    4,
+    0,
+    0,
+    0,
+    0
+   ],
+   "rejected": true,
+   "bbox": [
+    150,
+    143,
+    2642,
+    2588
+   ]
+  }
+ ]
+}
