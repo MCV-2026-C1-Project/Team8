@@ -95,7 +95,7 @@ The retrieval table groups comparisons by dataset. QSD1-W1 was reused for the We
 | 3 | QSD2-W3 | Coarser DCT + 3% crop inset | 0.8462 | 0.8803 |
 | 3 | QSD2-W3 | Lab only, 5×5 grid, L1 | 0.7436 | 0.7628 |
 | 3 | QSD2-W3 | Final DCT + Lab fusion | **0.9487** | **0.9487** |
-| 4 | QSD1-W4 | Local features, geometric verification and unknown rejection | — | — |
+| 4 | QSD1-W4 | Local features, geometric verification and unknown rejection | **0.949** | **0.949** |
 
 The Week 4 experiment runner writes the scores to `summary.json` and `results.csv`. The repository tracks the experiment configurations.
 
