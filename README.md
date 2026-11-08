@@ -95,9 +95,11 @@ The retrieval table groups comparisons by dataset. QSD1-W1 was reused for the We
 | 3 | QSD2-W3 | Coarser DCT + 3% crop inset | 0.8462 | 0.8803 |
 | 3 | QSD2-W3 | Lab only, 5×5 grid, L1 | 0.7436 | 0.7628 |
 | 3 | QSD2-W3 | Final DCT + Lab fusion | **0.9487** | **0.9487** |
-| 4 | QSD1-W4 | Local features, geometric verification and unknown rejection | **0.949** | **0.949** |
+| 4 | QSD1-W4 | SIFT, ratio 0.65, USAC/MAGSAC at 2.5 px, inlier count, T = 5 | **0.9487** | **0.9487** |
+| 4 | QSD1-W4 | AKAZE, ratio 0.65 + mutual check, USAC/MAGSAC at 4 px, inlier count, T = 7 | **0.9487** | **0.9487** |
+| 4 | QSD1-W4 | ORB, ratio 0.85 + mutual check, RANSAC at 4 px, coverage-weighted score, T = 8 | 0.8721 | 0.8721 |
 
-The Week 4 experiment runner writes the scores to `summary.json` and `results.csv`. The repository tracks the experiment configurations.
+For Week 4, T is the minimum number of verified inliers required to accept the top-ranked candidate. Reprojection thresholds are in normalised pixels. The Week 4 experiment runner writes the scores to `summary.json` and `results.csv`. The repository tracks the experiment configurations.
 
 | Segmentation dataset | Method | Mean precision | Mean recall | Mean F1 | Correct painting count |
 |---|---|---:|---:|---:|---:|
