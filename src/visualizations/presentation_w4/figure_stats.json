@@ -1,0 +1,88 @@
+{
+  "detection": {
+    "query": 8,
+    "paintings": 2,
+    "labels": [
+      104,
+      130
+    ]
+  },
+  "keypoints": {
+    "query": 15,
+    "shape": [
+      1359,
+      1588
+    ],
+    "sift": {
+      "count": 1000,
+      "bytes": 512
+    },
+    "orb": {
+      "count": 1000,
+      "bytes": 32
+    },
+    "akaze": {
+      "count": 2880,
+      "bytes": 61
+    }
+  },
+  "matching": {
+    "query": 3,
+    "truth": 259,
+    "tentative": 1000,
+    "ratio": 147,
+    "ratio_mutual": 142,
+    "inliers": 95,
+    "ransac_inliers": 97,
+    "shown_before": 200,
+    "top5": [
+      {
+        "id": 259,
+        "inliers": 95,
+        "coverage": 71.25
+      },
+      {
+        "id": 2,
+        "inliers": 4,
+        "coverage": 0.8660254037844386
+      },
+      {
+        "id": 3,
+        "inliers": 4,
+        "coverage": 0.8660254037844386
+      },
+      {
+        "id": 29,
+        "inliers": 4,
+        "coverage": 1.0
+      },
+      {
+        "id": 31,
+        "inliers": 4,
+        "coverage": 0.8660254037844386
+      }
+    ]
+  },
+  "unknown": {
+    "known": {
+      "query": 4,
+      "truth": 161,
+      "top": 161,
+      "inliers": 358
+    },
+    "unknown": {
+      "query": 26,
+      "truth": -1,
+      "top": 61,
+      "inliers": 4
+    }
+  },
+  "failure_128": {
+    "query": 8,
+    "inliers": 0
+  },
+  "failure_11": {
+    "query": 16,
+    "inliers": 0
+  }
+}

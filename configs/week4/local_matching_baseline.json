@@ -1,0 +1,9 @@
+{
+  "feature_method": "sift",
+  "feature_params": {},
+  "matching": {"backend": "bf", "filter": "ratio", "ratio_threshold": 0.75},
+  "geometry": {"model": "homography", "estimator": "ransac", "reprojection_threshold": 3.0, "reference_long_side": 1000, "max_iterations": 2000, "confidence": 0.995},
+  "scoring": {"mode": "inlier_count", "coverage_grid": [4, 4]},
+  "retrieval": {"k": 5},
+  "crop": {"inset": 0.03}
+}
