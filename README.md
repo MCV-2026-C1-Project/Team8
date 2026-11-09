@@ -2,6 +2,8 @@
 
 Given a museum photograph, the system locates up to two paintings, crops each one and ranks matching paintings from the museum database (BBDD). Weeks 1–3 developed global colour and texture baselines. Week 4 adds local feature matching, geometric verification and rejection of paintings absent from the database.
 
+Link for the slides: https://uab-my.sharepoint.com/:p:/g/personal/1631745_uab_cat/IQDN8u6e1zAvTZouX8wDdbe6AZNUEp0UFwDYW8EjmjtAhv0?rtime=wWD0XzM-30g
+
 ## Setup
 
 From the repository root, create and activate a virtual environment, then install the dependencies.
